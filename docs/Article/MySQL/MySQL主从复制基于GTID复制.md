@@ -40,9 +40,9 @@ gtid在master和slave上是一直 **持久化保存** (即使删除了日志，�
 
    注意，主从复制的情况下，sync-binlog基本上都会设置为1，这表示在每次提交事务时将缓存中的binlog刷盘。所以，在事务提交前，gtid以及事务相关操作的信息都在缓存中，提交后它们才写入到binlog file中，然后才会被dump线程dump出去。
 
-   换句话说， **只有提交了的事务，gtid和对应的事务操作才会记录到binlog文件中。记录的格式是先记录gtid，紧跟着再记录事务相关的操作。** 2.  当binlog传送到relay log中后，slave上的SQL线程首先读取该gtid，并设置变量 _gtid_next_ 的值为该gtid，表示下一个要操作的事务是该gtid。 _gtid_next_ **是基于会话的，不同会话的gtid_next不同。** 3.  随后slave检测该gtid在自己的binlog中是否存在。如果存在，则放弃此gtid事务；如果不存在，则将此gtid写入到 **自己的binlog中** ，然后立刻执行该事务，并在自己的binlog中记录该事务相关的操作。
+   换句话说，**只有提交了的事务，gtid和对应的事务操作才会记录到binlog文件中。记录的格式是先记录gtid，紧跟着再记录事务相关的操作。** 2.  当binlog传送到relay log中后，slave上的SQL线程首先读取该gtid，并设置变量 _gtid_next_ 的值为该gtid，表示下一个要操作的事务是该gtid。 _gtid_next_ **是基于会话的，不同会话的gtid_next不同。** 3.  随后slave检测该gtid在自己的binlog中是否存在。如果存在，则放弃此gtid事务；如果不存在，则将此gtid写入到 **自己的binlog中**，然后立刻执行该事务，并在自己的binlog中记录该事务相关的操作。
 
-   注意， **slave上replay的时候，gtid不是提交后才写到自己的binlog file的，而是判断gtid不存在后立即写入binlog file。** 通过这种在执行事务前先检查并写gtid到binlog的机制，不仅可以保证当前会话在此之前没有执行过该事务，还能保证没有其他会话读取了该gtid却没有提交。因为如果其他会话读取了该gtid会立即写入到binlog(不管是否已经开始执行事务)，所以当前会话总能读取到binlog中的该gtid，于是当前会话就会放弃该事务。总之，一个gtid事务是决不允许多次执行、多个会话并行执行的。
+   注意，**slave上replay的时候，gtid不是提交后才写到自己的binlog file的，而是判断gtid不存在后立即写入binlog file。** 通过这种在执行事务前先检查并写gtid到binlog的机制，不仅可以保证当前会话在此之前没有执行过该事务，还能保证没有其他会话读取了该gtid却没有提交。因为如果其他会话读取了该gtid会立即写入到binlog(不管是否已经开始执行事务)，所以当前会话总能读取到binlog中的该gtid，于是当前会话就会放弃该事务。总之，一个gtid事务是决不允许多次执行、多个会话并行执行的。
 
 1. slave在重放relay log中的事务时，不会自己生成gtid，所以所有的slave(无论是何种方式的一主一从或一主多从复制架构)通过重放relay log中事务获取的gtid都来源于master，并永久保存在slave上。
 

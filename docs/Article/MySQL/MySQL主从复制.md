@@ -19,13 +19,13 @@ mysql复制是指从一个mysql服务器(MASTER)将数据 **通过日志的方�
 
 它的工作原理很简单。首先 **确保master数据库上开启了二进制日志，这是复制的前提** 。
 
-- 在slave准备开始复制时，首先 **要执行change master to语句设置连接到master服务器的连接参数** ，在执行该语句的时候要提供一些信息，包括如何连接和要从哪复制binlog，这些信息在连接的时候会记录到slave的datadir下的master.info文件中，以后再连接master的时候将不用再提供这新信息而是直接读取该文件进行连接。
+- 在slave准备开始复制时，首先 **要执行change master to语句设置连接到master服务器的连接参数**，在执行该语句的时候要提供一些信息，包括如何连接和要从哪复制binlog，这些信息在连接的时候会记录到slave的datadir下的master.info文件中，以后再连接master的时候将不用再提供这新信息而是直接读取该文件进行连接。
 
 - 在slave上有两种线程，
 
   分别是IO线程和SQL线程
 
-  - IO线程用于连接master，监控和接受master的binlog。当启动IO线程成功连接master时， **master会同时启动一个dump线程** ，该线程将slave请求要复制的binlog给dump出来，之后IO线程负责监控并接收master上dump出来的二进制日志，当master上binlog有变化的时候，IO线程就将其复制过来并写入到自己的中继日志(relay log)文件中。
+  - IO线程用于连接master，监控和接受master的binlog。当启动IO线程成功连接master时，**master会同时启动一个dump线程**，该线程将slave请求要复制的binlog给dump出来，之后IO线程负责监控并接收master上dump出来的二进制日志，当master上binlog有变化的时候，IO线程就将其复制过来并写入到自己的中继日志(relay log)文件中。
   - slave上的另一个线程SQL线程用于监控、读取并重放relay log中的日志，将数据写入到自己的数据库中。如下图所示。
 
 站在slave的角度上看，过程如下：
@@ -42,9 +42,9 @@ mysql复制是指从一个mysql服务器(MASTER)将数据 **通过日志的方�
 1. slave的IO线程复制这些变动的binlog到自己的relay log中。
 1. slave的SQL线程读取并重新应用relay log到自己的数据库上，让其和master数据库保持一致。
 
-从复制的机制上可以知道，在复制进行前，slave上必须具有master上部分完整内容作为复制基准数据。例如，master上有数据库A，二进制日志已经写到了pos1位置，那么在复制进行前，slave上必须要有数据库A，且如果要从pos1位置开始复制的话，还必须有和master上pos1之前完全一致的数据。如果不满足这样的一致性条件，那么在replay中继日志的时候将不知道如何进行应用而导致数据混乱。 **也就是说，复制是基于binlog的position进行的，复制之前必须保证position一致。** (注：这是传统的复制方式所要求的)
+从复制的机制上可以知道，在复制进行前，slave上必须具有master上部分完整内容作为复制基准数据。例如，master上有数据库A，二进制日志已经写到了pos1位置，那么在复制进行前，slave上必须要有数据库A，且如果要从pos1位置开始复制的话，还必须有和master上pos1之前完全一致的数据。如果不满足这样的一致性条件，那么在replay中继日志的时候将不知道如何进行应用而导致数据混乱。**也就是说，复制是基于binlog的position进行的，复制之前必须保证position一致。** (注：这是传统的复制方式所要求的)
 
-可以选择对哪些数据库甚至数据库中的哪些表进行复制。 **默认情况下，MySQL的复制是异步的。slave可以不用一直连着master，即使中间断开了也能从断开的position处继续进行复制。** MySQL 5.6对比MySQL 5.5在复制上进行了很大的改进，主要包括支持GTID(Global Transaction ID,全局事务ID)复制和多SQL线程并行重放。GTID的复制方式和传统的复制方式不一样，通过全局事务ID，它不要求复制前slave有基准数据，也不要求binlog的position一致。
+可以选择对哪些数据库甚至数据库中的哪些表进行复制。**默认情况下，MySQL的复制是异步的。slave可以不用一直连着master，即使中间断开了也能从断开的position处继续进行复制。** MySQL 5.6对比MySQL 5.5在复制上进行了很大的改进，主要包括支持GTID(Global Transaction ID,全局事务ID)复制和多SQL线程并行重放。GTID的复制方式和传统的复制方式不一样，通过全局事务ID，它不要求复制前slave有基准数据，也不要求binlog的position一致。
 
 MySQL 5.7.17则提出了组复制(MySQL Group Replication,MGR)的概念。像数据库这样的产品，必须要尽可能完美地设计一致性问题，特别是在集群、分布式环境下。Galera就是一个MySQL集群产品，它支持多主模型(多个master)，但是当MySQL 5.7.17引入了MGR功能后，Galera的优势不再明显，甚至MGR可以取而代之。MGR为MySQL集群中多主复制的很多问题提供了很好的方案，可谓是一项革命性的功能。
 
@@ -58,11 +58,11 @@ MySQL 5.7.17则提出了组复制(MySQL Group Replication,MGR)的概念。像数
 
 主要有以下几点好处： **1.提供了读写分离的能力。** replication让所有的slave都和master保持数据一致，因此外界客户端可以从各个slave中读取数据，而写数据则从master上操作。也就是实现了读写分离。
 
-需要注意的是，为了保证数据一致性， **写操作必须在master上进行** 。
+需要注意的是，为了保证数据一致性，**写操作必须在master上进行** 。
 
-通常说到读写分离这个词，立刻就能意识到它会分散压力、提高性能。 **2.为MySQL服务器提供了良好的伸缩(scale-out)能力。** 由于各个slave服务器上只提供数据检索而没有写操作，因此"随意地"增加slave服务器数量来提升整个MySQL群的性能，而不会对当前业务产生任何影响。
+通常说到读写分离这个词，立刻就能意识到它会分散压力、提高性能。**2.为MySQL服务器提供了良好的伸缩(scale-out)能力。** 由于各个slave服务器上只提供数据检索而没有写操作，因此"随意地"增加slave服务器数量来提升整个MySQL群的性能，而不会对当前业务产生任何影响。
 
-之所以"随意地"要加上双引号，是因为每个slave都要和master建立连接，传输数据。如果slave数量巨多，master的压力就会增大，网络带宽的压力也会增大。 **3.数据库备份时，对业务影响降到最低。** 由于MySQL服务器群中所有数据都是一致的(至少几乎是一致的)，所以在需要备份数据库的时候可以任意停止某一台slave的复制功能(甚至停止整个mysql服务)，然后从这台主机上进行备份，这样几乎不会影响整个业务(除非只有一台slave，但既然只有一台slave，说明业务压力并不大，短期内将这个压力分配给master也不会有什么影响)。 **4.能提升数据的安全性。** 这是显然的，任意一台mysql服务器断开，都不会丢失数据。即使是master宕机，也只是丢失了那部分还没有传送的数据(异步复制时才会丢失这部分数据)。 **5.数据分析不再影响业务。**
+之所以"随意地"要加上双引号，是因为每个slave都要和master建立连接，传输数据。如果slave数量巨多，master的压力就会增大，网络带宽的压力也会增大。**3.数据库备份时，对业务影响降到最低。** 由于MySQL服务器群中所有数据都是一致的(至少几乎是一致的)，所以在需要备份数据库的时候可以任意停止某一台slave的复制功能(甚至停止整个mysql服务)，然后从这台主机上进行备份，这样几乎不会影响整个业务(除非只有一台slave，但既然只有一台slave，说明业务压力并不大，短期内将这个压力分配给master也不会有什么影响)。**4.能提升数据的安全性。** 这是显然的，任意一台mysql服务器断开，都不会丢失数据。即使是master宕机，也只是丢失了那部分还没有传送的数据(异步复制时才会丢失这部分数据)。**5.数据分析不再影响业务。**
 
 需要进行数据分析的时候，直接划分一台或多台slave出来专门用于数据分析。这样OLTP和OLAP可以共存，且几乎不会影响业务处理性能。
 
@@ -93,7 +93,7 @@ MySQL支持两种不同的复制方法：传统的复制方式和GTID复制。My
 
 ## 3.3 异步复制
 
-客户端发送DDL/DML语句给master， **master执行完毕立即返回成功信息给客户端，而不管slave是否已经开始复制** 。这样的复制方式导致的问题是，当master写完了binlog，而slave还没有开始复制或者复制还没完成时， **slave上和master上的数据暂时不一致，且此时master突然宕机，slave将会丢失一部分数据。如果此时把slave提升为新的master，那么整个数据库就永久丢失这部分数据。** ![img](../assets/733013-20180524205215240-203795747.png)
+客户端发送DDL/DML语句给master，**master执行完毕立即返回成功信息给客户端，而不管slave是否已经开始复制** 。这样的复制方式导致的问题是，当master写完了binlog，而slave还没有开始复制或者复制还没完成时，**slave上和master上的数据暂时不一致，且此时master突然宕机，slave将会丢失一部分数据。如果此时把slave提升为新的master，那么整个数据库就永久丢失这部分数据。**![img](../assets/733013-20180524205215240-203795747.png)
 
 ## 3.4 延迟复制
 
@@ -107,7 +107,7 @@ mysql支持一主一从和一主多从。但是每个slave必须只能是一个m
 
 以下是一主一从的结构图： ![img](../assets/733013-20180528163847611-1424365065.png)
 
-在开始传统的复制(非GTID复制)前，需要完成以下几个关键点， **这几个关键点指导后续复制的所有步骤** 。
+在开始传统的复制(非GTID复制)前，需要完成以下几个关键点，**这几个关键点指导后续复制的所有步骤** 。
 
 1. 为master和slave设定不同的`server-id`，这是主从复制结构中非常关键的标识号。到了MySQL 5.7，似乎不设置server id就无法开启binlog。设置server id需要重启MySQL实例。
 1. 开启master的binlog。刚安装并初始化的MySQL默认未开启binlog，建议手动设置binlog且为其设定文件名，否则默认以主机名为基名时修改主机名后会找不到日志文件。
@@ -245,7 +245,7 @@ mysql> select * from backuptest.num_isam limit 10;
 ```
 
 ### 4.2.1 获取master binlog的坐标 **如果master是全新的数据库实例，或者在此之前没有开启过binlog，那么它的坐标位置是position=4** 。之所以是4而非0，是因为binlog的前4个记录单元是每个binlog文件的头部信息。
-如果master已有数据，或者说master以前就开启了binlog并写过数据库，那么需要手动获取position。 **为了安全以及没有后续写操作，必须先锁表。** 
+如果master已有数据，或者说master以前就开启了binlog并写过数据库，那么需要手动获取position。**为了安全以及没有后续写操作，必须先锁表。** 
 
 ```python
 mysql> flush tables with read lock;
@@ -272,7 +272,7 @@ mysql> show master status;   # 为了排版，简化了输出结果
 
 2. 如果要复制的是某个或某几个库，直接拷贝相关目录即可。但注意，这种冷备份的方式只适合MyISAM表和开启了`innodb_file_per_table=ON`的InnoDB表。如果没有开启该变量，innodb表使用公共表空间，无法直接冷备份。
 1. 如果要冷备份innodb表，最安全的方法是先关闭master上的mysql，而不是通过表锁。
-   所以， **如果没有涉及到innodb表，那么在锁表之后，可以直接冷拷贝。最后释放锁。** 
+   所以，**如果没有涉及到innodb表，那么在锁表之后，可以直接冷拷贝。最后释放锁。** 
 
 ```python
    mysql> flush tables with read lock;
@@ -314,7 +314,7 @@ shell> mysqldump -uroot -p --all-databases --master-data=2 >dump.db
 
 注意，`--master-data`选项将再dump.db中加入`change master to`相关的语句，值为2时，`change master to`语句是注释掉的，值为1或者没有提供值时，这些语句是直接激活的。同时，`--master-data`会锁定所有表(如果同时使用了`--single-transaction`，则不是锁所有表，详细内容请参见[mysqldump](https://www.cnblogs.com/f-ck-need-u/p/9013458.html))。
 
-因此，可以直接从dump.db中获取到binlog的坐标。 **记住这个坐标。** 
+因此，可以直接从dump.db中获取到binlog的坐标。**记住这个坐标。** 
 
 ```plaintext
 \[\[email protected\] ~\]# grep -i -m 1 'change master to' dump.db
@@ -357,7 +357,7 @@ drwxr-x--- 2 root root    12288 May 29 04:12 sys
 -rw-r----- 1 root root     2560 May 29 04:12 xtrabackup_logfile
 ```
 
-其中xtrabackup\_binlog\_info中记录了binlog的坐标。 **记住这个坐标。** 
+其中xtrabackup\_binlog\_info中记录了binlog的坐标。**记住这个坐标。** 
 
 ```plaintext
 \[\[email protected\] ~\]# cat /backup/2018-05-29_04-12-15/xtrabackup_binlog_info
@@ -491,7 +491,7 @@ start slave sql_thread;
 
 ### 4.4.1 master.info
 
-master.info文件记录的是 **IO线程相关的信息** ，也就是连接master以及读取master binlog的信息。通过这个文件，下次连接master时就不需要再提供连接选项。
+master.info文件记录的是 **IO线程相关的信息**，也就是连接master以及读取master binlog的信息。通过这个文件，下次连接master时就不需要再提供连接选项。
 
 以下是master.info的内容，每一行的意义见[官方手册](https://dev.mysql.com/doc/refman/5.7/en/slave-logs-status.html)
 
@@ -769,10 +769,10 @@ IO线程每次从master复制日志要写入到relay log中，但是它是先放
 
 仍然有三种方法从slave上获取基准数据：冷备份、mysqldump和xtrabackup。方法见前文[将slave恢复到master指定的坐标](https://www.cnblogs.com/f-ck-need-u/p/9155003.html#blog4.2)。
 
-其实 **临时关闭一个slave对业务影响很小，所以我个人建议，新添加slave时采用冷备份slave的方式** ，不仅备份恢复的速度最快，配置成slave也最方便，这一点和前面配置"一主一从"不一样。但冷备份slave的时候需要注意几点：
+其实 **临时关闭一个slave对业务影响很小，所以我个人建议，新添加slave时采用冷备份slave的方式**，不仅备份恢复的速度最快，配置成slave也最方便，这一点和前面配置"一主一从"不一样。但冷备份slave的时候需要注意几点：
 
 1.  可以考虑将slave1完全shutdown再将整个datadir拷贝到新的slave2上。
-2. **建议新的slave2配置文件中的"relay-log"的值和slave1的值完全一致** ，否则应该手动从slave2的relay-log.info中获取IO线程连接master时的坐标，并在slave2上使用`change master to`语句设置连接参数。 方法很简单，所以不做演示了。
+2. **建议新的slave2配置文件中的"relay-log"的值和slave1的值完全一致**，否则应该手动从slave2的relay-log.info中获取IO线程连接master时的坐标，并在slave2上使用`change master to`语句设置连接参数。 方法很简单，所以不做演示了。
 
 5.2 配置一主多从(从中有从)
 ----------------
@@ -788,7 +788,7 @@ IO线程每次从master复制日志要写入到relay log中，但是它是先放
 > > 1.  将不同数据库复制到不同slave上。
 > > 2.  可以将master上的事务表(如InnoDB)复制为slave上的非事务表(如MyISAM)，这样slave上回放的速度加快，查询数据的速度在一定程度上也会提升。
 
-回到这种主从结构，它有些不同，master只负责传送日志给slave1、slave2和slave3，slave 2\_1和slave 2\_2的日志由slave2负责传送，所以slave2上也必须要开启binlog选项。此外，还必须开启一个选项`--log-slave-updates`让slave2能够在重放relay log时也写自己的binlog，否则slave2的binlog仅接受人为的写操作。 **问：slave能否进行写操作？重放relay log的操作是否会记录到slave的binlog中？** 1.  在slave上没有开启`read-only`选项(只读变量)时，任何有写权限的用户都可以进行写操作，这些操作都会记录到binlog中。注意， **read-only选项对具有super权限的用户以及SQL线程执行的重放写操作无效** 。默认这个选项是关闭的。
+回到这种主从结构，它有些不同，master只负责传送日志给slave1、slave2和slave3，slave 2\_1和slave 2\_2的日志由slave2负责传送，所以slave2上也必须要开启binlog选项。此外，还必须开启一个选项`--log-slave-updates`让slave2能够在重放relay log时也写自己的binlog，否则slave2的binlog仅接受人为的写操作。**问：slave能否进行写操作？重放relay log的操作是否会记录到slave的binlog中？** 1.  在slave上没有开启`read-only`选项(只读变量)时，任何有写权限的用户都可以进行写操作，这些操作都会记录到binlog中。注意，**read-only选项对具有super权限的用户以及SQL线程执行的重放写操作无效** 。默认这个选项是关闭的。
 ```
 
 mysql> show variables like "read_only";
@@ -799,7 +799,7 @@ mysql> show variables like "read_only";
 +---------------+-------+
 
 ```plaintext
-1.  在slave上没有开启`log-slave-updates`和binlog选项时，重放relay log不会记录binlog。 **所以如果slave2要作为某些slave的master，那么在slave2上必须要开启log-slave-updates和binlog选项。为了安全和数据一致性，在slave2上还应该启用read-only选项。** 环境如下：
+1.  在slave上没有开启`log-slave-updates`和binlog选项时，重放relay log不会记录binlog。**所以如果slave2要作为某些slave的master，那么在slave2上必须要开启log-slave-updates和binlog选项。为了安全和数据一致性，在slave2上还应该启用read-only选项。** 环境如下：
 
 ![img](../assets/733013-20180608100823680-1104661841.png)
 
@@ -920,7 +920,7 @@ Replicate_Wild_Ignore_Table: 通配符方式指定不复制的表
 ```plaintext
 如果要指定列表，则多次使用这些变量进行设置。
 
-需要注意的是， **尽管显式指定了要复制和忽略的库或者表，但是master还是会将所有的binlog传给slave并写入到slave的relay log中，真正负责筛选的slave上的SQL线程** 。
+需要注意的是，**尽管显式指定了要复制和忽略的库或者表，但是master还是会将所有的binlog传给slave并写入到slave的relay log中，真正负责筛选的slave上的SQL线程** 。
 
 另外，如果slave上开启了binlog，SQL线程读取relay log后会将所有的事件都写入到自己的binlog中，只不过对于那些被忽略的事件只记录相关的事务号等信息，不记录事务的具体内容。所以，如果之前设置了被忽略的库或表，后来取消忽略后，它们在取消忽略以前的变化是不会再重放的，特别是基于gtid的复制会严格比较binlog中的gtid。
 
@@ -976,7 +976,7 @@ mysql> show slave hosts;
 6.4 多线程复制
 ---------
 
-在老版本中，只有一个SQL线程读取relay log并重放。重放的速度肯定比IO线程写relay log的速度慢非常多，导致SQL线程非常繁忙，且 **实现到从库上延迟较大** 。 **没错，多线程复制可以解决主从延迟问题，且使用得当的话效果非常的好(关于主从复制延迟，是生产环境下最常见的问题之一，且没有很好的办法来避免。后文稍微介绍了一点方法)** 。
+在老版本中，只有一个SQL线程读取relay log并重放。重放的速度肯定比IO线程写relay log的速度慢非常多，导致SQL线程非常繁忙，且 **实现到从库上延迟较大** 。**没错，多线程复制可以解决主从延迟问题，且使用得当的话效果非常的好(关于主从复制延迟，是生产环境下最常见的问题之一，且没有很好的办法来避免。后文稍微介绍了一点方法)** 。
 
 在MySQL 5.6中引入了多线程复制(multi-thread slave，简称MTS)，这个 **多线程指的是多个SQL线程，IO线程还是只有一个** 。当IO线程将master binlog写入relay log中后，一个称为"多线程协调器(multithreaded slave coordinator)"会对多个SQL线程进行调度，让它们按照一定的规则去执行relay log中的事件。
 
@@ -1024,9 +1024,9 @@ mysql> show full processlist;
 
 是否还记得`show slave status`中的`Exec_master_log_pos`代表的意义？它表示SQL线程最近执行的事件对应的是master binlog中的哪个位置。问题由此而来。通过`show slave status`，我们看到已经执行事件对应的坐标，它前面可能还有事务没有执行。而在relay log中，事务B记录的位置是在事务A之后的(和master一样)，于是事务A和事务B之间可能就存在一个孔洞(gap)，这个孔洞是事务A剩余要执行的操作。
 
-正常情况下，多线程协调器记录了一切和多线程复制相关的内容，它能识别这种孔洞(通过打低水位标记low-watermark)，也能正确填充孔洞。 **即使是在存在孔洞的情况下执行stop slave也不会有任何问题，因为在停止SQL线程之前，它会等待先把孔洞填充完** 。但危险因素太多，比如突然宕机、突然杀掉mysqld进程等等，这些都会导致孔洞持续下去，甚至可能因为操作不当而永久丢失这部分孔洞。
+正常情况下，多线程协调器记录了一切和多线程复制相关的内容，它能识别这种孔洞(通过打低水位标记low-watermark)，也能正确填充孔洞。**即使是在存在孔洞的情况下执行stop slave也不会有任何问题，因为在停止SQL线程之前，它会等待先把孔洞填充完** 。但危险因素太多，比如突然宕机、突然杀掉mysqld进程等等，这些都会导致孔洞持续下去，甚至可能因为操作不当而永久丢失这部分孔洞。
 
-那么如何避免这种问题，出现这种问题如何解决？ **1.如何避免gap。** 前面说了，多个SQL线程是通过协调器来调度的。默认情况下，可能会出现gap的情况，这是因为变量`slave_preserve_commit_order`的默认值为0。该变量指示协调器是否让每个SQL线程执行的事务按master binlog中的顺序提交。因此，将其设置为1，然后重启SQL线程即可保证SQL线程按序提交，也就不可能会有gap的出现。
+那么如何避免这种问题，出现这种问题如何解决？**1.如何避免gap。** 前面说了，多个SQL线程是通过协调器来调度的。默认情况下，可能会出现gap的情况，这是因为变量`slave_preserve_commit_order`的默认值为0。该变量指示协调器是否让每个SQL线程执行的事务按master binlog中的顺序提交。因此，将其设置为1，然后重启SQL线程即可保证SQL线程按序提交，也就不可能会有gap的出现。
 
 当事务B准备先于事务A提交的时候，它将一直等待。此时slave的状态将显示：
 ```
@@ -1140,7 +1140,7 @@ slave通过IO线程获取master的binlog，并通过SQL线程来应用获取到�
 
 所以，第一个优化方式是不要在mysql中使用大事务，这是mysql主从优化的第一口诀。
 
-在回归正题，要解决slave的高延迟问题，先要知道`Second_Behind_Master`是如何计算延迟的：SQL线程比IO线程慢多少(其本质是NOW()减去`Exec_Master_Log_Pos`处设置的TIMESTAMP)。在主从网络状态良好的情况下，IO线程和master的binlog大多数时候都能保持一致(也即是IO线程没有多少延迟，除非事务非常大，导致二进制日志传输时间久， **但mysql优化的一个最基本口诀就是大事务切成小事务** )，所以在这种理想状态下，可以认为主从延迟说的是slave上的数据状态比master要延迟多少。它的计数单位是秒。
+在回归正题，要解决slave的高延迟问题，先要知道`Second_Behind_Master`是如何计算延迟的：SQL线程比IO线程慢多少(其本质是NOW()减去`Exec_Master_Log_Pos`处设置的TIMESTAMP)。在主从网络状态良好的情况下，IO线程和master的binlog大多数时候都能保持一致(也即是IO线程没有多少延迟，除非事务非常大，导致二进制日志传输时间久，**但mysql优化的一个最基本口诀就是大事务切成小事务** )，所以在这种理想状态下，可以认为主从延迟说的是slave上的数据状态比master要延迟多少。它的计数单位是秒。
 
 1. **从产生Binlog的master上考虑，可以在master上应用group commit的功能，并设置参数binlog_group_commit_sync_delay和binlog_group_commit_sync_no_delay_count，前者表示延迟多少秒才提交事务，后者表示要堆积多少个事务之后再提交。这样一来，事务的产生速度降低，slave的SQL线程相对就得到缓解** 。
 

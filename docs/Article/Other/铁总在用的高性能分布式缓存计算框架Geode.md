@@ -256,7 +256,7 @@ Monitor and Manage Apache Geode
 
 **注意：命令行可以 tab 键自动补全，及其方便操作。** #### connect
 
-要管理 Goode 集群我们需要连接到主 locator 上， 有两种方式。 **1. 直接使用 JMX 进行连接** 当我们知道哪个是主的时候，就直接使用 JMX 进行连接即可。
+要管理 Goode 集群我们需要连接到主 locator 上， 有两种方式。**1. 直接使用 JMX 进行连接** 当我们知道哪个是主的时候，就直接使用 JMX 进行连接即可。
 
 ```plaintext
 gfsh>connect --jmx-manager=192.168.33.15
@@ -964,7 +964,7 @@ Geode 只会读取到一致性的结果，如果处在事务提交中的状态�
 
 #### 持久性
 
-关系数据库通过使用磁盘存储进行恢复和事务日志记录来提供持久性。Geode 针对性能进行了优化， **不支持事务的磁盘持久性** 。从测试中发现，确实不支持 persisternt 类型的 region。
+关系数据库通过使用磁盘存储进行恢复和事务日志记录来提供持久性。Geode 针对性能进行了优化，**不支持事务的磁盘持久性** 。从测试中发现，确实不支持 persisternt 类型的 region。
 
 ```java
 Caused by: java.lang.UnsupportedOperationException: Operations on persist-backup regions are not allowed because this thread has an active transaction
@@ -1350,7 +1350,7 @@ server_33_23 | geode-study.jar | /opt/geode_work/server_33_23/geode-study.v5.jar
 server_33_29 | geode-study.jar | /opt/geode_work/server_33_29/geode-study.v5.jar
 ```
 
-我们在做 deploy 的时候，Geode 会自动将实现了 function 接口的类型进行函数注册。 **3. 执行函数** 方式一：
+我们在做 deploy 的时候，Geode 会自动将实现了 function 接口的类型进行函数注册。**3. 执行函数** 方式一：
 
 ```javascript
 Cluster-254 gfsh>execute function --id=func-a --region=test99 --filter=KEY_4,KEY_7
@@ -1398,7 +1398,7 @@ http://192.168.33.15:7070/pulse
 
 在 locator 变为 leader 之后会自动启用 pulse，用户名密码为 admin/admin。
 
-pulse 中可以在不同维护查看数据。 **1. 总览** 内存，成员数，服务数，region 数量，集群读写等等。
+pulse 中可以在不同维护查看数据。**1. 总览** 内存，成员数，服务数，region 数量，集群读写等等。
 
 ![在这里插入图片描述](../assets/133ac250-1689-11ea-94bc-f516225b4bcb.png) **2. ip 维度** 这里多了一个机器的链接详情：
 
@@ -1485,7 +1485,7 @@ metricList.add(build);
 
 #### 防止和恢复磁盘完全错误
 
-监视 Geode 成员的磁盘使用情况非常重要。 如果成员缺少足够的磁盘空间用于磁盘存储，则该成员会尝试关闭磁盘存储及其关联的缓存，并记录错误消息。由于成员磁盘空间不足而导致的关闭可能导致数据丢失，数据文件损坏，日志文件损坏以及可能对您的应用程序产生负面影响 的其他错误情况。为成员提供足够的磁盘空间后，可以重新启动该成员。 **换言之，一定要做磁盘容量监控！** #### java.lang.OutOfMemoryError
+监视 Geode 成员的磁盘使用情况非常重要。 如果成员缺少足够的磁盘空间用于磁盘存储，则该成员会尝试关闭磁盘存储及其关联的缓存，并记录错误消息。由于成员磁盘空间不足而导致的关闭可能导致数据丢失，数据文件损坏，日志文件损坏以及可能对您的应用程序产生负面影响 的其他错误情况。为成员提供足够的磁盘空间后，可以重新启动该成员。**换言之，一定要做磁盘容量监控！** #### java.lang.OutOfMemoryError
 
 如果应用程序经常内存不足，您可能需要对其进行分析以确定原因，可以尝试 -Xmx 重置最大堆大小来增加直接内存。
 
@@ -1521,7 +1521,7 @@ list is: [[ent(27134):60330/45855, ent(27130):60333/36743]]
 
 描述：成员（27130）60333/36743 由于可疑验证失败而面临被迫退出集群的危险。在达到 ack-wait-threshold 之后，将在警告级别发出此警报。
 
-操作员应检查过程以确定其是否健康。 在名为 ent 的机器上，慢响应器的进程 ID 是 27130。慢响应者的端口是 60333/36743。 查找字符串，Starting distribution manager ent：60333/36743，并检查拥有包含此字符串的日志文件的进程。 **如上只是摘抄了几个官方常见异常** ，[具体请查看这里](https://geode.apache.org/docs/guide/19/managing/troubleshooting/chapter_overview.html)。
+操作员应检查过程以确定其是否健康。 在名为 ent 的机器上，慢响应器的进程 ID 是 27130。慢响应者的端口是 60333/36743。 查找字符串，Starting distribution manager ent：60333/36743，并检查拥有包含此字符串的日志文件的进程。**如上只是摘抄了几个官方常见异常**，[具体请查看这里](https://geode.apache.org/docs/guide/19/managing/troubleshooting/chapter_overview.html)。
 
 实际在近一年多的使用中，并未发现不可思议的异常与灾难。
 
@@ -1554,7 +1554,7 @@ gfsh>start server
 ```
 
 **HTTP 分布式 session** 之前接触的分布式 session 方案是 Redis-cluster + Tomcat 来做的， 其实道理是一样的， Geode 替换了 Redis 就成功 geode-session-Tomcat 了。
-Geode 使用了不小的篇幅来描述该扩展功能，[详见](https://geode.apache.org/docs/guide/110/tools_modules/http_session_mgmt/quick_start.html)。 **Redis 适配器** 
+Geode 使用了不小的篇幅来描述该扩展功能，[详见](https://geode.apache.org/docs/guide/110/tools_modules/http_session_mgmt/quick_start.html)。**Redis 适配器** 
 
 ```plaintext
 gfsh> start server --name=server1 --redis-bind-address=localhost \
@@ -1565,7 +1565,7 @@ gfsh> start server --name=server1 --redis-bind-address=localhost \
 
 > Geode 相比较 Redis 具有多线程、高并发、扩展性强、结果报告， 并且 Geode wan 复制模式能够水平扩展，跨数据中心还能维护数据一致性。
 
-虽然这么厉害，但是经过简单测试，还是不要冒险改用 Redis，老老实实用 Redis。 **Lucene 支持**
+虽然这么厉害，但是经过简单测试，还是不要冒险改用 Redis，老老实实用 Redis。**Lucene 支持**
 
 Geode 底层引入了 Lucene 的包并支持创建 index、查询 index，换句话说 Geode 引入了 Lucene 的一些特性在它的内部，依然持有和 Redis 一样的观点，改用 ES 还是老老实实去用 ES 吧。
 

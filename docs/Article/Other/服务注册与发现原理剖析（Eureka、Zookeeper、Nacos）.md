@@ -20,15 +20,15 @@ Spring Cloud Eureka 是在 Netflix 的 Eureka 的基础上进行二次开发而�
 
 网上很多人说 Eureka 闭源，其实没有，只是 Eurkea 2.x 分支不再维护，官方依然在积极地维护 Eureka 1.x，Spring Cloud 还是使用的 1.x 版本的 Eureka，所以不必过分担心，就算 Eureka 真的闭源了，Spring Cloud 还可以使用 ZooKeeper、Consul、Nacos 等等来实现服务治理。比如使用 ZooKeeper 替代 Eureka，也是改几行配置和换个 jar 的事情。
 
-**Eureka Server 与 Eureka Client 的关系：** ![服务注册中心Eureka](../assets/f7dc7750-3a10-11ea-96f3-5d8c8a393bcd.png)
+**Eureka Server 与 Eureka Client 的关系：**![服务注册中心Eureka](../assets/f7dc7750-3a10-11ea-96f3-5d8c8a393bcd.png)
 
 ### 服务端（Eureka Server）
 
-Eureka Server 其实就是服务注册中心，负责管理每个 Eureka Client 的服务信息（IP、端口等等）和状态。服务端主要提供以下功能。 **提供服务注册** 提供一个统一存储服务的地方，即服务列表，Eureka Client 应用启动时把自己的服务都注册到这里。 **提供注册表** 为 Eureka Client 提供服务列表，Eureka Client 首次获取服务列表后会缓存一份到自己的本地，定时更新本地缓存，下次调用时直接使用本地缓存的服务信息进行远程调用，可以提高效率。 **服务剔除（Eviction）** 如果 Eureka Client 超过 90 秒（默认）不向 Eureka Sever 上报心跳，Eureka Server 会剔除该 Eureka Client 实例，但是前提是不满足自我保护机制才剔除，避免杀错好人。 **自我保护机制** 如果出现网络不稳定的时候，Eureka Client 的都能正常提供服务，即使超过了 90 秒没有上报心跳，也不会马上剔除该 Eureka Client 实例，而是进入自我保护状态，不会做任何的删除服务操作，仍然可以提供注册服务，当网络稳定之时，则解除自我保护恢复正常。
+Eureka Server 其实就是服务注册中心，负责管理每个 Eureka Client 的服务信息（IP、端口等等）和状态。服务端主要提供以下功能。**提供服务注册** 提供一个统一存储服务的地方，即服务列表，Eureka Client 应用启动时把自己的服务都注册到这里。**提供注册表** 为 Eureka Client 提供服务列表，Eureka Client 首次获取服务列表后会缓存一份到自己的本地，定时更新本地缓存，下次调用时直接使用本地缓存的服务信息进行远程调用，可以提高效率。**服务剔除（Eviction）** 如果 Eureka Client 超过 90 秒（默认）不向 Eureka Sever 上报心跳，Eureka Server 会剔除该 Eureka Client 实例，但是前提是不满足自我保护机制才剔除，避免杀错好人。**自我保护机制** 如果出现网络不稳定的时候，Eureka Client 的都能正常提供服务，即使超过了 90 秒没有上报心跳，也不会马上剔除该 Eureka Client 实例，而是进入自我保护状态，不会做任何的删除服务操作，仍然可以提供注册服务，当网络稳定之时，则解除自我保护恢复正常。
 
 ### 客户端（Eureka Client）
 
-Eureka Client 可以是服务提供者客户端角色，也可以是服务消费者客户端角色，客户端主要提供以下功能。 **服务注册（Register）** 作为服务提供者角色，把自己的服务（IP、端口等等）注册到服务注册中心。 **自动刷新缓存（GetRegisty）** 作为服务消费者角色，从服务注册中心获取服务列表，并缓存在本地供下次使用，每 30 秒刷新一次缓存。 **服务续约（Renew）** Eureka Client 每 30 秒（默认可配置）向 Server 端上报心跳（http 请求）告诉自己很健康，如果 Server 端在 90 秒（默认可配置）内没有收到心跳，而且不是自我保护情况，则剔除之。 **远程调用（Remote Call）** 作为服务消费者角色，从服务注册中心获取服务列表后，就可以根据服务相关信息进行远程调用了，如果存在多个服务提供者实例时，默认使用负载均衡 Ribbon 的轮询策略调用服务。 **服务下线（Cancel）** 作为服务提供者角色，在应用关闭时会发请求到服务端，服务端接受请求并把该实例剔除。
+Eureka Client 可以是服务提供者客户端角色，也可以是服务消费者客户端角色，客户端主要提供以下功能。**服务注册（Register）** 作为服务提供者角色，把自己的服务（IP、端口等等）注册到服务注册中心。**自动刷新缓存（GetRegisty）** 作为服务消费者角色，从服务注册中心获取服务列表，并缓存在本地供下次使用，每 30 秒刷新一次缓存。**服务续约（Renew）** Eureka Client 每 30 秒（默认可配置）向 Server 端上报心跳（http 请求）告诉自己很健康，如果 Server 端在 90 秒（默认可配置）内没有收到心跳，而且不是自我保护情况，则剔除之。**远程调用（Remote Call）** 作为服务消费者角色，从服务注册中心获取服务列表后，就可以根据服务相关信息进行远程调用了，如果存在多个服务提供者实例时，默认使用负载均衡 Ribbon 的轮询策略调用服务。**服务下线（Cancel）** 作为服务提供者角色，在应用关闭时会发请求到服务端，服务端接受请求并把该实例剔除。
 
 ### 注册与发现的工作流程
 
@@ -45,7 +45,7 @@ Eureka Client 可以是服务提供者客户端角色，也可以是服务消费
 
 ![Eureka Server集群](../assets/aaca0b10-36c0-11ea-83e2-610758492683.png)
 
-Eureka Server 集群当中的每个节点都是 **通过 Replicate（即复制）来同步数据** ，没有主节点和从节点之分，所有节点都是平等而且数据都保持一致。因为结点之间是通过 **异步方式** 进行同步数据，不保证强一致性，保证可用性，所以是 AP。
+Eureka Server 集群当中的每个节点都是 **通过 Replicate（即复制）来同步数据**，没有主节点和从节点之分，所有节点都是平等而且数据都保持一致。因为结点之间是通过 **异步方式** 进行同步数据，不保证强一致性，保证可用性，所以是 AP。
 
 假如其中一个 Eureka Server 节点宕机了，不影响 Eureka Client 正常工作，Eureka Client 的请求由其他正常的 Eureka Server 节点接收，当出现宕机的那个 Eureka Server 节点正常启动后，复制其他节点的最新数据（服务列表）后，又可以正常提供服务了。
 
@@ -86,7 +86,7 @@ ZK 的文件结构类似于 Linux 系统的树状结构，注册服务时，即�
 ![Nacos 架构图](../assets/45cfac70-3a89-11ea-9aa1-b99f5be963bb.png)
 
 主要功能点
------ **服务注册与发现** 类似 Eureka、ZooKeeper、Consul 等组件，既可以支持 HTTP、https 的服务注册和发现，也可以支持 RPC 的服务注册和发现，比如 Dubbo，也是出自于阿里，完全可以替代 Eureka、ZooKeeper、Consul。 **动态配置服务**
+----- **服务注册与发现** 类似 Eureka、ZooKeeper、Consul 等组件，既可以支持 HTTP、https 的服务注册和发现，也可以支持 RPC 的服务注册和发现，比如 Dubbo，也是出自于阿里，完全可以替代 Eureka、ZooKeeper、Consul。**动态配置服务**
 
 类似 Spring Cloud Config + Bus、Apollo 等组件。提供了后台管理界面来统一管理所有的服务和应用的配置，后台修改公共配置后不需重启应用程序即可生效。
 

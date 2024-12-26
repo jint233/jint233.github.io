@@ -741,7 +741,7 @@ Query OK, 1 row affected (0.02 sec)
 Rows matched: 1  Changed: 1  Warnings: 0
 ```
 
-**sysconfiginsertsetuser** 当对 sys.sys_config 表做 insert 操作时，该触发器会将 sys_config 表的 set_by 列设置为当前用户名。 **sysconfigupdatesetuser**
+**sysconfiginsertsetuser** 当对 sys.sys_config 表做 insert 操作时，该触发器会将 sys_config 表的 set_by 列设置为当前用户名。**sysconfigupdatesetuser**
 
 当对 sys.sys_config 表做 insert 操作时，该触发器会将 sys_config 表的 set_by 列设置为当前用户名。
 

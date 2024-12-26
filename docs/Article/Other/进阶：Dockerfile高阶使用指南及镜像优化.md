@@ -22,7 +22,7 @@ Docker 构建系统中，默认情况下为了加快构建的速度，会将构�
 
 ### builder
 
-这里我们需要引入一个概念 **builder** .
+这里我们需要引入一个概念 **builder**.
 
 builder 就是上面提到的特定模块，也就是说构建内容 context 是由 Docker CLI 发送给 dockerd；并最终由 builder 完成构建。
 
@@ -216,9 +216,9 @@ IMAGE               CREATED             CREATED BY                              
 ...
 ```
 
-很明显，刚才增加的 ENV 可以直接通过 docker history/docker image history 看到。 **不建议真的这样做** 。
+很明显，刚才增加的 ENV 可以直接通过 docker history/docker image history 看到。**不建议真的这样做** 。
 
-由此，得出了我们的第一个结论， **Docker 镜像的构建历史是不安全的，通过 ENV 设置的信息可在 history 中看到** 。
+由此，得出了我们的第一个结论，**Docker 镜像的构建历史是不安全的，通过 ENV 设置的信息可在 history 中看到** 。
 
 这也引出了我们的第一个问题： **Docker 镜像的构建记录是可查看的，如何管理构建过程中需要的密码/密钥等敏感信息？** ### 高阶特性：密码管理
 
@@ -357,7 +357,7 @@ rpc error: code = Unknown desc = executor failed running \[/bin/sh -c git clone 
 
 在上面的内容中，我们学习到了通过 `docker image history` 可以查看镜像的构建历史，但构建历史是透明的，凡是可以拿到该镜像的人均可查看到其构建历史；所以它是不安全的。
 
-尤其是当我们通过 ENV 或者 RUN 指令等，将密码/配置信息等传递进去，或者是将自己的私钥之类的文件拷贝到镜像中， **这些操作都是不安全的，不应该这样使用** ，在启用 BuildKit 之后，我们可以通过使用新的实验性语法做到更安全的操作。
+尤其是当我们通过 ENV 或者 RUN 指令等，将密码/配置信息等传递进去，或者是将自己的私钥之类的文件拷贝到镜像中，**这些操作都是不安全的，不应该这样使用**，在启用 BuildKit 之后，我们可以通过使用新的实验性语法做到更安全的操作。
 
 实验性语法是在 Dockerfile 的头部增加了一个表示当前语法规则的 `# syntax = docker/dockerfile:experimental` （事实上，我们将它称之为 frontend）它其实是一个真实存在的 Docker 镜像，在构建过程中，会将它拉取下来使用，这里的详细内容我们可以之后对 frontend 详解的时候再进行讨论。
 
@@ -494,7 +494,7 @@ REPOSITORY           TAG                 IMAGE ID            CREATED            
 remote/spring-boot   1                   644867602b8a        About a minute ago   103MB
 ```
 
-镜像构建成功了。 **注意** 这里给 `docker buildx build` 命令传递了 `--load` 参数，表示我们要将构建好的镜像加载到我们现在在用的 dockerd 当中。
+镜像构建成功了。**注意** 这里给 `docker buildx build` 命令传递了 `--load` 参数，表示我们要将构建好的镜像加载到我们现在在用的 dockerd 当中。
 
 此时再查看 builder 的状态：
 
@@ -620,7 +620,7 @@ a2c1e139697b        About a minute ago                                          
 <missing>           2 weeks ago          /bin/sh -c #(nop) ADD file:a86aea1f3a7d68f6a…   0B
 ```
 
-可以看到之前的每层大小都已经变成了 0，这是因为把所有的层都合并到了最终的镜像上去了。 **特别注意：** `--squash` 虽然在 1.13.0 版本中就已经加入了 Docker 中，但他至今仍然是实验形式；所以你需要按照我在本篇文章开始部分的介绍那样，打开实验性功能的支持。
+可以看到之前的每层大小都已经变成了 0，这是因为把所有的层都合并到了最终的镜像上去了。**特别注意：** `--squash` 虽然在 1.13.0 版本中就已经加入了 Docker 中，但他至今仍然是实验形式；所以你需要按照我在本篇文章开始部分的介绍那样，打开实验性功能的支持。
 
 但直接传递 `--squash` 的方式，相对来说足够的简单，也更安全。
 

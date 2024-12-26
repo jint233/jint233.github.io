@@ -275,7 +275,7 @@ public void set<PropertyName>(boolean m);
 
 那这样做会带来什么问题呢。
 
-在一般情况下，其实是没有影响的。但是有一种特殊情况就会有问题，那就是发生序列化的时候。 **序列化带来的影响** 关于序列化和反序列化请参考 [Java 对象的序列化与反序列化](https://www.hollischuang.com/archives/1150)。我们这里拿比较常用的 JSON 序列化来举例，看看看常用的 fastJson、jackson 和 Gson 之间有何区别：
+在一般情况下，其实是没有影响的。但是有一种特殊情况就会有问题，那就是发生序列化的时候。**序列化带来的影响** 关于序列化和反序列化请参考 [Java 对象的序列化与反序列化](https://www.hollischuang.com/archives/1150)。我们这里拿比较常用的 JSON 序列化来举例，看看看常用的 fastJson、jackson 和 Gson 之间有何区别：
 
 ```java
     public class BooleanMainTest {
@@ -383,7 +383,7 @@ Model3[isSuccess=false]
 <img src="../../assets/15449492627754.jpg" alt="img">
 </figure>
 
-所以， **在定义 POJO 中的布尔类型的变量时，不要使用 isSuccess 这种形式，而要直接使用 success！**
+所以，**在定义 POJO 中的布尔类型的变量时，不要使用 isSuccess 这种形式，而要直接使用 success！**
 
 ### Boolean 还是 boolean？
 
@@ -466,7 +466,7 @@ default model : Model[success=null, failure=false]
 
 后来，作者单独和《阿里巴巴 Java 开发手册》、《码出高效》的作者 —— 孤尽 单独 1V1 (qing) Battle (jiao) 了一下。
 
-最终达成共识，还是 **尽量使用包装类型** 。 **但是，作者还是想强调一个我的观点，尽量避免在你的代码中出现不确定的 null 值。**  **null 何罪之有？**
+最终达成共识，还是 **尽量使用包装类型** 。**但是，作者还是想强调一个我的观点，尽量避免在你的代码中出现不确定的 null 值。**  **null 何罪之有？**
 
 关于 null 值的使用，我在 [使用 Optional 避免 NullPointerException](https://www.hollischuang.com/archives/883)、[9 Things about Null in Java](https://www.hollischuang.com/archives/74) 等文中就介绍过。
 
@@ -508,9 +508,9 @@ default model : Model[success=null, failure=false]
 
 ### 背景知识 - Serializable 和 Externalizable
 
-类通过实现 `java.io.Serializable` 接口以启用其序列化功能。 **未实现此接口的类将无法进行序列化或反序列化。** 可序列化类的所有子类型本身都是可序列化的。
+类通过实现 `java.io.Serializable` 接口以启用其序列化功能。**未实现此接口的类将无法进行序列化或反序列化。** 可序列化类的所有子类型本身都是可序列化的。
 
-如果读者看过 `Serializable` 的源码，就会发现，他只是一个空的接口，里面什么东西都没有。 **Serializable 接口没有方法或字段，仅用于标识可序列化的语义。** 但是，如果一个类没有实现这个接口，想要被序列化的话，就会抛出 `java.io.NotSerializableException` 异常。
+如果读者看过 `Serializable` 的源码，就会发现，他只是一个空的接口，里面什么东西都没有。**Serializable 接口没有方法或字段，仅用于标识可序列化的语义。** 但是，如果一个类没有实现这个接口，想要被序列化的话，就会抛出 `java.io.NotSerializableException` 异常。
 
 它是怎么保证只有实现了该接口的方法才能进行序列化与反序列化的呢？
 
@@ -656,7 +656,7 @@ java.io.InvalidClassException: com.hollis.User1; local class incompatible: strea
 
 这是因为，在进行反序列化时，JVM 会把传来的字节流中的 `serialVersionUID` 与本地相应实体类的 `serialVersionUID` 进行比较，如果相同就认为是一致的，可以进行反序列化，否则就会出现序列化版本不一致的异常，即是 `InvalidCastException`。
 
-这也是《阿里巴巴 Java 开发手册》中规定，在兼容性升级中，在修改类的时候，不要修改 `serialVersionUID` 的原因。 **除非是完全不兼容的两个版本** 。所以， **serialVersionUID 其实是验证版本一致性的。** 如果读者感兴趣，可以把各个版本的 JDK 代码都拿出来看一下，那些向下兼容的类的 `serialVersionUID` 是没有变化过的。比如 String 类的 `serialVersionUID` 一直都是 `-6849794470754667710L`。
+这也是《阿里巴巴 Java 开发手册》中规定，在兼容性升级中，在修改类的时候，不要修改 `serialVersionUID` 的原因。**除非是完全不兼容的两个版本** 。所以，**serialVersionUID 其实是验证版本一致性的。** 如果读者感兴趣，可以把各个版本的 JDK 代码都拿出来看一下，那些向下兼容的类的 `serialVersionUID` 是没有变化过的。比如 String 类的 `serialVersionUID` 一直都是 `-6849794470754667710L`。
 
 但是，作者认为，这个规范其实还可以再严格一些，那就是规定：
 
@@ -816,11 +816,11 @@ ObjectInputStream.readObject -> readObject0 -> readOrdinaryObject -> readClassDe
 
 字符串拼接是我们在 Java 代码中比较经常要做的事情，就是把多个字符串拼接到一起。
 
-我们都知道， **String 是 Java 中一个不可变的类** ，所以他一旦被实例化就无法被修改。
+我们都知道，**String 是 Java 中一个不可变的类**，所以他一旦被实例化就无法被修改。
 
 > 不可变类的实例一旦创建，其成员变量的值就不能被修改。这样设计有很多好处，比如可以缓存 hashcode、使用更加便利以及更加安全等。
 
-但是，既然字符串是不可变的，那么字符串拼接又是怎么回事呢？ **字符串不变性与字符串拼接** 其实，所有的所谓字符串拼接，都是重新生成了一个新的字符串。下面一段字符串拼接代码：
+但是，既然字符串是不可变的，那么字符串拼接又是怎么回事呢？**字符串不变性与字符串拼接** 其实，所有的所谓字符串拼接，都是重新生成了一个新的字符串。下面一段字符串拼接代码：
 
 ```yml
 <pre>
@@ -849,7 +849,7 @@ String introduce = "每日更新 Java 相关技术文章";
 String hollis = wechat + "," + introduce;
 ```
 
-这里要特别说明一点，有人把 Java 中使用 `+` 拼接字符串的功能理解为 **运算符重载** 。其实并不是， **Java 是不支持运算符重载的** 。这其实只是 Java 提供的一个 **语法糖** 。后面再详细介绍。
+这里要特别说明一点，有人把 Java 中使用 `+` 拼接字符串的功能理解为 **运算符重载** 。其实并不是，**Java 是不支持运算符重载的** 。这其实只是 Java 提供的一个 **语法糖** 。后面再详细介绍。
 
 > 运算符重载：在计算机程序设计中，运算符重载（英语：operator overloading）是多态的一种。运算符重载，就是对已有的运算符重新进行定义，赋予其另一种功能，以适应不同的数据类型。
 >
@@ -1588,7 +1588,7 @@ return (n < 0) ? 1 : (n >= MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + 1;
 
 Step 2 比较简单，就是做一下极限值的判断，然后把 Step 1 得到的数值 +1。
 
-Step 1 怎么理解呢？ **其实是对一个二进制数依次向右移位，然后与原值取或。** 其目的对于一个数字的二进制，从第一个不为 0 的位开始，把后面的所有位都设置成 1。
+Step 1 怎么理解呢？**其实是对一个二进制数依次向右移位，然后与原值取或。** 其目的对于一个数字的二进制，从第一个不为 0 的位开始，把后面的所有位都设置成 1。
 
 随便拿一个二进制数，套一遍上面的公式就发现其目的了：
 

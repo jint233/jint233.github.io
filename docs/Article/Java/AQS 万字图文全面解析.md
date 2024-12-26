@@ -51,7 +51,7 @@
 
 ### 线程一加锁成功
 
-如果同时有 **三个线程** 并发抢占锁，此时 **线程一** 抢占锁成功， **线程二** 和 **线程三** 抢占锁失败，具体执行流程如下：
+如果同时有 **三个线程** 并发抢占锁，此时 **线程一** 抢占锁成功，**线程二** 和 **线程三** 抢占锁失败，具体执行流程如下：
 
 ![image.png](../assets/aHR0cHM6Ly91c2VyLWdvbGQtY2RuLnhpdHUuaW8vMjAyMC81LzIvMTcxZDJkNDJjNWQyZWIyYw.jfif)
 
@@ -80,7 +80,7 @@ static final class NonfairSync extends Sync {
 }
 ```
 
-这里使用的 **ReentrantLock 非公平锁** ，线程进来直接利用 `CAS` 尝试抢占锁，如果抢占成功 `state` 值回被改为 1，且设置对象独占锁线程为当前线程。如下所示：
+这里使用的 **ReentrantLock 非公平锁**，线程进来直接利用 `CAS` 尝试抢占锁，如果抢占成功 `state` 值回被改为 1，且设置对象独占锁线程为当前线程。如下所示：
 
 ```java
 protected final boolean compareAndSetState(int expect, int update) {
@@ -93,7 +93,7 @@ protected final void setExclusiveOwnerThread(Thread thread) {
 
 ### 线程二抢占锁失败
 
-我们按照真实场景来分析， **线程一** 抢占锁成功后，`state` 变为 1， **线程二** 通过 `CAS` 修改 `state` 变量必然会失败。此时 `AQS` 中 `FIFO`(First In First Out 先进先出) 队列中数据如图所示：
+我们按照真实场景来分析，**线程一** 抢占锁成功后，`state` 变为 1，**线程二** 通过 `CAS` 修改 `state` 变量必然会失败。此时 `AQS` 中 `FIFO`(First In First Out 先进先出) 队列中数据如图所示：
 
 ![image.png](../assets/aHR0cHM6Ly91c2VyLWdvbGQtY2RuLnhpdHUuaW8vMjAyMC81LzIvMTcxZDJkNDMwYjUyNTZkZQ.jfif)
 
@@ -136,7 +136,7 @@ final boolean nonfairTryAcquire(int acquires) {
 
 如果 `state` 为 0，则执行 `CAS` 操作，尝试更新 `state` 值为 1，如果更新成功则代表当前线程加锁成功。
 
-以 **线程二** 为例，因为 **线程一** 已经将 `state` 修改为 1，所以 **线程二** 通过 `CAS` 修改 `state` 的值不会成功。加锁失败。 **线程二** 执行 `tryAcquire ()` 后会返回 false，接着执行 `addWaiter (Node.EXCLUSIVE)` 逻辑，将自己加入到一个 `FIFO` 等待队列中，代码实现如下：
+以 **线程二** 为例，因为 **线程一** 已经将 `state` 修改为 1，所以 **线程二** 通过 `CAS` 修改 `state` 的值不会成功。加锁失败。**线程二** 执行 `tryAcquire ()` 后会返回 false，接着执行 `addWaiter (Node.EXCLUSIVE)` 逻辑，将自己加入到一个 `FIFO` 等待队列中，代码实现如下：
 
 `java.util.concurrent.locks.AbstractQueuedSynchronizer.addWaiter()`:
 
@@ -262,13 +262,13 @@ private Node addWaiter(Node mode) {
 }
 ```
 
-此时等待队列的 `tail` 节点指向 **线程二** ，进入 `if` 逻辑后，通过 `CAS` 指令将 `tail` 节点重新指向 **线程三** 。接着 **线程三** 调用 `enq ()` 方法执行入队操作，和上面 **线程二** 执行方式是一致的，入队后会修改 **线程二** 对应的 `Node` 中的 `waitStatus=SIGNAL`。最后 **线程三** 也会被挂起。此时等待队列的数据如图：
+此时等待队列的 `tail` 节点指向 **线程二**，进入 `if` 逻辑后，通过 `CAS` 指令将 `tail` 节点重新指向 **线程三** 。接着 **线程三** 调用 `enq ()` 方法执行入队操作，和上面 **线程二** 执行方式是一致的，入队后会修改 **线程二** 对应的 `Node` 中的 `waitStatus=SIGNAL`。最后 **线程三** 也会被挂起。此时等待队列的数据如图：
 
 ![image.png](../assets/aHR0cHM6Ly91c2VyLWdvbGQtY2RuLnhpdHUuaW8vMjAyMC81LzIvMTcxZDJkNDJjOGU1ZTI2OA-1590419214352.jfif)
 
 ### 线程一释放锁
 
-现在来分析下释放锁的过程，首先是 **线程一** 释放锁，释放锁后会唤醒 `head` 节点的后置节点，也就是我们现在的 **线程二** ，具体操作流程如下：
+现在来分析下释放锁的过程，首先是 **线程一** 释放锁，释放锁后会唤醒 `head` 节点的后置节点，也就是我们现在的 **线程二**，具体操作流程如下：
 
 ![image.png](../assets/aHR0cHM6Ly91c2VyLWdvbGQtY2RuLnhpdHUuaW8vMjAyMC81LzIvMTcxZDJkNDMzMmRmNmZkNQ.jfif)
 
@@ -345,7 +345,7 @@ private void unparkSuccessor(Node node) {
 
 ![image.png](../assets/aHR0cHM6Ly91c2VyLWdvbGQtY2RuLnhpdHUuaW8vMjAyMC81LzIvMTcxZDJkNDM0MzkzYzU4Zg-1590419228808.jfif)
 
-此时 **线程二** 被唤醒， **线程二** 接着之前被 `park` 的地方继续执行，继续执行 `acquireQueued ()` 方法。
+此时 **线程二** 被唤醒，**线程二** 接着之前被 `park` 的地方继续执行，继续执行 `acquireQueued ()` 方法。
 
 ### 线程二唤醒继续加锁
 
@@ -383,7 +383,7 @@ final boolean acquireQueued(final Node node, int arg) {
 
 ### 线程二释放锁 / 线程三加锁
 
-当 **线程二** 释放锁时，会唤醒被挂起的 **线程三** ，流程和上面大致相同，被唤醒的 **线程三** 会再次尝试加锁，具体代码可以参考上面内容。具体流程图如下：
+当 **线程二** 释放锁时，会唤醒被挂起的 **线程三**，流程和上面大致相同，被唤醒的 **线程三** 会再次尝试加锁，具体代码可以参考上面内容。具体流程图如下：
 
 ![image.png](../assets/aHR0cHM6Ly91c2VyLWdvbGQtY2RuLnhpdHUuaW8vMjAyMC81LzIvMTcxZDJkNDNhMWEyNmU5NA.jfif)
 
@@ -393,13 +393,13 @@ final boolean acquireQueued(final Node node, int arg) {
 
 ### 公平锁实现原理
 
-上面所有的加锁场景都是基于 **非公平锁** 来实现的， **非公平锁** 是 `ReentrantLock` 的默认实现，那我们接着来看一下 **公平锁** 的实现原理，这里先用一张图来解释 **公平锁** 和 **非公平锁** 的区别： **非公平锁** 执行流程：
+上面所有的加锁场景都是基于 **非公平锁** 来实现的，**非公平锁** 是 `ReentrantLock` 的默认实现，那我们接着来看一下 **公平锁** 的实现原理，这里先用一张图来解释 **公平锁** 和 **非公平锁** 的区别： **非公平锁** 执行流程：
 
 ![image.png](../assets/aHR0cHM6Ly91c2VyLWdvbGQtY2RuLnhpdHUuaW8vMjAyMC81LzIvMTcxZDJkNDNjMjExMjgzOQ.jfif)
 
-这里我们还是用之前的线程模型来举例子，当 **线程二** 释放锁的时候，唤醒被挂起的 **线程三** ， **线程三** 执行 `tryAcquire ()` 方法使用 `CAS` 操作来尝试修改 `state` 值，如果此时又来了一个 **线程四** 也来执行加锁操作，同样会执行 `tryAcquire ()` 方法。
+这里我们还是用之前的线程模型来举例子，当 **线程二** 释放锁的时候，唤醒被挂起的 **线程三**，**线程三** 执行 `tryAcquire ()` 方法使用 `CAS` 操作来尝试修改 `state` 值，如果此时又来了一个 **线程四** 也来执行加锁操作，同样会执行 `tryAcquire ()` 方法。
 
-这种情况就会出现竞争， **线程四** 如果获取锁成功， **线程三** 仍然需要待在等待队列中被挂起。这就是所谓的 **非公平锁** ， **线程三** 辛辛苦苦排队等到自己获取锁，却眼巴巴的看到 **线程四** 插队获取到了锁。 **公平锁** 执行流程：
+这种情况就会出现竞争，**线程四** 如果获取锁成功，**线程三** 仍然需要待在等待队列中被挂起。这就是所谓的 **非公平锁**，**线程三** 辛辛苦苦排队等到自己获取锁，却眼巴巴的看到 **线程四** 插队获取到了锁。**公平锁** 执行流程：
 
 ![image.png](../assets/aHR0cHM6Ly91c2VyLWdvbGQtY2RuLnhpdHUuaW8vMjAyMC81LzIvMTcxZDJkNDNjMzQ2MmQ2YQ.jfif)
 
@@ -473,7 +473,7 @@ public final boolean hasQueuedPredecessors() {
 
 在第一个红框处，例如 **线程一** 执行完成，此时 head 已经有值，而还未执行 `tail=head` 的时候，此时 **线程二** 判断 `head != tail` 成立。而接着 **线程一** 执行完第二个红框处，此时 `tail = node`，但是并未将 `head.next` 指向 `node`。而这时 **线程二** 就会得到 `head.next == null` 成立，直接返回 true。这种情况代表有节点正在做入队操作。
 
-如果 `head.next` 不为空，那么接着判断 `head.next` 节点是否为当前线程，如果不是则返回 false。大家要记清楚，返回 false 代表 FIFO 队列中没有等待获取锁的节点，此时线程可以直接尝试获取锁，如果返回 true 代表有等待线程，当前线程如要入队排列，这就是体现 **公平锁** 的地方。 **非公平锁** 和 **公平锁** 的区别： **非公平锁** 性能高于 **公平锁** 性能。 **非公平锁** 可以减少 `CPU` 唤醒线程的开销，整体的吞吐效率会高点，`CPU` 也不必取唤醒所有线程，会减少唤起线程的数量 **非公平锁** 性能虽然优于 **公平锁** ，但是会存在导致 **线程饥饿** 的情况。在最坏的情况下，可能存在某个线程 **一直获取不到锁** 。不过相比性能而言，饥饿问题可以暂时忽略，这可能就是 `ReentrantLock` 默认创建非公平锁的原因之一了。
+如果 `head.next` 不为空，那么接着判断 `head.next` 节点是否为当前线程，如果不是则返回 false。大家要记清楚，返回 false 代表 FIFO 队列中没有等待获取锁的节点，此时线程可以直接尝试获取锁，如果返回 true 代表有等待线程，当前线程如要入队排列，这就是体现 **公平锁** 的地方。**非公平锁** 和 **公平锁** 的区别： **非公平锁** 性能高于 **公平锁** 性能。**非公平锁** 可以减少 `CPU` 唤醒线程的开销，整体的吞吐效率会高点，`CPU` 也不必取唤醒所有线程，会减少唤起线程的数量 **非公平锁** 性能虽然优于 **公平锁**，但是会存在导致 **线程饥饿** 的情况。在最坏的情况下，可能存在某个线程 **一直获取不到锁** 。不过相比性能而言，饥饿问题可以暂时忽略，这可能就是 `ReentrantLock` 默认创建非公平锁的原因之一了。
 
 ## Condition 实现原理
 
@@ -534,7 +534,7 @@ public class ReentrantLockDemo {
 
 ![image.png](../assets/aHR0cHM6Ly91c2VyLWdvbGQtY2RuLnhpdHUuaW8vMjAyMC81LzIvMTcxZDJkNDNlNjc4NTFiMw.jfif)
 
-这里 **线程一** 先获取锁，然后使用 `await ()` 方法挂起当前线程并 **释放锁** ， **线程二** 获取锁后使用 `signal` 唤醒 **线程一** 。
+这里 **线程一** 先获取锁，然后使用 `await ()` 方法挂起当前线程并 **释放锁**，**线程二** 获取锁后使用 `signal` 唤醒 **线程一** 。
 
 ### Condition 实现原理图解
 
@@ -590,11 +590,11 @@ private Node addConditionWaiter() {
 }
 ```
 
-这里会用当前线程创建一个 `Node` 节点，`waitStatus` 为 `CONDITION`。接着会释放该节点的锁，调用之前解析过的 `release ()` 方法，释放锁后此时会唤醒被挂起的 **线程二** ， **线程二** 会继续尝试获取锁。
+这里会用当前线程创建一个 `Node` 节点，`waitStatus` 为 `CONDITION`。接着会释放该节点的锁，调用之前解析过的 `release ()` 方法，释放锁后此时会唤醒被挂起的 **线程二**，**线程二** 会继续尝试获取锁。
 
 接着调用 `isOnSyncQueue ()` 方法是判断当前的线程节点是不是在同步队列中，因为上一步已经释放了锁，也就是说此时可能有线程已经获取锁同时可能已经调用了 `singal ()` 方法，如果已经唤醒，那么就不应该 `park` 了，而是退出 `while` 方法，从而继续争抢锁。
 
-此时 **线程一** 被挂起， **线程二** 获取锁成功。
+此时 **线程一** 被挂起，**线程二** 获取锁成功。
 
 具体流程如下图：
 
@@ -717,7 +717,7 @@ final boolean acquireQueued(final Node node, int arg) {
 }
 ```
 
-此时 **线程一** 的流程都已经分析完了，等 **线程二** 释放锁后， **线程一** 会继续重试获取锁，流程到此终结。
+此时 **线程一** 的流程都已经分析完了，等 **线程二** 释放锁后，**线程一** 会继续重试获取锁，流程到此终结。
 
 ### Condition 总结
 

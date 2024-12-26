@@ -71,7 +71,7 @@ CRUD（Create、Read、Update、Delete）是 **面向数据** 的，它将对数
 
 ### Event Souring
 
-Event Souring，翻译过来叫事件溯源。什么意思呢？它把对象的创建、修改、删除等一系列的操作都当作事件（_注意：事件和命令还有区别，后面会讲到_），持久化的时候只存储事件，存储事件的介质叫做 **EventStore** ，当要获取一个对象的最新状态时，通过EventStore检索该对象的所有Event并重新加载来获取对象的最新状态。EventStore可以是数据库、磁盘文件、MongoDB等，由于Event的存储都是新增的，所以不存在并发冲突的问题。
+Event Souring，翻译过来叫事件溯源。什么意思呢？它把对象的创建、修改、删除等一系列的操作都当作事件（_注意：事件和命令还有区别，后面会讲到_），持久化的时候只存储事件，存储事件的介质叫做 **EventStore**，当要获取一个对象的最新状态时，通过EventStore检索该对象的所有Event并重新加载来获取对象的最新状态。EventStore可以是数据库、磁盘文件、MongoDB等，由于Event的存储都是新增的，所以不存在并发冲突的问题。
 
 ## Command和Event
 

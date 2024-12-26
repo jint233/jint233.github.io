@@ -1574,7 +1574,7 @@ protected ModelAndView processHandlerException(HttpServletRequest request, HttpS
 }
 ```
 
-处，遍历 HandlerExceptionResolver 数组，调用 HandlerExceptionResolver#resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) 方法，解析异常，生成 ModelAndView 对象。 **处，情况一，生成了 ModelAndView 对象，进行返回。当然，这里的后续代码还有 10 多行，比较简单，胖友自己瞅瞅就 OK 啦。** **
+处，遍历 HandlerExceptionResolver 数组，调用 HandlerExceptionResolver#resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) 方法，解析异常，生成 ModelAndView 对象。**处，情况一，生成了 ModelAndView 对象，进行返回。当然，这里的后续代码还有 10 多行，比较简单，胖友自己瞅瞅就 OK 啦。** **
 处，情况二，未生成 ModelAndView 对象，则抛出异常。
 <3.1> 处，调用 `#render(ModelAndView mv, HttpServletRequest request, HttpServletResponse response)` 方法，渲染页面。
 <3.2> 处，当是 <2> 处的情况二时，则调用 `WebUtils#clearErrorRequestAttributes(HttpServletRequest request)` 方法，清理请求中的错误消息属性。为什么会有这一步呢？答案在 `#processHandlerException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)` 方法中，会调用 `WebUtils#exposeErrorRequestAttributes(HttpServletRequest request, Throwable ex, String servletName)` 方法，设置请求中的错误消息属性。

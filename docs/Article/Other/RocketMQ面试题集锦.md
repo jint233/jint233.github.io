@@ -70,7 +70,7 @@ Producer 在发送消息的时候指定什么时刻发送，然后消息被发�
 
 顺序消息在日常的功能场景中很常见，比如点外卖生成外卖订单、付款、送餐的消息需要保证严格的顺序。
 
-**全局顺序消息：** RocketMQ 的一个 Topic 下默认有八个读队列和八个写队列，如果要保证全局顺序消息的话需要在生产端只保留一个读写队列，然后消费端只有一个消费线程，这样会降低 RocketMQ 的高可用和高吞吐量。 **分区顺序消息：** 分区顺序消息同样需要生产端和消费端配合，生产端根据同一个订单 ID 把消息路由到同一个 MessageQueue，消费端控制从同一个 MessageQueue 取出的消息不被并发处理。 **生成端发送分区顺序消息：** 
+**全局顺序消息：** RocketMQ 的一个 Topic 下默认有八个读队列和八个写队列，如果要保证全局顺序消息的话需要在生产端只保留一个读写队列，然后消费端只有一个消费线程，这样会降低 RocketMQ 的高可用和高吞吐量。**分区顺序消息：** 分区顺序消息同样需要生产端和消费端配合，生产端根据同一个订单 ID 把消息路由到同一个 MessageQueue，消费端控制从同一个 MessageQueue 取出的消息不被并发处理。**生成端发送分区顺序消息：** 
 
 ```java
 SendResult sendResult = Producer.send(msg , new MessageQueueSelector() {
@@ -140,7 +140,7 @@ MappedByteBuffer#write() 方法会将数据直接写入到 PageCache 中，然�
 ![在这里插入图片描述](../assets/79b95410-9ea6-11ea-853e-a34978cba4d6.png)
 MMAP 虽然可以提高磁盘读写的性能，但是仍然有诸多缺陷和限制，比如：
 *   MMAP 进行文件映射的时候对文件大小有限制，在 1.5GB~2GB 之间，所以 RocketMQ 设计 CommitLog 单个文件 1GB，ConsumeQueue 单个文件 5.7MB；
-*   当不再需要使用 MappedByteBuffer 的时候，需要手动释放占用的虚拟内存。 **PageCache 技术** 为了优化磁盘中数据文件的读写性能，PageCache 技术对数据文件进行了缓存。“对磁盘中数据文件的顺序读写性能接近于对内存的读写性能”，其主要原因就是 PageCache 对磁盘中数据文件的读写进行了优化。
+*   当不再需要使用 MappedByteBuffer 的时候，需要手动释放占用的虚拟内存。**PageCache 技术** 为了优化磁盘中数据文件的读写性能，PageCache 技术对数据文件进行了缓存。“对磁盘中数据文件的顺序读写性能接近于对内存的读写性能”，其主要原因就是 PageCache 对磁盘中数据文件的读写进行了优化。
 * **PageCache 对数据文件的读优化：** 由于读数据文件的时候会先从 PageCache 加载数据，如果 PageCache 没有数据的话，会从磁盘的数据文件中加载数据并且顺序把相邻的数据文件页面预加载到 PageCache 中，这样子如果之后读取的数据文件在 PageCache 中能找到的话就省去了去磁盘加载数据的操作相当于直接读内存。
 * **PageCache 对数据文件的写优化：** 往数据文件中写数据的时候同样先写到 PageCache 中，然后操作系统会定期刷盘把 PageCache 中的数据持久化到磁盘中。
 那么 RocketMQ 具体是怎么使用 PageCache + Mmap 技术的呢？又做了哪些优化呢？
@@ -150,10 +150,10 @@ MMAP 虽然可以提高磁盘读写的性能，但是仍然有诸多缺陷和限
 ![在这里插入图片描述](../assets/c7c074e0-9ea6-11ea-853e-a34978cba4d6.png)
 虽然 PageCache 技术优化了数据文件的读写性能，但是仍然有一些影响其性能的问题：
 操作系统的脏页回写（当空闲内存不足的时候操作系统会将脏页刷到磁盘释放内存空间）、内存回收、内存 SWAP（当内存不足的时候把一部分磁盘空间虚拟成内存使用） 等都会造成消息读写的延迟。
-为了解决消息读写的延迟问题，RocketMQ 还引入了其他优化方案，下文继续分析。 **预分配 MappedFile（内存预分配）** 为了解决 PageCache 技术带来的消息读写延迟问题，RocketMQ 进行了内存预分配处理。
+为了解决消息读写的延迟问题，RocketMQ 还引入了其他优化方案，下文继续分析。**预分配 MappedFile（内存预分配）** 为了解决 PageCache 技术带来的消息读写延迟问题，RocketMQ 进行了内存预分配处理。
 当往 CommitLog 写入消息的时候，会先判断 MappedFileQueue 队列中是否有对应的 MappedFile，如果没有的话会封装一个 AllocateRequest 请求，参数有：文件路径、下下个文件路径、文件大小等，并把请求放到一个 AllocateRequestQueue 队列里面；
 在 Broker 启动的时候会自动创建一个 AllocateMappedFileService 服务线程，该线程不停的运行并从 AllocateRequestQueue 队列消费请求，执行 MappedFile 映射文件的创建和下下个 MappedFile 的预分配逻辑，创建 MappedFile 映射文件的方式有两个：一个是在虚拟内存中通过 MapperByteBuffer 即 Mmap 创建一个 MappedFile 实例，另一个是在堆外内存中通过 DirectByteBuffer 创建一个 MappedFile 实例。创建完当前 MappedFile 实例后还会将下一个 MappedFile 实例创建好并且添加到 MappedFileQueue 队列里面，即预分配 MappedFile。
-![在这里插入图片描述](../assets/251a5070-9ea7-11ea-bf38-950ba54cfedc.png) **mlock 系统调用** 当内存不足的时候可能发生内存 SWAP，读写消息的进程所使用的内存可能会被交换到 SWAP 空间，为了保证 RocketMQ 的吞吐量和读写消息低延迟，肯定希望尽可能使用物理内存，所以 RocketMQ 采用了 mlock 系统调用将读写消息的进程所使用的部分或者全部内存锁在了物理内存中，防止被交换到 SWAP 空间。 **文件预热（内存预热）** mlock 系统调用未必会锁住读写消息进程所使用的物理内存，因为可能会有一些内存分页是写时复制的，所以 RocketMQ 在创建 MapperFile 的过程中，会将 Mmap 映射出的虚拟内存中随机写入一些值，防止内存被交换到 SWAP 空间。
+![在这里插入图片描述](../assets/251a5070-9ea7-11ea-bf38-950ba54cfedc.png) **mlock 系统调用** 当内存不足的时候可能发生内存 SWAP，读写消息的进程所使用的内存可能会被交换到 SWAP 空间，为了保证 RocketMQ 的吞吐量和读写消息低延迟，肯定希望尽可能使用物理内存，所以 RocketMQ 采用了 mlock 系统调用将读写消息的进程所使用的部分或者全部内存锁在了物理内存中，防止被交换到 SWAP 空间。**文件预热（内存预热）** mlock 系统调用未必会锁住读写消息进程所使用的物理内存，因为可能会有一些内存分页是写时复制的，所以 RocketMQ 在创建 MapperFile 的过程中，会将 Mmap 映射出的虚拟内存中随机写入一些值，防止内存被交换到 SWAP 空间。
 由于 Mmap 技术只是创建了虚拟内存地址至物理内存地址的映射表，并没有将磁盘中的数据文件加载到内存中来，如果内存中没有找到数据就会发生缺页中断，而去磁盘读取数据，所以 RocketMQ 采用了 madvise 系统调用将数据文件尽可能多的加载到内存中达到内存预热的效果。
 总结
 ==

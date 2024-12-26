@@ -31,7 +31,7 @@ Raft 将共识问题分解三个子问题：
 1. **follower 从节点** ：
 
    - 节点默认是 follower；
-   - 如果 **刚刚开始** 或 **和 leader 通信超时** ，follower 会发起选举，变成 candidate，然后去竞选 leader；
+   - 如果 **刚刚开始** 或 **和 leader 通信超时**，follower 会发起选举，变成 candidate，然后去竞选 leader；
    - 如果收到其他 candidate 的竞选投票请求，按照 **先来先得** & **每个任期只能投票一次** 的投票原则投票;
 
 2. **candidate 候选者** ：
@@ -65,7 +65,7 @@ Raft 将共识问题分解三个子问题：
 
    - **投票原则** ：当多个 Candidate 竞选 Leader 时：
 
-     - 一个任期内，follower 只会 **投票一次票** ，且投票 **先来显得** ；
+     - 一个任期内，follower 只会 **投票一次票**，且投票 **先来显得** ；
      - Candidate 存储的日志至少要和 follower 一样新（ **安全性准则** ），否则拒绝投票；
 
 5. **投票未超过半数，选举失败** ：
@@ -80,7 +80,7 @@ Raft 将共识问题分解三个子问题：
 - 如果请求的任期 TermId 不小于 Candidate 当前任期 TermId，那么 Candidate 会承认该 Leader 的合法地位并转化为 Follower；
 - 否则，拒绝这次请求，并继续保持 Candidate；
 
-简单的多， **Leader Election 领导选举** 通过若干的投票原则，保证一次选举有且仅可能最多选出一个 leader，从而解决了脑裂问题。
+简单的多，**Leader Election 领导选举** 通过若干的投票原则，保证一次选举有且仅可能最多选出一个 leader，从而解决了脑裂问题。
 
 ## 2.2 Log Replication 日志复制
 
@@ -97,7 +97,7 @@ follower 收到日志复制请求的处理流程：
 3. 如此循环往复，直到找到一个共同的任期号&日志索引。此时 follower 从这个索引值开始复制，最终和 leader 节点日志保持一致；
 4. 日志复制过程中，Leader 会无限重试直到成功。如果超过半数的节点复制日志成功，就可以任务当前数据请求达成了共识，即日志可以 commite 提交了；
 
-综上， **Log Replication 日志复制** 有两个特点：
+综上，**Log Replication 日志复制** 有两个特点：
 
 1. 如果在不同日志中的两个条目有着相同索引和任期号，则所存储的命令是相同的，这点是由 leader 来保证的；
 2. 如果在不同日志中的两个条目有着相同索引和任期号，则它们之间所有条目完全一样，这点是由日志复制的规则来保证的；
@@ -108,7 +108,7 @@ follower 收到日志复制请求的处理流程：
 
 **日志不一致问题** ：在正常情况下，leader 和 follower 的日志复制能够保证整个集群的一致性，但是遇到 leader 崩溃的时候，leader 和 follower 日志可能出现了不一致的状态，此时 follower 相比 leader 缺少部分日志。
 
-为了解决数据不一致性，Raft 算法规定 **follower 强制复制 leader 节日的日志** ，即 follower 不一致日志都会被 leader 的日志覆盖，最终 follower 和 leader 保持一致。简单的说，从前向后寻找 follower 和 leader 第一个公共 LogIndex 的位置，然后从这个位置开始，follower 强制复制 leader 的日志。但是这么多还有其他的安全性问题，所以需要引入 **Safety 安全性** 规则 。
+为了解决数据不一致性，Raft 算法规定 **follower 强制复制 leader 节日的日志**，即 follower 不一致日志都会被 leader 的日志覆盖，最终 follower 和 leader 保持一致。简单的说，从前向后寻找 follower 和 leader 第一个公共 LogIndex 的位置，然后从这个位置开始，follower 强制复制 leader 的日志。但是这么多还有其他的安全性问题，所以需要引入 **Safety 安全性** 规则 。
 
 ## 2.3 Safety 安全性
 
@@ -118,7 +118,7 @@ follower 收到日志复制请求的处理流程：
 
 选举安全性要求一个任期 Term 内只能有一个 leader，即不能出现脑裂现象，否者 raft 的日志复制原则很可能出现数据覆盖丢失的问题。Raft 算法通过规定若干投票原则来解决这个问题：
 
-- 一个任期内，follower 只会 **投票一次票** ，且先来先得；
+- 一个任期内，follower 只会 **投票一次票**，且先来先得；
 - Candidate 存储的日志至少要和 follower 一样新；
 - 只有获得超过半数投票才有机会成为 leader；
 
@@ -126,7 +126,7 @@ follower 收到日志复制请求的处理流程：
 
 Raft 算法规定，所有的数据请求都要交给 leader 节点处理，要求
 
-1. leader 只能日志追加日志， **不能覆盖日志** ；
+1. leader 只能日志追加日志，**不能覆盖日志** ；
 2. 只有 leader 的日志项才能被提交，follower 不能接收写请求和提交日志；
 3. 只有已经提交的日志项，才能被应用到状态机中；
 4. 选举时限制新 leader 日志包含所有已提交日志项；

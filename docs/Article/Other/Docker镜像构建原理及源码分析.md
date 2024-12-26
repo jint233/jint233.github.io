@@ -85,7 +85,7 @@ API docs preview will be running at http://localhost:9000
 
 通过 API 我们也知道了该接口所需的请求体是一个 `tar` 归档文件（可选择压缩算法进行压缩），同时它的请求头中会携带用户在镜像仓库中的认证信息。
 
-这提醒我们， **如果在使用远程 Dockerd 构建时，请注意安全，尽量使用 tls 进行加密，以免数据泄漏。**
+这提醒我们，**如果在使用远程 Dockerd 构建时，请注意安全，尽量使用 tls 进行加密，以免数据泄漏。**
 
 ### CLI
 
@@ -226,7 +226,7 @@ Successfully built ce88644a7395
 invalid argument: can't use stdin for both build context and dockerfile
 ```
 
-就会报错了。所以， **不能同时使用 stdin 读取 Dockerfile 和 build context** 。
+就会报错了。所以，**不能同时使用 stdin 读取 Dockerfile 和 build context** 。
 
 - **build context 支持四种行为。** 
 
@@ -550,7 +550,7 @@ func doBuild(ctx context.Context, eg *errgroup.Group, dockerCli command.Cli, std
 }
 ```
 
-从以上的介绍我们可以先做个小的总结。 **当 build context 从 stdin 读，并且是个 tar 归档时，实际会向 dockerd 发起两次 /build 请求** 而一般情况下只会发送一次请求。
+从以上的介绍我们可以先做个小的总结。**当 build context 从 stdin 读，并且是个 tar 归档时，实际会向 dockerd 发起两次 /build 请求** 而一般情况下只会发送一次请求。
 那这里会有什么差别呢？此处先不展开，我们留到下面讲 `dockerd` 后端的时候再来解释。
 
 #### 小结
@@ -636,7 +636,7 @@ return errf(err)
 }
 ```
 
-这里就需要注意了: 真正的构建过程要开始了。 **使用 backend 的 Build 函数来完成真正的构建过程** 
+这里就需要注意了: 真正的构建过程要开始了。**使用 backend 的 Build 函数来完成真正的构建过程** 
 
 ```go
 // api/server/backend/build/backend.go#L52

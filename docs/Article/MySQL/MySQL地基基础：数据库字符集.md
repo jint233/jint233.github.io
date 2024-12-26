@@ -265,19 +265,19 @@ create table tab1(column1 varchar(5) character set utf8 collate utf8_bin);
 *   如果指定了字符集未指定校对规则，则使用指定字符集和默认校对规则
 *   如果未指定字符集和校对规则，则使用表字符集和校对规则
 
-**4. 如何处理带数据的字符集** 当表中已经存在数据，直接更改字符集，不会更改既有的数据字符集，我们需要先将数据导出，调整字符集再导入。 **第一步：导出表结构** 
+**4. 如何处理带数据的字符集** 当表中已经存在数据，直接更改字符集，不会更改既有的数据字符集，我们需要先将数据导出，调整字符集再导入。**第一步：导出表结构** 
 
 ```plaintext
 mysqldump -uroot -p --default-character-set=gbk -d db1> createtab.sql
 ```
 
-**第二步：修改表字符集** 编辑修改 createtab.sql 文件，将表结构定义中的字符集改为新的字符集。 **第三步：导出所有数据** 
+**第二步：修改表字符集** 编辑修改 createtab.sql 文件，将表结构定义中的字符集改为新的字符集。**第三步：导出所有数据** 
 
 ```plaintext
 mysqldump -uroot -p --quick --no-create-info --extended-insert --default-character-set=latin1 db1> data.sql
 ```
 
-**第四步：修改数据字符集** 编辑修改 data.sql，将 set names latin1 修改成 set names gbk。 **第五步：创建数据库** 
+**第四步：修改数据字符集** 编辑修改 data.sql，将 set names latin1 修改成 set names gbk。**第五步：创建数据库** 
 
 ```plaintext
 create database db1 default charset gbk;

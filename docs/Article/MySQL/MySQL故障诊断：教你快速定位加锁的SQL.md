@@ -12,7 +12,7 @@
 
 在实际应用中你肯定遇到过锁问题，这个锁的威力很大，那出现了数据库锁，会造成什么影响呢？
 
-**锁等待** 一个连接申请了锁资源，其他连接要申请资源，无法获取，等待资源释放。 **死锁**
+**锁等待** 一个连接申请了锁资源，其他连接要申请资源，无法获取，等待资源释放。**死锁**
 
 你锁我，我也锁你，大家一起锁着吧。
 
@@ -109,7 +109,7 @@ mysql> select trx_id,trx_started,trx_requested_lock_id,trx_query,trx_mysql_threa
 2 rows in set (0.01 sec)
 ```
 
-结果有两个事务，MySQL 事务线程 id 为 38 和 41，很直观的看到 41 是我们的 delete 事务，被 38 锁定。 **定位线程** 
+结果有两个事务，MySQL 事务线程 id 为 38 和 41，很直观的看到 41 是我们的 delete 事务，被 38 锁定。**定位线程** 
 
 ```sql
 mysql> select * from performance_schema.threads where processlist_id=38;
@@ -121,7 +121,7 @@ mysql> select * from performance_schema.threads where processlist_id=38;
 1 row in set (0.00 sec)
 ```
 
-结果找到 MySQL 事务线程 38 对应的服务器线程 63。 **定位加锁 SQL** 
+结果找到 MySQL 事务线程 38 对应的服务器线程 63。**定位加锁 SQL** 
 
 ```sql
 mysql> select * from performance_schema.events_statements_current where thread_id=63;
@@ -133,5 +133,5 @@ mysql> select * from performance_schema.events_statements_current where thread_i
 1 row in set (0.00 sec)
 ```
 
-结果中我们找到了加锁的 update 的 SQL 语句。 **总结** 在 MySQL 数据库中出现了锁，不要着急，我们通过这个方法可以快速定位加锁的 SQL，你学会了吗？
+结果中我们找到了加锁的 update 的 SQL 语句。**总结** 在 MySQL 数据库中出现了锁，不要着急，我们通过这个方法可以快速定位加锁的 SQL，你学会了吗？
 ```

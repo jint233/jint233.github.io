@@ -6,7 +6,7 @@
 
 本文主要分析 MySQL Buffer Pool 的相关技术以及实现原理，源码基于阿里云 RDS MySQL 5.6 分支，其中部分特性已经开源到 AliSQL。
 
-Buffer Pool 相关的源代码在 buf 目录下，主要包括 **LRU List**，**Flu List**，**Double write buffer**, **预读预写**，**Buffer Pool 预热**，**压缩页内存管理** 等模块，包括头文件和 IC 文件，一共两万行代码。
+Buffer Pool 相关的源代码在 buf 目录下，主要包括 **LRU List**，**Flu List**，**Double write buffer**,**预读预写**，**Buffer Pool 预热**，**压缩页内存管理** 等模块，包括头文件和 IC 文件，一共两万行代码。
 
 ## 基础知识
 
