@@ -11,6 +11,13 @@
 
 ## 项目启动&部署方式
 
+### 环境安装
+
+```bash
+pip install mkdocs-material
+pip install mkdocs-glightbox
+```
+
 ### 本地启动
 
 ```bash
