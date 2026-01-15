@@ -6,7 +6,7 @@
 
   在看源码之前我们先看下 Spring MVC 在 Spring 中的架构依赖，它不是一个单独的项目，它有依赖的爸爸 spring-web 项目，也有两个兄弟 spring-webflux 和 spring-websocket 项目，本文只讲 Spring MVC，Spring Webflux 和 Spring WebSocket 日后会更新 Chat。
 
-  ![在这里插入图片描述](../assets/423ba560-3227-11ea-b8e0-e5f2366b7ae1.jpg)
+  ![img](../assets/423ba560-3227-11ea-b8e0-e5f2366b7ae1.jpg)
 
 ### 一、上下文在 Web 容器中的启动
 
@@ -51,7 +51,7 @@
 
 ```javascript
 先看下 ContextLoaderListener 的类图：
-![在这里插入图片描述](../assets/4b2e3250-322c-11ea-9a23-3953d44b4f10.jpg)
+![img](../assets/4b2e3250-322c-11ea-9a23-3953d44b4f10.jpg)
 org.springframework.web.context.ContextLoaderListener，实现 ServletContextListener 接口，继承 ContextLoader 类，实现 Servlet 容器启动和关闭时，分别初始化和销毁 WebApplicationContext 容器。(注意，这个 ContextLoaderListener 类，是在 spring-web 项目中。)
 ContextLoaderListener 初始化 Root WebApplicationContext 的入口在 ContextLoaderListener#contextInitialized() 方法中，代码如下：
 ```
@@ -323,7 +323,7 @@ public WebApplicationContext initWebApplicationContext(ServletContext servletCon
 
 即， Servlet WebApplicationContext 容器的初始化，是在 DispatcherServlet 初始化的过程中执行。
 DispatcherServlet 的类图如下：
-![在这里插入图片描述](../assets/584a3d50-3234-11ea-b8e0-e5f2366b7ae1.jpg)
+![img](../assets/584a3d50-3234-11ea-b8e0-e5f2366b7ae1.jpg)
 
 ```javascript
 - HttpServletBean，负责将 ServletConfig 设置到当前 Servlet 对象中。
@@ -974,7 +974,7 @@ public interface FlashMapManager {
 ```
 
 一个用户的请求，是如何被 DispatcherServlet 处理的。如下图所示：
-![在这里插入图片描述](../assets/2480b4f0-323d-11ea-924d-0fd6db928ace.jpg)
+![img](../assets/2480b4f0-323d-11ea-924d-0fd6db928ace.jpg)
 摘自《Spring MVC 原理探秘——一个请求的旅行过程》
 整体流程实际不复杂，但是涉及的全部代码会非常多，所以下面重点在于解析整体的流程。
 

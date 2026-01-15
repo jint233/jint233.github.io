@@ -6,7 +6,7 @@
 
 java.lang.Object
 
-![在这里插入图片描述](../assets/ff073620-61e1-11ea-adab-69d66e125cd5.jpg)
+![img](../assets/ff073620-61e1-11ea-adab-69d66e125cd5.jpg)
 
 下面是对应方法的含义。
 
@@ -197,7 +197,7 @@ Hashtable is synchronized.  If a thread-safe implementation is not needed, it is
 
 紧接上个问题，面试官很有可能会问红黑树，下面把红黑树的几个特征列出来：
 
-![在这里插入图片描述](../assets/54a67640-61e2-11ea-b16a-f1bd5f6b62c7.jpg)
+![img](../assets/54a67640-61e2-11ea-b16a-f1bd5f6b62c7.jpg)
 
 如果面试官还要继续问红黑树具体是怎么添加节点和删除节点的，推荐看：
 
@@ -212,7 +212,7 @@ try-catch-finally
 - finally 块负责清理各种资源，不管是否出现异常都会执行
 - 其中 try 块是必须的，catch 和 finally 至少存在一个标准异常处理流程
 
-![在这里插入图片描述](../assets/64193c20-61e2-11ea-861e-fb2bdb9ba1ba.jpg)
+![img](../assets/64193c20-61e2-11ea-861e-fb2bdb9ba1ba.jpg)
 
 > 抛出异常→捕获异常→捕获成功（当 catch 的异常类型与抛出的异常类型匹配时，捕获成功）→异常被处理，程序继续运行 抛出异常→捕获异常→捕获失败（当 catch 的异常类型与抛出异常类型不匹配时，捕获失败）→异常未被处理，程序中断运行
 
@@ -245,7 +245,7 @@ javap -verbose FinallyDemo.class >>test.txt
 
 然后打开 test.txt，关键部分内容如下：
 
-![在这里插入图片描述](../assets/7c6db850-61e2-11ea-b15e-81680fd47bd3.jpg)
+![img](../assets/7c6db850-61e2-11ea-b15e-81680fd47bd3.jpg)
 
 发现在字节码指令中，将 hello 保存在本地变量 2 中，然后直到把本地变量 2 加载到操作数栈中，然后就直接出栈，return 回去了，所以本题的返回去的是 hello，但是 finally 代码块也执行了，执行完 finally 模块后再返回一个临时变量 2。
 
@@ -253,13 +253,13 @@ javap -verbose FinallyDemo.class >>test.txt
 
 ### 1. Java 类加载器有几种？
 
-![在这里插入图片描述](../assets/8aa58d30-61e2-11ea-8032-6b1a3b46917c.jpg)
+![img](../assets/8aa58d30-61e2-11ea-8032-6b1a3b46917c.jpg)
 
-![在这里插入图片描述](../assets/9659eb80-61e2-11ea-b16a-f1bd5f6b62c7.jpg)
+![img](../assets/9659eb80-61e2-11ea-b16a-f1bd5f6b62c7.jpg)
 
 ### 2. 说一下有哪些类加载场景？
 
-![在这里插入图片描述](../assets/a9977500-61e2-11ea-861e-fb2bdb9ba1ba.jpg)
+![img](../assets/a9977500-61e2-11ea-861e-fb2bdb9ba1ba.jpg)
 
 ### 3. 说说 Java 类加载机制是什么？说说 new 创建一个普通对象的过程？
 
@@ -267,7 +267,7 @@ javap -verbose FinallyDemo.class >>test.txt
 
 加载、验证、准备、解析、初始化。
 
-![在这里插入图片描述](../assets/b5133720-61e2-11ea-995f-d7947324f2ec.jpg)
+![img](../assets/b5133720-61e2-11ea-995f-d7947324f2ec.jpg)
 
 new 创建一个普通对象的过程如下：
 
@@ -279,23 +279,23 @@ new 创建一个普通对象的过程如下：
 
 下面用一张图来描述：
 
-![在这里插入图片描述](../assets/c106c150-61e2-11ea-8fc3-cbeb82bc1da0.jpg)
+![img](../assets/c106c150-61e2-11ea-8fc3-cbeb82bc1da0.jpg)
 
 ### 4. 说说类的生命周期？
 
 注意类生命周期和对象声明周期，类生命周期主要有以下几个阶段：
 
-![在这里插入图片描述](../assets/cc8828c0-61e2-11ea-995f-d7947324f2ec.jpg)
+![img](../assets/cc8828c0-61e2-11ea-995f-d7947324f2ec.jpg)
 
-![在这里插入图片描述](../assets/d9050730-61e2-11ea-a96d-0d011f52751a.jpg)
+![img](../assets/d9050730-61e2-11ea-a96d-0d011f52751a.jpg)
 
 ### 5. 什么是双亲委派模型？
 
-![在这里插入图片描述](../assets/e775c660-61e2-11ea-b15e-81680fd47bd3.jpg)
+![img](../assets/e775c660-61e2-11ea-b15e-81680fd47bd3.jpg)
 
 ### 6. 如何破坏双亲委派模型？
 
-![在这里插入图片描述](../assets/f5017cc0-61e2-11ea-a96d-0d011f52751a.jpg)
+![img](../assets/f5017cc0-61e2-11ea-a96d-0d011f52751a.jpg)
 
 ### 7. 能不能自己也写一个 java.lang.String 类？
 
@@ -322,11 +322,11 @@ public class MyTest {
 
 运行：
 
-![在这里插入图片描述](../assets/00ed8ce0-61e3-11ea-855c-4f1f59747b98.jpg)
+![img](../assets/00ed8ce0-61e3-11ea-855c-4f1f59747b98.jpg)
 
 具体校验的源码地方：
 
-![在这里插入图片描述](../assets/0c73fd60-61e3-11ea-8fc3-cbeb82bc1da0.jpg)
+![img](../assets/0c73fd60-61e3-11ea-8fc3-cbeb82bc1da0.jpg)
 
 结论就是定义包目录的时候，不能以 java. 开头。
 
@@ -334,7 +334,7 @@ public class MyTest {
 
 此题我想用我的方法说，不像网上一堆一堆抄书上的，希望能对大家有所帮助，如果没多大帮助，那可以网上找个看看，只能说抱歉了。
 
-![在这里插入图片描述](../assets/1983f410-61e3-11ea-995f-d7947324f2ec.jpg)
+![img](../assets/1983f410-61e3-11ea-995f-d7947324f2ec.jpg)
 
 下面我们直入主题：
 
@@ -347,23 +347,23 @@ public class MyTest {
 
 > 一个线程进来就创建虚拟机栈，该线程调用的方法就是栈帧，进入方法，栈帧就入栈（虚拟机栈），出方法就是出虚拟机栈。可以通过下面两张图进行理解：
 
-![在这里插入图片描述](../assets/37317500-61e3-11ea-baf8-f1bca404e984.jpg)
+![img](../assets/37317500-61e3-11ea-baf8-f1bca404e984.jpg)
 
-![在这里插入图片描述](../assets/475e6320-61e3-11ea-b16a-f1bd5f6b62c7.jpg) **本地方法栈** 和 Java 虚拟机栈类似，Java 虚拟机栈针对的是 Java 方法，而本地方法栈针对的 native 修饰的方法。**堆** JVM 几乎所有的对象的内存分配都在堆里。由于对象是有生命周期的，所以把堆又分成了新生代和老年代。
+![img](../assets/475e6320-61e3-11ea-b16a-f1bd5f6b62c7.jpg) **本地方法栈** 和 Java 虚拟机栈类似，Java 虚拟机栈针对的是 Java 方法，而本地方法栈针对的 native 修饰的方法。**堆** JVM 几乎所有的对象的内存分配都在堆里。由于对象是有生命周期的，所以把堆又分成了新生代和老年代。
 
 新生代和老年代大小比例 = 1:2（默认）。新生代又分为 Eden、S0、S1 区域，Ede:S0:S1=8:1:1。
 
 大多数对象在 Eden 区出生和死亡。Eden 区存活下来的对象进入 S0 区，S0 区活下来的对象放到 S1，S1 区活下来的对象放到 S0 区，这过程中 S0 和 S1 至少有一个区域是空着的。并且对象每次倒腾一次自己的年龄就加 1，直达加到 15 岁的时候，就直接入老年代了。有的大对象可以直接进入老年代，条件是把该对象的大小以及达到了能直接进入老年代的条件了（阈值可以设置）。
 
-![在这里插入图片描述](../assets/54a03f40-61e3-11ea-829b-7dbe678b494f.jpg)
+![img](../assets/54a03f40-61e3-11ea-829b-7dbe678b494f.jpg)
 
 **方法区** 先按照图中的关键字回答。但是方法区由于 JDK 版本有所变动。
 
-![在这里插入图片描述](../assets/6152fac0-61e3-11ea-861e-fb2bdb9ba1ba.jpg)
+![img](../assets/6152fac0-61e3-11ea-861e-fb2bdb9ba1ba.jpg)
 
 回答的时候，一定要说一下方法区由于 JDK 版本有所变动。版本变动情况如下：
 
-![在这里插入图片描述](../assets/6df03270-61e3-11ea-be13-9d4b32a4c9f6.jpg)
+![img](../assets/6df03270-61e3-11ea-be13-9d4b32a4c9f6.jpg)
 
 ### 9. 方法区和永久代有什么区别？
 
@@ -383,7 +383,7 @@ public class MyTest {
 
 建议把阈值对应的几个区也简要的说一下：
 
-![在这里插入图片描述](../assets/7eb7b2e0-61e3-11ea-adab-69d66e125cd5.jpg)
+![img](../assets/7eb7b2e0-61e3-11ea-adab-69d66e125cd5.jpg)
 
 ### 11. 为什么要用 metaspace 替换 permspace 呢？
 
@@ -395,7 +395,7 @@ public class MyTest {
 
 下面是 JDK 几个版本中方法区和堆存储的信息的关系：
 
-![在这里插入图片描述](../assets/8959dde0-61e3-11ea-995f-d7947324f2ec.jpg) **总结**
+![img](../assets/8959dde0-61e3-11ea-995f-d7947324f2ec.jpg) **总结**
 
 - 字符串存在永久代中，容易出现性能问题和内存溢出。
 - 类及方法的信息等比较难确定其大小，因此对于永久代的大小指定比较困难，太小容易出现永久代溢出，太大则容易导致老年代溢出。
@@ -442,31 +442,31 @@ java -XX:+PrintFlagsFinal -version |grep MetaspaceSize
 ### 13. Java 对象的引用类型有哪些？
 
 对象引用类型有四类： **强引用、软引用、弱引用、虚引用** 。
-![在这里插入图片描述](../assets/968a54e0-61e3-11ea-8032-6b1a3b46917c.jpg)
+![img](../assets/968a54e0-61e3-11ea-8032-6b1a3b46917c.jpg)
 
 ### 14. JVM 垃圾回收算法有哪些？
 
 垃圾回收算法共四种：其实我更愿意说成三种，因为分代回收其实不是算法。
-![在这里插入图片描述](../assets/a3e907d0-61e3-11ea-b15e-81680fd47bd3.jpg)
+![img](../assets/a3e907d0-61e3-11ea-b15e-81680fd47bd3.jpg)
 
 ### 15. 垃圾收集器有哪些？
 
 目前常见的有如下几种：
-![在这里插入图片描述](../assets/b2b52d70-61e3-11ea-995f-d7947324f2ec.jpg)
+![img](../assets/b2b52d70-61e3-11ea-995f-d7947324f2ec.jpg)
 Serial 收集器
-![在这里插入图片描述](../assets/bf2a1ca0-61e3-11ea-855c-4f1f59747b98.jpg)
+![img](../assets/bf2a1ca0-61e3-11ea-855c-4f1f59747b98.jpg)
 ParNew 收集器
-![在这里插入图片描述](../assets/c9fad1b0-61e3-11ea-a96d-0d011f52751a.jpg)
+![img](../assets/c9fad1b0-61e3-11ea-a96d-0d011f52751a.jpg)
 Parallel scavenge 收集器
-![在这里插入图片描述](../assets/d79491d0-61e3-11ea-baf8-f1bca404e984.jpg)
+![img](../assets/d79491d0-61e3-11ea-baf8-f1bca404e984.jpg)
 Serial Old 收集器
-![在这里插入图片描述](../assets/e84ef2e0-61e3-11ea-8032-6b1a3b46917c.jpg)
+![img](../assets/e84ef2e0-61e3-11ea-8032-6b1a3b46917c.jpg)
 CMS=Concurrent Mark Sweep 收集器
-![在这里插入图片描述](../assets/f84874f0-61e3-11ea-855c-4f1f59747b98.jpg)
+![img](../assets/f84874f0-61e3-11ea-855c-4f1f59747b98.jpg)
 Parallel Old 收集器
-![在这里插入图片描述](../assets/0364b1f0-61e4-11ea-8fc3-cbeb82bc1da0.jpg)
+![img](../assets/0364b1f0-61e4-11ea-8fc3-cbeb82bc1da0.jpg)
 G1=Garbage-First 收集器
-![在这里插入图片描述](../assets/0ee35a40-61e4-11ea-861e-fb2bdb9ba1ba.jpg)
+![img](../assets/0ee35a40-61e4-11ea-861e-fb2bdb9ba1ba.jpg)
 
 - **垃圾收集器整合** - G1 是新生代和老年代一起搞，不和别人合伙。
   - Serial：CMS 或者 Serial Old
@@ -479,7 +479,7 @@ G1=Garbage-First 收集器
 
 ### 16. 说说 JVM 中内存的分配与回收策略
 
-![在这里插入图片描述](../assets/1a4d4210-61e4-11ea-a96d-0d011f52751a.jpg)
+![img](../assets/1a4d4210-61e4-11ea-a96d-0d011f52751a.jpg)
 
 ## 三、Dubbo 篇
 
@@ -488,9 +488,9 @@ G1=Garbage-First 收集器
 ### 1. 说说一次 Dubbo 服务请求流程？
 
 基本工作流程：
-![在这里插入图片描述](../assets/27800300-61e4-11ea-b16a-f1bd5f6b62c7.jpg)
+![img](../assets/27800300-61e4-11ea-b16a-f1bd5f6b62c7.jpg)
 上图中角色说明：
-![在这里插入图片描述](../assets/362d2ef0-61e4-11ea-b15e-81680fd47bd3.jpg)
+![img](../assets/362d2ef0-61e4-11ea-b15e-81680fd47bd3.jpg)
 
 ### 2. 说说 Dubbo 工作原理
 
@@ -512,7 +512,7 @@ G1=Garbage-First 收集器
 
 ### 3. Dubbo 支持哪些协议？
 
-![在这里插入图片描述](../assets/427d7f20-61e4-11ea-a96d-0d011f52751a.jpg)
+![img](../assets/427d7f20-61e4-11ea-a96d-0d011f52751a.jpg)
 还有三种，混个眼熟就行：Memcached 协议、Redis 协议、Rest 协议。
 上图基本上把序列化的方式也罗列出来了。
 详细请参考：[Dubbo 官网](https://dubbo.apache.org/zh-cn/docs/user/references/protocol/dubbo.html)。
@@ -520,12 +520,12 @@ G1=Garbage-First 收集器
 ### 4. 注册中心挂了，consumer 还能不能调用 provider？
 
 可以。因为刚开始初始化的时候，consumer 会将需要的所有提供者的地址等信息拉取到本地缓存，所以注册中心挂了可以继续通信。但是 provider 挂了，那就没法调用了。
-![在这里插入图片描述](../assets/4d469310-61e4-11ea-be13-9d4b32a4c9f6.jpg)
+![img](../assets/4d469310-61e4-11ea-be13-9d4b32a4c9f6.jpg)
 关键字：consumer 本地缓存服务列表。
 
 ### 5. 怎么实现动态感知服务下线的呢？
 
-![在这里插入图片描述](../assets/5c804790-61e4-11ea-8fc3-cbeb82bc1da0.jpg)
+![img](../assets/5c804790-61e4-11ea-8fc3-cbeb82bc1da0.jpg)
 服务订阅通常有 pull 和 push 两种方式：
 
 - pull 模式需要客户端定时向注册中心拉取配置；
@@ -555,7 +555,7 @@ G1=Garbage-First 收集器
 
 ### 10. 说说 TCP 与 UDP 的区别，以及各自的优缺点
 
-![在这里插入图片描述](../assets/6e7fabc0-61e4-11ea-adab-69d66e125cd5.jpg)
+![img](../assets/6e7fabc0-61e4-11ea-adab-69d66e125cd5.jpg)
 
 ### 11. 说一下 HTTP 和 HTTPS 的区别
 
@@ -581,16 +581,16 @@ HTTP 协议的长连接和短连接，实质上是 TCP 协议的长连接和短�
 
 ### 1. 说说 MyBatis 的缓存
 
-![在这里插入图片描述](../assets/7dec5720-61e4-11ea-8fc3-cbeb82bc1da0.jpg)
+![img](../assets/7dec5720-61e4-11ea-8fc3-cbeb82bc1da0.jpg)
 
 **一级缓存** 在应用运行过程中，我们有可能在一次数据库会话中，执行多次查询条件完全相同的 SQL，MyBatis 提供了一级缓存的方案优化这部分场景，如果是相同的 SQL 语句，会优先命中一级缓存，避免直接对数据库进行查询，提高性能。
 每个 SqlSession 中持有了 Executor，每个 Executor 中有一个 LocalCache。当用户发起查询时，MyBatis 根据当前执行的语句生成 MappedStatement，在 Local Cache 进行查询，如果缓存命中的话，直接返回结果给用户，如果缓存没有命中的话，查询数据库，结果写入 Local Cache，最后返回结果给用户。具体实现类的类关系图如下图所示：
-![在这里插入图片描述](../assets/893e9840-61e4-11ea-8fc3-cbeb82bc1da0.jpg)
+![img](../assets/893e9840-61e4-11ea-8fc3-cbeb82bc1da0.jpg)
 
 1. MyBatis 一级缓存的生命周期和 SqlSession 一致。
 2. MyBatis 一级缓存内部设计简单，只是一个没有容量限定的 HashMap，在缓存的功能性上有所欠缺。
 3. MyBatis 的一级缓存最大范围是 SqlSession 内部，有多个 SqlSession 或者分布式的环境下，数据库写操作会引起脏数据，建议设定缓存级别为 Statement。**二级缓存** 在上文中提到的一级缓存中，其最大的共享范围就是一个 SqlSession 内部，如果多个 SqlSession 之间需要共享缓存，则需要使用到二级缓存。开启二级缓存后，会使用 CachingExecutor 装饰 Executor，进入一级缓存的查询流程前，先在 CachingExecutor 进行二级缓存的查询，具体的工作流程如下所示。
-![在这里插入图片描述](../assets/942a9d80-61e4-11ea-829b-7dbe678b494f.jpg)
+![img](../assets/942a9d80-61e4-11ea-829b-7dbe678b494f.jpg)
 二级缓存开启后，同一个 namespace 下的所有操作语句，都影响着同一个 Cache，即二级缓存被多个 SqlSession 共享，是一个全局的变量。
 当开启缓存后，数据的查询执行的流程为：
 
@@ -686,7 +686,7 @@ JDK 动态代理：
 
 ### 5. MyBatis 中见过什么设计模式？
 
-![在这里插入图片描述](../assets/a9668f10-61e4-11ea-be13-9d4b32a4c9f6.jpg)
+![img](../assets/a9668f10-61e4-11ea-be13-9d4b32a4c9f6.jpg)
 
 ## 五、MySQL 篇
 
@@ -702,11 +702,11 @@ select name from t_user where id=1
 4. **优化器**，是在表里有多个索引的时候，决定使用哪个索引；或者一个语句中存在多表关联的时候（join），决定各个表的连接顺序。
 5. **执行器**，通过分析器让 SQL 知道你要干啥，通过优化器知道该怎么做，于是开始执行语句。执行语句的时候还要判断是否具备此权限，没有权限就直接返回提示没有权限的错误；有权限则打开表，根据表的引擎定义，去使用这个引擎提供的接口，获取这个表的第一行，判断 id 是都等于 1。如果是，直接返回；如果不是继续调用引擎接口去下一行，重复相同的判断，直到取到这个表的最后一行，最后返回。
 MySQL 的典型的三层结构（连接器 + Server + 执行器）：
-![在这里插入图片描述](../assets/b60ffbc0-61e4-11ea-8fc3-cbeb82bc1da0.jpg)
+![img](../assets/b60ffbc0-61e4-11ea-8fc3-cbeb82bc1da0.jpg)
 
 ### 2. MySQL 有哪些存储引擎？
 
-![在这里插入图片描述](../assets/c1088420-61e4-11ea-b15e-81680fd47bd3.jpg)
+![img](../assets/c1088420-61e4-11ea-b15e-81680fd47bd3.jpg)
 
 ### 3. MySQL 中 varchar 与 char 的区别？varchar (30) 中的 30 代表的涵义？
 
@@ -724,7 +724,7 @@ int (11) 中的 11，不影响字段存储的范围，只影响展示效果。
 
 ### 6. 说说数据库的三范式和反模式
 
-![在这里插入图片描述](../assets/d250f460-61e4-11ea-a96d-0d011f52751a.jpg)
+![img](../assets/d250f460-61e4-11ea-a96d-0d011f52751a.jpg)
 
 ### 7. 在设计数据库表的时候，字段用于存储金额、余额时，选择什么类型比较好？
 
@@ -745,11 +745,11 @@ MySQL 中存储引擎使用类似的方式进行查询，先去索引中查找�
 
 ### 10. 索引有什么优缺点？
 
-![在这里插入图片描述](../assets/e11d4110-61e4-11ea-8fc3-cbeb82bc1da0.jpg)
+![img](../assets/e11d4110-61e4-11ea-8fc3-cbeb82bc1da0.jpg)
 
 ### 11. MySQL 索引类型有哪些？
 
-![在这里插入图片描述](../assets/eb0bfa90-61e4-11ea-861e-fb2bdb9ba1ba.jpg)
+![img](../assets/eb0bfa90-61e4-11ea-861e-fb2bdb9ba1ba.jpg)
 
 ### 12. 什么时候不要使用索引？
 
@@ -759,7 +759,7 @@ MySQL 中存储引擎使用类似的方式进行查询，先去索引中查找�
 
 ### 13. 使用 MySQL 的索引应该注意些什么？
 
-![在这里插入图片描述](../assets/f7d7bc50-61e4-11ea-829b-7dbe678b494f.jpg)
+![img](../assets/f7d7bc50-61e4-11ea-829b-7dbe678b494f.jpg)
 
 ### 14. 怎么知道一条查询语句是否用到了索引，用了什么类型的索引？
 
@@ -833,24 +833,24 @@ MySQL 中有共享锁和排它锁，也就是读锁和写锁。
 ### 1. 看你简历上写了 RabbitMQ，通常会问：为什么要用 RabbitMQ？
 
 **异步** 场景：需要把 A 系统信息发给 B、C、D 系统。
-![在这里插入图片描述](../assets/0d188fe0-61e5-11ea-829b-7dbe678b494f.jpg)
+![img](../assets/0d188fe0-61e5-11ea-829b-7dbe678b494f.jpg)
 用户发起请求总耗时 380，调用 A 系统耗时 80ms，A 系统调用 B 系统 100ms，A 系统调用 C 系统耗时 110ms，A 系统调用 D 系统耗时 90ms。其中 A 系统只管把数据推送出去就行。
 如果引入 RabbitMQ 后，该请求总耗时 = A 系统耗时 + 发送 RabbitMQ 耗时，总耗时从 380ms 到 120ms 了。
-![在这里插入图片描述](../assets/18998220-61e5-11ea-855c-4f1f59747b98.jpg)
+![img](../assets/18998220-61e5-11ea-855c-4f1f59747b98.jpg)
 可以看到通过 RabbitMQ 的异步功能，可以大大提高接口的性能。
 
 **解耦** 场景：业务需要把用户信息从 A 系统推送到 B 系统和 C 系统，流程如下：
-![在这里插入图片描述](../assets/276afef0-61e5-11ea-8fc3-cbeb82bc1da0.jpg)
+![img](../assets/276afef0-61e5-11ea-8fc3-cbeb82bc1da0.jpg)
 但是这回业务变化了，还需要把 A 系统把用户信息推送给 D 系统和 E 系统。如果还按照上面系统那种模式，那么 A 系统得又得新开发。就变成下面这样：
-![在这里插入图片描述](../assets/32234a00-61e5-11ea-b16a-f1bd5f6b62c7.jpg)
+![img](../assets/32234a00-61e5-11ea-b16a-f1bd5f6b62c7.jpg)
 如果引入 RabbitMQ 的话：
-![在这里插入图片描述](../assets/41689740-61e5-11ea-829b-7dbe678b494f.jpg)
+![img](../assets/41689740-61e5-11ea-829b-7dbe678b494f.jpg)
 往后不管有多少个系统需要 A 系统推送用户信息，A 系统就不用变，只是对应系统去 RabbitMQ 取数据就可以搞定了。
 
 **削峰** 场景：A 系统常规情况下，每秒并发 200，但是高峰时间可能会到几千或者上万，但是数据库每秒只能处理 1000 左右，多了会把数据库搞死。正常情况下：
-![在这里插入图片描述](../assets/4d4a6e30-61e5-11ea-855c-4f1f59747b98.jpg)
+![img](../assets/4d4a6e30-61e5-11ea-855c-4f1f59747b98.jpg)
 如果引入 RabbitMQ 的话，就是先把消息给 RabbitMQ，然后慢慢入库，这样数据库就不会有太大压力了。
-![在这里插入图片描述](../assets/57776930-61e5-11ea-995f-d7947324f2ec.jpg)
+![img](../assets/57776930-61e5-11ea-995f-d7947324f2ec.jpg)
 削峰就类似于银行办理业务，正常情况下，几个窗口够用，但是在节假日去银行办理业务的人太多了，几个窗口就支持不了，窗口边会站满了人。于是就可以采取取号制度，先拿号码去大厅坐着，我们一个一个来。（如有觉得场景不妥的，望谅解）
 上面三种场景能回答上来，基本上就可以避免 “我们领导叫我们这么用的” 尴尬场面。
 真实场景：
@@ -863,12 +863,12 @@ MySQL 中有共享锁和排它锁，也就是读锁和写锁。
 
 ### 2. 可能你讲了上面三个 RabbitMQ 的优点后，会继续问：使用 RabbitMQ 容易带来什么问题？
 
-![在这里插入图片描述](../assets/68516030-61e5-11ea-a96d-0d011f52751a.jpg)
+![img](../assets/68516030-61e5-11ea-a96d-0d011f52751a.jpg)
 
 ### 3. 那么多消息队列，为什么选 RabbitMQ 呢？
 
 这里就得把常见的消息队列都列出来进行对比，如果是做技术选型的话，这也是必须要考察的。短期为了面试，长期为了在做架构时的技术选型。
-![在这里插入图片描述](../assets/773b1ff0-61e5-11ea-829b-7dbe678b494f.jpg)
+![img](../assets/773b1ff0-61e5-11ea-829b-7dbe678b494f.jpg)
 
 ### 4. RabbitMQ 中什么是死信队列？
 
@@ -891,7 +891,7 @@ DLX=Dead-Letter-Exchange。利用 DLX，当消息在一个队列中变成死信�
 ### 6. 怎么保证消息不会被丢失？
 
 有三种场景会导致消息丢失：
-![在这里插入图片描述](../assets/84a125e0-61e5-11ea-8032-6b1a3b46917c.jpg)
+![img](../assets/84a125e0-61e5-11ea-8032-6b1a3b46917c.jpg)
 总结为：生产者搞丢数据、RabbitMQ 搞丢数据、消费者搞丢数据。
 
 **生产者搞丢数据**  **事务功能机制** 使用 RabbitMQ 的事务功能，就是生产者发送数据之前开启 RabbitMQ 事务 channel.txSelect，然后发送消息，如果消息没有成功被 RabbitMQ 接收到，那么生产者会收到异常报错，此时就可以回滚事务 channel.txRollback，然后重试发送消息；如果收到了消息，那么可以提交事务 channel.txCommit。但是这种方案是存在问题的，即 RabbitMQ 事务机制（同步）一搞，基本上 **吞吐量会下来**，因为 **太耗性能** 。**confirm 机制** 在生产者那里设置开启 confirm 模式后，你每次写的消息都会分配一个唯一的 ID。如果写入 RabbitMQ 成功后会回传一个 ack 消息，告诉你这个消息已经到达 RabbitMQ 了；如果没收到你的消息或者失败了，则会回调你的一个 nack，告诉你这个消息 RabbitMQ 接受失败，然后你就可以继续重试发送，而且你可以结合这个机制在内存里维护一个 ID 的状态。如果超过一定时间没收到回调，那么就可以再次发送消息。所以一般在生产者这方避免数据丢失，都是使用 confirm 机制。**事务机制 PK confirm 模式** 事务机制是同步的，提交事务后会阻塞在那里等待。confirm 是异步的，发送这个消息后就可以发送下一个消息了。消息被 RabbitMQ 接收之后会异步回调一个通知，告知你这个消息已接收到了。
@@ -907,20 +907,20 @@ DLX=Dead-Letter-Exchange。利用 DLX，当消息在一个队列中变成死信�
 **消费端搞丢消息数据** 消费端代码中可能有 bug，异常没有处理导致消费失败，或者系统重启、挂了等，那么 RabbitMQ 认为咱们已经消费了，所以对应消息数据就会丢失了。
    这时候我们就得使用 RabbitMQ 的 ack 机制。得把自动 ack 关闭，有个 api 直接调用，然后在自己代码里，确保消费者真的成功消费完成后，再进行一个手动 ack。
 
-**总结**![在这里插入图片描述](../assets/a09d4d50-61e5-11ea-b15e-81680fd47bd3.jpg)
+**总结**![img](../assets/a09d4d50-61e5-11ea-b15e-81680fd47bd3.jpg)
 
 ### 7. RabbitMQ 怎么高可用呢？
 
 **单机模式** 不属于高可用，单机模式就是启动单个 RabbitMQ 节点，一般用于本地开发或者测试环境。实际生产上，基本不会使用这种单节点模式。
 
 **普通集群模式** 不属于高可用，普通集群模式就是在多台机器上启动多个 RabbitMQ 实例，每个机器各自启动一个。你创建的 queue，只会放在一个 RabbitMQ 实例上，但是每个实例都是同步 queue 的元数据（元数据可以认为是 queue 的一些配置基本信息，通过元数据，可以找到 queue 所在的实例）。你消费的时候，如果连接到另外一个实例，那个实例就会从 queue 所在的实例上把数据拉取过来。
-![在这里插入图片描述](../assets/ab4ac2f0-61e5-11ea-baf8-f1bca404e984.jpg)
+![img](../assets/ab4ac2f0-61e5-11ea-baf8-f1bca404e984.jpg)
 
 上面这种普通集群方式确实很麻烦，给人的感觉不是很好，没有做到真正的分布式，就是一个普通的集群。因为这导致要么消费者每次都链接一个实例然后拉取消息数据，要么固定连接那个 queue 所在实例消费数据。前者有数据拉取的开销，后者导致实例性能瓶颈。如果消息放的 queue 挂了，会导致接下来其他实例无法从该实例上拉取消息数据。如果开启了消息持久化，让 RabbitMQ 本地持久化，消息不一定会丢。得等到这个实例重启恢复后，才可以继续从这个 queue 上拉取消息数据。所以上面这种模式，就没有所谓的高可用。这方案主要是提高吞吐量的，就是说让集群中多个节点来服务 queue 的读写操作。
 
 **镜像集群模式** 高可用模式，镜像集群模式才是所谓的 RabbitMQ 的高可用模式。跟普通集群模式不一样的是，**在镜像集群模式下，你所创建的 queue，无论元数据还是 queue 里的消息数据都会存在于多个实例上** 。也就是说，每个 RabbitMQ 都有 queue 的一个完整镜像，包含 queue 的全部数据。每次写消息到 queue 的时候，都会自动把消息数据同步到多个实例的 queue 上。
 
-![在这里插入图片描述](../assets/b8673cc0-61e5-11ea-b16a-f1bd5f6b62c7.jpg)
+![img](../assets/b8673cc0-61e5-11ea-b16a-f1bd5f6b62c7.jpg)
 
 那么，要如何才能开启这个镜像集群模式呢？其实很简单，RabbitMQ 有很好的管理控制台，在后台新增一个策略，这个策略就是镜像集群模式的策略。指定的时候可以要求数据同步到所有节点，也可以要求同步到指定数量的节点上。再次创建 queue 的时候，应用这个策略，就会自动将数据同步到其他的结点上了。
 可以看到，不管任何一个机器挂了、宕了，都没影响。其他机器或者节点上还包括这个 queue 的完整数据，其他消费者都可从其他节点上去拉取消息数据进行消费。但有坏处：
@@ -935,7 +935,7 @@ DLX=Dead-Letter-Exchange。利用 DLX，当消息在一个队列中变成死信�
 与 Kafka 和 RocketMQ 不同，Kafka 不存在类似 Topic 的概念，而是真正的一条一条队列，并且每个队列可以被多个消费者拉取消息。这是一个非常大的差异。
 在 RabbitMQ 中，一个 queue，多个 consumer。比如：生产者向 RabbitMQ 里发送了三条数据，顺序依次为是 data1/data2/data3，压入的是 RabbitMQ 的内存队列里。有三个消费者分别从 RabbitMQ 中消费三条数据中的一条，结果消费者 2 先执行完操作，把 data2 存入数据库，然后是 data1/data3。这不明显乱了，没有按照顺序消费消息。
 
-![在这里插入图片描述](../assets/d31ab790-61e5-11ea-b16a-f1bd5f6b62c7.jpg)
+![img](../assets/d31ab790-61e5-11ea-b16a-f1bd5f6b62c7.jpg)
 
 应对上面的顺序消费问题有两种方案：
 
@@ -944,7 +944,7 @@ DLX=Dead-Letter-Exchange。利用 DLX，当消息在一个队列中变成死信�
 
 **方法二** 就一个 queue，但对应一个 consumer，consumer 内部用内存做队列、做排队，然后分发给底层不同的 worker 来处理。这种方式就是将一个 queue 里的，相同 key 交给同一个 worker 来执行。因为 RabbitMQ 是可以单条消息来 ack，所以较为方便。
 
-![在这里插入图片描述](../assets/ddf94f50-61e5-11ea-995f-d7947324f2ec.jpg)
+![img](../assets/ddf94f50-61e5-11ea-995f-d7947324f2ec.jpg)
 
 从上面两个方案可以看出，前提都是一个 queue 只能启动一个 consumer 对应。
 
@@ -960,10 +960,10 @@ DLX=Dead-Letter-Exchange。利用 DLX，当消息在一个队列中变成死信�
 下面大致搞一个图来表示。
 
 解决之前的架构一：
-![在这里插入图片描述](../assets/ea68c040-61e5-11ea-b16a-f1bd5f6b62c7.jpg)
+![img](../assets/ea68c040-61e5-11ea-b16a-f1bd5f6b62c7.jpg)
 
 解决消息堆积的临时架构二：
-![在这里插入图片描述](../assets/05ce9b20-61e6-11ea-b16a-f1bd5f6b62c7.jpg)
+![img](../assets/05ce9b20-61e6-11ea-b16a-f1bd5f6b62c7.jpg)
 
 问题处理完了，还得把架构改成架构一。
 
@@ -1012,7 +1012,7 @@ Redis 内部使用 **文件事件处理器** file event handler，这个文件�
 
 来看客户端与 Redis 的一次通信过程：
 
-![在这里插入图片描述](../assets/14954280-61e6-11ea-be13-9d4b32a4c9f6.jpg)
+![img](../assets/14954280-61e6-11ea-be13-9d4b32a4c9f6.jpg)
 
 下面来大致说一下这个图：
 
@@ -1033,7 +1033,7 @@ Redis 内部使用 **文件事件处理器** file event handler，这个文件�
 
 ### 5. Redis 缓存刷新策略有哪些？
 
-![在这里插入图片描述](../assets/213909e0-61e6-11ea-be13-9d4b32a4c9f6.jpg)
+![img](../assets/213909e0-61e6-11ea-be13-9d4b32a4c9f6.jpg)
 
 ### 6. Redis 持久化方式有哪些？以及有什么区别？
 
@@ -1173,17 +1173,17 @@ public @interface SpringBootApplication {
 
 ### 6. Spring Boot 有什么优缺点？
 
-![在这里插入图片描述](../assets/5e209f30-61e6-11ea-855c-4f1f59747b98.jpg)
+![img](../assets/5e209f30-61e6-11ea-855c-4f1f59747b98.jpg)
 
 ### 7. 读取配置文件中配置项的有哪些方法？
 
-![在这里插入图片描述](../assets/6836dde0-61e6-11ea-baf8-f1bca404e984.jpg)
+![img](../assets/6836dde0-61e6-11ea-baf8-f1bca404e984.jpg)
 
 ## 九、Spring 篇
 
 ### 1. Spring 中 ApplicationContext 和 BeanFactory 的区别
 
-- **类图**![在这里插入图片描述](../assets/720bf4e0-61e6-11ea-861e-fb2bdb9ba1ba.jpg)
+- **类图**![img](../assets/720bf4e0-61e6-11ea-861e-fb2bdb9ba1ba.jpg)
 
 - **包目录不同** - spring-beans.jar 中 org.springframework.beans.factory.BeanFactory
   - spring-context.jar 中 org.springframework.context.ApplicationContext
@@ -1205,11 +1205,11 @@ public @interface SpringBootApplication {
 
 ### 2. 说一下你对 Spring IOC 的理解
 
-![在这里插入图片描述](../assets/99962df0-61e6-11ea-be13-9d4b32a4c9f6.jpg)
+![img](../assets/99962df0-61e6-11ea-be13-9d4b32a4c9f6.jpg)
 
 ### 3. Spring IOC 有什么优点？
 
-![在这里插入图片描述](../assets/a50bae80-61e6-11ea-adab-69d66e125cd5.jpg)
+![img](../assets/a50bae80-61e6-11ea-adab-69d66e125cd5.jpg)
 
 ### 4. Bean 的生命周期
 
@@ -1231,15 +1231,15 @@ Bean 的声明周期为 bean 的创建、应用、销毁。
 
   销毁过程会依次调用 DisposableBean 的 destroy 方法和 Bean 自身定制的 destroy 方法。
   网上找到一张图：
-  ![在这里插入图片描述](../assets/b0df0680-61e6-11ea-a96d-0d011f52751a.jpg)
+  ![img](../assets/b0df0680-61e6-11ea-a96d-0d011f52751a.jpg)
 
 ### 5. Spring Bean 的作用域有哪些？
 
-![在这里插入图片描述](../assets/1b2be570-61e8-11ea-8fc3-cbeb82bc1da0.jpg) **注** ：网络上很多文章说有 Global-session 级别，它是 Portlet 模块独有，目前已经废弃，在 Spring 5 中是找不到的。
+![img](../assets/1b2be570-61e8-11ea-8fc3-cbeb82bc1da0.jpg) **注** ：网络上很多文章说有 Global-session 级别，它是 Portlet 模块独有，目前已经废弃，在 Spring 5 中是找不到的。
 
 ### 6. Spring 是怎么管理事务的？
 
-![在这里插入图片描述](../assets/262bc0d0-61e8-11ea-adab-69d66e125cd5.jpg)
+![img](../assets/262bc0d0-61e8-11ea-adab-69d66e125cd5.jpg)
 
 ### 7. 说说你对 Spring AOP 的理解
 
@@ -1262,8 +1262,8 @@ Bean 的声明周期为 bean 的创建、应用、销毁。
       - 外层拦截器根据代理配置信息，创建内层拦截器，创建的过程中，会根据表达式判断当前拦截是否匹配这个拦截器，而这个拦截器链设计模式就是职责链模式。
       - 当整个链条执行到最后时，就会触发创建代理时那个尾部的默认拦截器，从而调用目标方法，最后返回。
       咋一看觉得动态代理和装饰器模式很像，都是功能增加，但是，这两个模式的本质是不一样的，代理重在访问权限的控制，装饰器模式重在动态地对原本的功能进行改变。
-      ![在这里插入图片描述](../assets/34a27370-61e8-11ea-8fc3-cbeb82bc1da0.jpg)
-      ![在这里插入图片描述](../assets/4f507000-61e8-11ea-adab-69d66e125cd5.jpg)
+      ![img](../assets/34a27370-61e8-11ea-8fc3-cbeb82bc1da0.jpg)
+      ![img](../assets/4f507000-61e8-11ea-adab-69d66e125cd5.jpg)
 
 ### 8. Spring 中用到了哪些设计模式？
 
@@ -1279,7 +1279,7 @@ Spring 框架并没有对单例 Bean 进行任何多线程的封装处理。
 
 ### 10. Spring 是怎么解决循环依赖的？
 
-![在这里插入图片描述](../assets/5c9ad7a0-61e8-11ea-855c-4f1f59747b98.jpg)
+![img](../assets/5c9ad7a0-61e8-11ea-855c-4f1f59747b98.jpg)
 整个流程大致如下：
 
 1. 首先 A 完成初始化第一步并将自己 **提前曝光** 出来（通过 ObjectFactory 将自己提前曝光），在初始化的时候，发现自己依赖对象 B，此时就会去尝试 get (B)，这个时候发现 B 还没有被创建出来；
@@ -1304,7 +1304,7 @@ ZooKeeper 是一个开放源码的分布式协调服务，它是集群的管理�
 
 ### 3. ZooKeeper 有哪些节点类型？
 
-![在这里插入图片描述](../assets/6af6af40-61e8-11ea-995f-d7947324f2ec.jpg)
+![img](../assets/6af6af40-61e8-11ea-995f-d7947324f2ec.jpg)
 
 ### 4. 请描述一下 ZooKeeper 的通知机制是什么？
 
@@ -1331,7 +1331,7 @@ ZooKeeper 允许客户端向服务端的某个 znode 注册一个 Watcher 监听
 
 ### 6. ZooKeeper 集群中有哪些角色？
 
-![在这里插入图片描述](../assets/76aa9860-61e8-11ea-adab-69d66e125cd5.jpg)
+![img](../assets/76aa9860-61e8-11ea-adab-69d66e125cd5.jpg)
 在一个集群中，最少需要 3 台。或者保证 2N+1 台，即奇数。为什么保证奇数？主要是为了选举算法。
 
 ### 7. ZooKeeper 集群中 Server 有哪些工作状态？
@@ -1393,9 +1393,9 @@ Leader 服务器会和每一个 Follower/Observer 服务器都建立 TCP 连接�
 ### 2. 说说线程的生命周期
 
 先来看一张图：
-![在这里插入图片描述](../assets/a2b5c5b0-61e8-11ea-855c-4f1f59747b98.jpg)
+![img](../assets/a2b5c5b0-61e8-11ea-855c-4f1f59747b98.jpg)
 这六个状态就对应线程的生命周期。下图为线程对应状态以及状态出发条件：
-![在这里插入图片描述](../assets/ad908ce0-61e8-11ea-8fc3-cbeb82bc1da0.jpg)
+![img](../assets/ad908ce0-61e8-11ea-8fc3-cbeb82bc1da0.jpg)
 
 ### 3. 说说 synchronized 的使用和原理
 
@@ -1437,7 +1437,7 @@ Leader 服务器会和每一个 Follower/Observer 服务器都建立 TCP 连接�
 
 在共享内存的并发模型里，线程之间共享程序的公共状态，线程之间通过写 - 读内存中的公共状态来隐式进行通信。典型的共享内存通信方式，就是通过共享对象进行通信。
 
-![在这里插入图片描述](../assets/c01574c0-61e8-11ea-be13-9d4b32a4c9f6.jpg)
+![img](../assets/c01574c0-61e8-11ea-be13-9d4b32a4c9f6.jpg)
 
 例如上图线程 A 与 线程 B 之间如果要通信的话，那么就必须经历下面两个步骤：
 
@@ -1448,11 +1448,11 @@ Leader 服务器会和每一个 Follower/Observer 服务器都建立 TCP 连接�
 
 在消息传递的并发模型里，线程之间没有公共状态，线程之间必须通过明确的发送消息来显式进行通信。在 Java 中典型的消息传递方式，就是 wait () 和 notify ()，或者 BlockingQueue。
 
-![在这里插入图片描述](../assets/cd3486a0-61e8-11ea-baf8-f1bca404e984.jpg)
+![img](../assets/cd3486a0-61e8-11ea-baf8-f1bca404e984.jpg)
 
 ### 8. 说说你对 volatile 的理解
 
-![在这里插入图片描述](../assets/d778da30-61e8-11ea-855c-4f1f59747b98.jpg)
+![img](../assets/d778da30-61e8-11ea-855c-4f1f59747b98.jpg)
 
 ### 9. 说一下 volatile 和 synchronized 的区别？
 
@@ -1487,7 +1487,7 @@ public class ThreadDemo {
 ### 11. 说一下 Java 创建线程池有哪些方式？
 
 通过 java.util.concurrent.Executors 来创建以下常见线程池：
-![在这里插入图片描述](../assets/ef2c3460-61e8-11ea-a96d-0d011f52751a.jpg)
+![img](../assets/ef2c3460-61e8-11ea-a96d-0d011f52751a.jpg)
 也可以通过 java.util.concurrent.ThreadPoolExecutor 来创建自定义线程池，其中核心的几个参数：
 
 ```java
@@ -1501,11 +1501,11 @@ RejectedExecutionHandler handler // 当任务无法执行的时候的处理方�
 ```
 
 线程池原理：
-![在这里插入图片描述](../assets/fc8234c0-61e8-11ea-8032-6b1a3b46917c.jpg)
+![img](../assets/fc8234c0-61e8-11ea-8032-6b1a3b46917c.jpg)
 
 ### 12. 说说 ThreadLocal 底层原理是什么，怎么避免内存泄漏？
 
-![在这里插入图片描述](../assets/3d1daa50-61e9-11ea-8032-6b1a3b46917c.jpg)
+![img](../assets/3d1daa50-61e9-11ea-8032-6b1a3b46917c.jpg)
 推荐阅读：
 
 > [ThreadLocal 面试六连问，中高级必问](https://mp.weixin.qq.com/s/VrFarzkLQqdQskXO5MxW0g)
@@ -1520,7 +1520,7 @@ RejectedExecutionHandler handler // 当任务无法执行的时候的处理方�
   - 但是，不使用实际的许可对象，Semaphore 只对可用许可的数量进行计数，并采取相应的行动。
   
     信号量常常用于多线程的代码中，比如数据库连接池。
-    ![在这里插入图片描述](../assets/6acaeee0-61e9-11ea-829b-7dbe678b494f.jpg)
+    ![img](../assets/6acaeee0-61e9-11ea-829b-7dbe678b494f.jpg)
   
 - CountDownLatch
   字面意思是减小计数（CountDown）的门闩（Latch）。它要做的事情是，等待指定数量的计数被减少，意味着门闩被打开，然后进行执行。CountDownLatch 默认的构造方法是 CountDownLatch (int count)，其参数表示需要减少的计数，主线程调用 await () 方法告诉 CountDownLatch 阻塞等待指定数量的计数被减少，然后其它线程调用 CountDownLatch 的 CountDown () 方法，减小计数 (不会阻塞)。等待计数被减少到零，主线程结束阻塞等待，继续往下执行。
@@ -1628,11 +1628,11 @@ RejectedExecutionHandler handler // 当任务无法执行的时候的处理方�
 
 下面使用《图解 HTTP》里的一张图：
 
-![在这里插入图片描述](../assets/936efc60-61e9-11ea-855c-4f1f59747b98.jpg)
+![img](../assets/936efc60-61e9-11ea-855c-4f1f59747b98.jpg)
 
 ### 3. 说说分布式事务解决方案有哪些？
 
-![在这里插入图片描述](../assets/a034a3a0-61e9-11ea-baf8-f1bca404e984.jpg)
+![img](../assets/a034a3a0-61e9-11ea-baf8-f1bca404e984.jpg)
 
 更多方案详情，推荐阅读：
 
@@ -1640,7 +1640,7 @@ RejectedExecutionHandler handler // 当任务无法执行的时候的处理方�
 
 ### 4. 说说常用的 JVM 调优命令和工具有哪些？
 
-![在这里插入图片描述](../assets/ad2d8fe0-61e9-11ea-baf8-f1bca404e984.jpg)
+![img](../assets/ad2d8fe0-61e9-11ea-baf8-f1bca404e984.jpg)
 
 常用 JVM 调优工具分为两类：
 
@@ -1654,7 +1654,7 @@ JDK 自带监控工具：jconsole 和 jvisualvm 2、第三方有：MAT（Memory 
 ### 5. 说说你对 JVM 内存溢出和内存泄漏的理解
 
 - **内存溢出** 即 OutOfMemoryError，当没有足够的空闲内存可供程序使用时出现。
-    ![在这里插入图片描述](../assets/ccda1520-61e9-11ea-b15e-81680fd47bd3.jpg)
+    ![img](../assets/ccda1520-61e9-11ea-b15e-81680fd47bd3.jpg)
 
 - **内存泄漏** 内存使用后未得到及时释放，又不能被 GC 回收，导致虚拟机不能再次使用该内存，此时这段内存就泄露了。
     常见避免方法：
@@ -1665,4 +1665,4 @@ JDK 自带监控工具：jconsole 和 jvisualvm 2、第三方有：MAT（Memory 
 
 ### 6. 说说 JVM 中有哪些常用参数？
 
-![在这里插入图片描述](../assets/d820e490-61e9-11ea-8032-6b1a3b46917c.jpg)
+![img](../assets/d820e490-61e9-11ea-8032-6b1a3b46917c.jpg)

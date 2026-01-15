@@ -1464,7 +1464,7 @@ public class NIOClient3 {
 比如对于 32 位的 Linux 系统而言，用户空间和内核空间划分如下：
 
 <figure markdown="span">
-<img src="../../assets/8e7d3c50-93c3-11eb-987a-1fa99aac0083" alt="img">
+<img src="../assets/8e7d3c50-93c3-11eb-987a-1fa99aac0083" alt="img">
 </figure>
 
 32 位操作系统的寻址空间（虚拟地址空间）为 4G（2 的 32 次方）。在 Linux 中，4G 虚拟地址空间中的最高的 1G 字节空间分配给内核独享使用。低地址的 3G 空间为应用程序共享，即每个应用程序都有最大 3G 的虚拟地址空间。每个进程可以通过系统调用切换进入内核，所有进程可以共享 Linux 内核。因此可以认为每个进程都有 4G 字节的虚拟空间。
@@ -1472,7 +1472,7 @@ public class NIOClient3 {
 Linux 内部结构图如下：
 
 <figure markdown="span">
-<img src="../../assets/999dbf10-93c3-11eb-9ad9-9f9d57de4e5a" alt="img">
+<img src="../assets/999dbf10-93c3-11eb-9ad9-9f9d57de4e5a" alt="img">
 </figure>
 
 ### Linux 的五种 I/O 模型
@@ -1482,7 +1482,7 @@ Linux 内部结构图如下：
 下图展示了 Linux I/O 的过程。
 
 <figure markdown="span">
-<img src="../../assets/a31a07b0-93c3-11eb-b9e3-79badd8952b7" alt="img">
+<img src="../assets/a31a07b0-93c3-11eb-b9e3-79badd8952b7" alt="img">
 </figure>
 
 操作系统内核收到用户进程发起的请求后，从 I/O 设备读取数据到 kernel buffer 中，再将 buffer 中的数据拷贝到用户进程的地址空间，用户进程获取到数据后返回给客户端。
@@ -1511,7 +1511,7 @@ Linux 内部结构图如下：
 用户进程调用了 recvfrom 系统调用，此后一直处于等待状态，直到数据包到达并被拷贝到应用程序缓冲区，或者发生 error 才返回。整个过程从开始 recvfrom 调用到它返回一直处于阻塞状态。当 recvfrom 调用返回后，应用进程才能处理数据。
 
 <figure markdown="span">
-<img src="../../assets/b7816b30-93c3-11eb-987a-1fa99aac0083" alt="img">
+<img src="../assets/b7816b30-93c3-11eb-987a-1fa99aac0083" alt="img">
 </figure>
 
 #### 2.Nonblocking I/O
@@ -1519,7 +1519,7 @@ Linux 内部结构图如下：
 可以设置 Socket 为非阻塞模式。这种设置相当于告诉内核 “当 I/O 操作时，如果请求是不可能完成的，不要把进程进入睡眠状态，返回一个错误即可 “。下图展示了整个流程：在前三次调用 recvfrom 系统调用时，没有就绪的数据返回，所以内核立即返回 EWOULDBLOCK 错误。第四次调用 recvfrom 时，数据报已经准备好，它被复制到应用程序缓冲区中，然后 recvfrom 成功返回。最后应用进程对数据进行处理。当应用程序在一个非阻塞描述符上循环调用 recvfrom 系统调用时，这种方式也被称为轮询。应用程序不断轮询内核，以查看是否有某些操作准备好了。很明显，这通常会浪费 CPU 时间，但这种模式偶尔也会被使用。通常在专门用于一个功能的系统上使用。
 
 <figure markdown="span">
-<img src="../../assets/dead57a0-93c3-11eb-ad2b-3b3e8354e125" alt="img">
+<img src="../assets/dead57a0-93c3-11eb-ad2b-3b3e8354e125" alt="img">
 </figure>
 
 #### 3.I/O Multiplexing
@@ -1529,7 +1529,7 @@ I/O 多路复用通常使用 select 或者 poll 系统调用。这种方式下�
 乍一看，这种方式和 blocking I/O 相比似乎更差，因为整个过程产生了 2 次系统调用，select 和 recvfrom。但是使用 select 的好处是可以同时等待多个描述符准备好。换句话说可以同时 “聆听” 多个 Socket 通道，同时处理多个连接。select 的优势不是对于单个连接处理得更快，而是能同时处理更多的连接。这和多线程阻塞式 I/O 有点类似。只不过后者是使用多个线程（每个文件描述符对应一个线程）来处理 I/O，每个线程都可以自由地调用阻塞式系统调用，比如 recvfrom。我们知道线程多了会带来上下文切换的开销，因此未必优于 select 方式。在前面 Java NIO 的例子中，我们已经体会到了 selector 带来的性能提升。
 
 <figure markdown="span">
-<img src="../../assets/ef1e2c90-93c3-11eb-bfbd-21c3c45ef49d" alt="img">
+<img src="../assets/ef1e2c90-93c3-11eb-bfbd-21c3c45ef49d" alt="img">
 </figure>
 
 Linux 内核将所有外部设备都当成一个个文件来操作。我们对文件的读写都通过调用内核提供的系统调用；内核给我们返回一个文件描述符（file descriptor）。而对一个 Socket 的读写也会有相应的描述符，称为 socketfd。应用进程对文件的读写通过对 fd 的读写完成。
@@ -1539,7 +1539,7 @@ Linux 内核将所有外部设备都当成一个个文件来操作。我们对�
 信号驱动方式就是等数据准备好后，由内核发出 SIGIO 信号通知应用进程。示意图如下：
 
 <figure markdown="span">
-<img src="../../assets/fe975b10-93c3-11eb-b56e-cd09bd777412" alt="img">
+<img src="../assets/fe975b10-93c3-11eb-b56e-cd09bd777412" alt="img">
 </figure>
 
 应用进程通过 sigaction 系统调用建立起 SIGIO 信号处理通道，然后此系统调用就返回，不阻塞。当数据准备好后，内核会产生一个 SIGIO 信号通知到应用进程。此时既可以使用 SIGIO 信号处理器通过 recvfrom 系统调用读取数据，然后通知应用进程数据准备好了，可以处理了；也可以直接通知应用进程读取数据。不管使用何种方式，好处都是应用进程不会阻塞，可以继续执行，只要等待信号通知数据准备好被处理了、数据准备好被读取了。
@@ -1549,7 +1549,7 @@ Linux 内核将所有外部设备都当成一个个文件来操作。我们对�
 异步 I/O 是由 POSIX 规范定义的。和信号驱动 I/O 模型的区别是前者内核告诉我们何时可以开始一个 I/O 操作，而后者内核会告诉我们一个 I/O 操作何时完成。示意图如下：
 
 <figure markdown="span">
-<img src="../../assets/078630c0-93c4-11eb-bcbc-e5059ba8d4c2" alt="img">
+<img src="../assets/078630c0-93c4-11eb-bcbc-e5059ba8d4c2" alt="img">
 </figure>
 
 当用户进程发起系统调用后会立刻返回，并把所有的任务都交给内核去完成，不会被阻塞等待 I/O 完成。内核完成之后，只需返回一个信号告诉用户进程已经完成就可以了。
@@ -1557,7 +1557,7 @@ Linux 内核将所有外部设备都当成一个个文件来操作。我们对�
 五种 I/O 模式可以从同步、异步，阻塞、非阻塞两个维度来划分：
 
 <figure markdown="span">
-<img src="../../assets/164a6720-93c4-11eb-9ad9-9f9d57de4e5a" alt="img">
+<img src="../assets/164a6720-93c4-11eb-9ad9-9f9d57de4e5a" alt="img">
 </figure>
 
 ### 零拷贝（Zero-copy）
@@ -1578,7 +1578,7 @@ Linux 内核将所有外部设备都当成一个个文件来操作。我们对�
 程序中调用 RandomAccessFile 的 read 方法将 index.jsp 的内容读取到字节数组中。然后调用 write 方法将字节数组中的数据写入到 Socket 对应的输出流中发送给客户端。那么 Java 应用程序中的 read、write 方法对应到 OS 底层是怎样的呢。下图展示了这个过程。
 
 <figure markdown="span">
-<img src="../../assets/2757f140-93c4-11eb-bcbc-e5059ba8d4c2" alt="img">
+<img src="../assets/2757f140-93c4-11eb-bcbc-e5059ba8d4c2" alt="img">
 </figure>
 
 图中上半部分记录了用户态和内核态的上下文切换。下半部分展示了数据的复制过程。上述 Java 代码对应的操作系统底层步骤：
@@ -1598,7 +1598,7 @@ Linux 内核将所有外部设备都当成一个个文件来操作。我们对�
 mmap 通过内存映射，将文件通过 DMA 的方式映射到内核缓冲区。操作系统会把这段内核缓冲区与应用程序（用户空间）共享。这样，在进行网络传输时，就能减少内核空间到用户空间的拷贝次数。此时输出数据时只要从内核缓冲区拷贝到 Socket 缓冲区即可。可见减少了一次 CPU 拷贝，但是上下文切换次数并没有减少。整个过程共 2 次 DMA 拷贝，1 次 CPU 拷贝，4 次上下文切换。示意图如下。
 
 <figure markdown="span">
-<img src="../../assets/0551d9b0-93c6-11eb-9ad9-9f9d57de4e5a" alt="img">
+<img src="../assets/0551d9b0-93c6-11eb-9ad9-9f9d57de4e5a" alt="img">
 </figure>
 
 #### sendFile
@@ -1606,13 +1606,13 @@ mmap 通过内存映射，将文件通过 DMA 的方式映射到内核缓冲区�
 Linux 2.1 开始提供了 sendFile 函数，其基本原理是：数据根本不经过用户态，直接从 Kernel Buffer 进入到 Socket Buffer，并且由于和用户态完全无关，这就避免了一次上下文切换。下图展示了整个过程。磁盘中的数据通过 DMA 引擎从复制到内核缓冲区。调用 write 方法时从内核缓冲区拷贝到 Socket 缓冲区。由于在同一个空间，因此没有发生上下文切换。最后由 Socket 缓冲区拷贝到协议引擎。整个过程共发生了 2 次 DMA 拷贝，1 次 CPU 拷贝，3 次上下文切换。
 
 <figure markdown="span">
-<img src="../../assets/40243580-93c4-11eb-8454-130424f2d76f" alt="img">
+<img src="../assets/40243580-93c4-11eb-8454-130424f2d76f" alt="img">
 </figure>
 
 在 Linux 2.4 版本中，进一步做了优化。从 Kernel Buffer 拷贝到 Socket Buffer 的操作也省了，直接拷贝到协议栈，再次减少了 CPU 数据拷贝。下图展示了整个流程。本地文件 index.jsp 要传输到网络中，只需 2 次拷贝。第一次是 DMA 引擎从文件拷贝到内核缓冲区；第二次是从内核缓冲区将数据拷贝到网络协议栈；内核缓存区只会拷贝一些元信息，比如 offset 和 length 信息到 SocketBuffer，基本无消耗。
 
 <figure markdown="span">
-<img src="../../assets/d7e0d040-93c4-11eb-b56e-cd09bd777412" alt="img">
+<img src="../assets/d7e0d040-93c4-11eb-b56e-cd09bd777412" alt="img">
 </figure>
 
 综上所述，最后一种方式发生了 2 次 DMA 拷贝、0 次 CPU 拷贝、3 次上下文切换。这就是所谓的 “零拷贝” 实现。
@@ -1636,7 +1636,7 @@ RocketMQ 和 Kafka 高性能的原因之一便是顺序写入和近似顺序读�
 正如我们前面写的传统 IO 通信案例版本 4。在版本 4 的例程中，为了同时处理多个客户端的请求，服务端为每一个连接都会分配一个新的线程处理。这个独立的线程完成数据的读写和业务处理。这虽然是 “传统” 的处理方式，但是也是最经典的 IO 线程模型。示意图如下：
 
 <figure markdown="span">
-<img src="../../assets/ee0e26b0-93c4-11eb-8398-b3d8a71d8c34" alt="img">
+<img src="../assets/ee0e26b0-93c4-11eb-8398-b3d8a71d8c34" alt="img">
 </figure>
 
 该模型采用阻塞式 IO，连接创建后，如果当前线程暂时没有数据可读，该线程会阻塞在 read 操作，造成线程资源浪费。
@@ -1666,7 +1666,7 @@ Reactor 对象通过 I/O 复用模型（在 Java NIO 中就是使用 Selector）
 注意，上述过程都是发生在一个线程里，只不过是非阻塞方式。工作原理示意图如下：
 
 <figure markdown="span">
-<img src="../../assets/ff03e310-93c4-11eb-9ad9-9f9d57de4e5a" alt="img">
+<img src="../assets/ff03e310-93c4-11eb-9ad9-9f9d57de4e5a" alt="img">
 </figure>
 
 这种方式，服务器端使用一个线程基于多路复用就完成了所有的 IO 操作（包括连接，读数据、业务处理、写数据等），没有多线程间通信、竞争的问题，实现简单。但是如果客户端连接数较多，将无法支撑。因为只有一个线程，不能完全发挥多核 CPU 的性能。且 Handler 在处理某个连接上的业务时，整个线程无法处理其他连接事件。如果业务处理很耗时，很容易会导致性能瓶颈。如果线程意外终止，或者进入死循环，会导致整个系统不可用。
@@ -1682,7 +1682,7 @@ eactor 对象通过 select 监控 client 端的请求事件，收到事件后，
 如果是连接建立请求，则由 acceptor 通过 accept 处理连接请求，然后分配一个 Handler 对象处理完成连接后的数据读写。
 
 <figure markdown="span">
-<img src="../../assets/07d60900-93c5-11eb-9c54-0984fa5d923a" alt="img">
+<img src="../assets/07d60900-93c5-11eb-9c54-0984fa5d923a" alt="img">
 </figure>
 
 如果不是连接请求，则由 reactor 分发（dispatch）给连接对应的 Handler 来处理。Handler 和 Reactor 运行在同一个线程中。
@@ -1722,7 +1722,7 @@ Reactor 主线程可以对应多个 Reactor 子线程，即 MainRecator 能关�
 其工作原理示意图如下（注意观察和上面一个图的区别）：
 
 <figure markdown="span">
-<img src="../../assets/1409d080-93c5-11eb-8398-b3d8a71d8c34" alt="img">
+<img src="../assets/1409d080-93c5-11eb-8398-b3d8a71d8c34" alt="img">
 </figure>
 
 ## 总结

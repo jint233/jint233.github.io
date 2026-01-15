@@ -90,11 +90,11 @@ docker restart es
 
 测试：
 
-![在这里插入图片描述](../assets/199ad3c0-cee2-11eb-bfdf-b9d6bba95aa3)
+![img](../assets/199ad3c0-cee2-11eb-bfdf-b9d6bba95aa3.png)
 
 查看分词器是否安装上：
 
-![在这里插入图片描述](../assets/25ebc030-cee2-11eb-ac3e-190fba44d759)
+![img](../assets/25ebc030-cee2-11eb-ac3e-190fba44d759.png)
 
 ### ES 查询
 
@@ -564,7 +564,7 @@ curl -X PUT "localhost:9200/my_index/_mapping/my_type?pretty" -H 'Content-Type: 
 
 创建 ES 集群：
 
-![在这里插入图片描述](../assets/f8f185b0-cee6-11eb-81e7-cb4b73a5fa4f)
+![img](../assets/f8f185b0-cee6-11eb-81e7-cb4b73a5fa4f.png)
 
 连接 ES：
 
@@ -602,7 +602,7 @@ public class JavaEsTest {
 
 测试结果：
 
-![在这里插入图片描述](../assets/1053b2a0-cee7-11eb-a372-c3e5da0127b2)
+![img](../assets/1053b2a0-cee7-11eb-a372-c3e5da0127b2.png)
 
 ### 总结
 

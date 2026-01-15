@@ -86,7 +86,7 @@ sysctl -p 重载
 
 一般我们选择第一个 tgz 的包 ，版本我这里先选用 1.8 的，为了后续测试滚动升级使用。
 
-![在这里插入图片描述](../assets/dc4cd400-1687-11ea-a278-bf8e3f1326ea.png)
+![img](../assets/dc4cd400-1687-11ea-a278-bf8e3f1326ea.png)
 
 #### 上传，解压，配置 /etc/profile
 
@@ -226,7 +226,7 @@ http://192.168.33.15:7070/pulse
 
 先看个效果图：
 
-![在这里插入图片描述](../assets/12c00980-1688-11ea-a278-bf8e3f1326ea.png)
+![img](../assets/12c00980-1688-11ea-a278-bf8e3f1326ea.png)
 
 ### gfsh 常用命令介绍
 
@@ -1047,11 +1047,11 @@ Geode 非常贴心地为我们继承了 Swagger 插件：
 <http://192.168.33.15:8888/geode/swagger-ui.html#/> 
 ```
 
-![在这里插入图片描述](../assets/46f3fd60-1688-11ea-988c-fdda706d8b74.png)
+![img](../assets/46f3fd60-1688-11ea-988c-fdda706d8b74.png)
 
-![在这里插入图片描述](../assets/6a96c310-1688-11ea-a278-bf8e3f1326ea.png)
+![img](../assets/6a96c310-1688-11ea-a278-bf8e3f1326ea.png)
 
-![在这里插入图片描述](../assets/747d6640-1688-11ea-b942-d94b94287f55.png)
+![img](../assets/747d6640-1688-11ea-b942-d94b94287f55.png)
 
 具体 API 可参考官方网页：
 
@@ -1063,13 +1063,13 @@ Geode 非常贴心地为我们继承了 Swagger 插件：
 
 点对点的方式也叫对等方式，就是我们没有专门的 Geode 集群，服务是迁入到我们应用程序中的。
 
-![在这里插入图片描述](../assets/8c5b52e0-1688-11ea-94bc-f516225b4bcb.png)
+![img](../assets/8c5b52e0-1688-11ea-94bc-f516225b4bcb.png)
 
 #### C/S
 
 该模式就是我们常用的集群模式，有一个 Geode 的中心集群，应用程序通过客户端去调用， 这个模式跟 ES 的集群， Redis 的集群非常相似。
 
-![在这里插入图片描述](../assets/9ef437f0-1688-11ea-981f-cdaafe390fdd.png)
+![img](../assets/9ef437f0-1688-11ea-981f-cdaafe390fdd.png)
 
 #### 多站点
 
@@ -1114,9 +1114,9 @@ ps -ef | grep geode //查看启动参数
 
 \\2. 第二个导出配置文件，是一些常规配置，以前修改过的，关于 region 等的一些配置。
 
-![在这里插入图片描述](../assets/c46bbda0-1688-11ea-981f-cdaafe390fdd.png)
+![img](../assets/c46bbda0-1688-11ea-981f-cdaafe390fdd.png)
 
-![在这里插入图片描述](../assets/caf79d10-1688-11ea-8478-cb869aae9121.png)
+![img](../assets/caf79d10-1688-11ea-8478-cb869aae9121.png)
 
 #### 拷贝新版本
 
@@ -1271,11 +1271,11 @@ sh start_server_33_15.sh
 
 原因解读：
 
-![在这里插入图片描述](../assets/ead82aa0-1688-11ea-8c8a-f5a12e386854.png)
+![img](../assets/ead82aa0-1688-11ea-8c8a-f5a12e386854.png)
 
 新的 1.8 的 client 包引入了新的类，这个新的类有 Java 9 的模块化信息，然后这个版本的 Tomcat 是无法扫描模块化 jar 包的。
 
-![在这里插入图片描述](../assets/f411ec00-1688-11ea-a6a9-8f5c13f0663b.png)
+![img](../assets/f411ec00-1688-11ea-a6a9-8f5c13f0663b.png)
 
 看 Tomcat 官网发现，在 7.0.83 的时候才支持了这个问题。使用了 7.0.91 测试就不报哪个异常了。
 
@@ -1400,13 +1400,13 @@ http://192.168.33.15:7070/pulse
 
 pulse 中可以在不同维护查看数据。**1. 总览** 内存，成员数，服务数，region 数量，集群读写等等。
 
-![在这里插入图片描述](../assets/133ac250-1689-11ea-94bc-f516225b4bcb.png) **2. ip 维度** 这里多了一个机器的链接详情：
+![img](../assets/133ac250-1689-11ea-94bc-f516225b4bcb.png) **2. ip 维度** 这里多了一个机器的链接详情：
 
-![在这里插入图片描述](../assets/1d2a1810-1689-11ea-8812-dd393aeead92.png) **3. region 维度**
+![img](../assets/1d2a1810-1689-11ea-8812-dd393aeead92.png) **3. region 维度**
 
 region 维度主要对 region 进行描述：
 
-![在这里插入图片描述](../assets/27c5da70-1689-11ea-a523-0bd97445ce75.png)
+![img](../assets/27c5da70-1689-11ea-a523-0bd97445ce75.png)
 
 #### 监控
 
@@ -1451,7 +1451,7 @@ metricList.add(build);
 
 关于 JMX 的数据结构大家可以使用 jvisualvm 连接查看：
 
-![在这里插入图片描述](../assets/383aa700-1689-11ea-8812-dd393aeead92.png)
+![img](../assets/383aa700-1689-11ea-8812-dd393aeead92.png)
 
 看它的目录结构，我们可以发现其实它就是按照集群、ip、region 进行区分的，与它的 pulse 中所能显示的保持一致性。
 
@@ -1459,9 +1459,9 @@ metricList.add(build);
 
 进入 ES 后我们再通过 Grafana 进行展示，这样就可以看见历史指标的波动情况，为分析问题提供依据。
 
-![在这里插入图片描述](../assets/3e6d9100-1689-11ea-8c8a-f5a12e386854.png)
+![img](../assets/3e6d9100-1689-11ea-8c8a-f5a12e386854.png)
 
-![在这里插入图片描述](../assets/430d09c0-1689-11ea-a6a9-8f5c13f0663b.png)
+![img](../assets/430d09c0-1689-11ea-a6a9-8f5c13f0663b.png)
 
 如上图所示是我们的一些重点指标。
 

@@ -54,7 +54,7 @@ private static Unsafe reflectGetUnsafe() {
 
 ## 功能介绍
 
-![img](../../assets/f182555953e29cec76497ebaec526fd1297846.png)
+![img](../assets/f182555953e29cec76497ebaec526fd1297846.png)
 
 如上图所示，Unsafe 提供的 API 大致可分为内存操作、CAS、Class 相关、对象操作、线程调度、系统信息获取、内存屏障、数组操作等几类，下面将对其相关方法和应用场景进行详细介绍。
 
@@ -96,17 +96,17 @@ DirectByteBuffer 是 Java 用于实现堆外内存的一个重要类，通常用
 
 下图为 DirectByteBuffer 构造函数，创建 DirectByteBuffer 的时候，通过 Unsafe.allocateMemory 分配内存、Unsafe.setMemory 进行内存初始化，而后构建 Cleaner 对象用于跟踪 DirectByteBuffer 对象的垃圾回收，以实现当 DirectByteBuffer 被垃圾回收时，分配的堆外内存一起被释放。
 
-![img](../../assets/5eb082d2e4baf2d993ce75747fc35de6486751.png)
+![img](../assets/5eb082d2e4baf2d993ce75747fc35de6486751.png)
 
 那么如何通过构建垃圾回收追踪对象 Cleaner 实现堆外内存释放呢？
 
 Cleaner 继承自 Java 四大引用类型之一的虚引用 PhantomReference（众所周知，无法通过虚引用获取与之关联的对象实例，且当对象仅被虚引用引用时，在任何发生 GC 的时候，其均可被回收），通常 PhantomReference 与引用队列 ReferenceQueue 结合使用，可以实现虚引用关联对象被垃圾回收时能够进行系统通知、资源清理等功能。如下图所示，当某个被 Cleaner 引用的对象将被回收时，JVM 垃圾收集器会将此对象的引用放入到对象引用中的 pending 链表中，等待 Reference-Handler 进行相关处理。其中，Reference-Handler 为一个拥有最高优先级的守护线程，会循环不断的处理 pending 链表中的对象引用，执行 Cleaner 的 clean 方法进行相关清理工作。
 
-![img](../../assets/9efac865a875c32cf570489332be5d0f131298.png)
+![img](../assets/9efac865a875c32cf570489332be5d0f131298.png)
 
 所以当 DirectByteBuffer 仅被 Cleaner 引用（即为虚引用）时，其可以在任意 GC 时段被回收。当 DirectByteBuffer 实例对象被回收时，在 Reference-Handler 线程操作中，会调用 Cleaner 的 clean 方法根据创建 Cleaner 时传入的 Deallocator 来进行堆外内存的释放。
 
-![img](../../assets/66e616c6db18202578c561649facac8d387390.png)
+![img](../assets/66e616c6db18202578c561649facac8d387390.png)
 
 ### CAS 相关
 
@@ -132,11 +132,11 @@ public final native boolean compareAndSwapLong(Object o, long offset, long expec
 
 CAS 在 java.util.concurrent.atomic 相关类、Java AQS、CurrentHashMap 等实现上有非常广泛的应用。如下图所示，AtomicInteger 的实现中，静态字段 valueOffset 即为字段 value 的内存偏移地址，valueOffset 的值在 AtomicInteger 初始化时，在静态代码块中通过 Unsafe 的 objectFieldOffset 方法获取。在 AtomicInteger 中提供的线程安全方法中，通过字段 valueOffset 的值可以定位到 AtomicInteger 对象中 value 的内存地址，从而可以根据 CAS 实现对 value 字段的原子操作。
 
-![img](../../assets/3bacb938ca6e63d6c79c2bb48d3f608f189412.png)
+![img](../assets/3bacb938ca6e63d6c79c2bb48d3f608f189412.png)
 
 下图为某个 AtomicInteger 对象自增操作前后的内存示意图，对象的基地址 baseAddress=“0x110000”，通过 baseAddress+valueOffset 得到 value 的内存地址 valueAddress=“0x11000c”；然后通过 CAS 进行原子性的更新操作，成功则返回，否则继续重试，直到更新成功为止。
 
-![img](../../assets/6e8b1fe5d5993d17a4c5b69bb72ac51d89826.png)
+![img](../assets/6e8b1fe5d5993d17a4c5b69bb72ac51d89826.png)
 
 ### 线程调度
 
@@ -192,11 +192,11 @@ public native Class<?> defineAnonymousClass(Class<?> hostClass, byte[] data, Obj
 
 在 Lambda 表达式实现中，通过 invokedynamic 指令调用引导方法生成调用点，在此过程中，会通过 ASM 动态生成字节码，而后利用 Unsafe 的 defineAnonymousClass 方法定义实现相应的函数式接口的匿名类，然后再实例化此匿名类，并返回与此匿名类中函数式方法的方法句柄关联的调用点；而后可以通过此调用点实现调用相应 Lambda 表达式定义逻辑的功能。下面以如下图所示的 Test 类来举例说明。
 
-![img](../../assets/7707d035eb5f04314b3684ff91dddb1663516.png)
+![img](../assets/7707d035eb5f04314b3684ff91dddb1663516.png)
 
 Test 类编译后的 class 文件反编译后的结果如下图一所示（删除了对本文说明无意义的部分），我们可以从中看到 main 方法的指令实现、invokedynamic 指令调用的引导方法 BootstrapMethods、及静态方法 `lambda$main$0`（实现了 Lambda 表达式中字符串打印逻辑）等。在引导方法执行过程中，会通过 Unsafe.defineAnonymousClass 生成如下图二所示的实现 Consumer 接口的匿名类。其中，accept 方法通过调用 Test 类中的静态方法 `lambda$main$0` 来实现 Lambda 表达式中定义的逻辑。而后执行语句 `consumer.accept（"lambda"）` 其实就是调用下图二所示的匿名类的 accept 方法。
 
-![img](../../assets/1038d53959701093db6c655e4a342e30456249.png)
+![img](../assets/1038d53959701093db6c655e4a342e30456249.png)
 
 ### 对象操作
 
@@ -226,7 +226,7 @@ public native Object allocateInstance(Class<?> cls) throws InstantiationExceptio
 
 如下图所示，在 Gson 反序列化时，如果类有默认构造函数，则通过反射调用默认构造函数创建实例，否则通过 UnsafeAllocator 来实现对象实例的构造，UnsafeAllocator 通过调用 Unsafe 的 allocateInstance 实现对象的实例化，保证在目标类无默认构造函数时，反序列化不够影响。
 
-![img](../../assets/b9fe6ab772d03f30cd48009920d56948514676.png)
+![img](../assets/b9fe6ab772d03f30cd48009920d56948514676.png)
 
 ### 数组相关
 
@@ -243,7 +243,7 @@ public native int arrayIndexScale(Class<?> arrayClass);
 
 这两个与数据操作相关的方法，在 java.util.concurrent.atomic 包下的 AtomicIntegerArray（可以实现对 Integer 数组中每个元素的原子性操作）中有典型的应用，如下图 AtomicIntegerArray 源码所示，通过 Unsafe 的 arrayBaseOffset、arrayIndexScale 分别获取数组首元素的偏移地址 base 及单个元素大小因子 scale。后续相关原子性操作，均依赖于这两个值进行数组中元素的定位，如下图二所示的 getAndAdd 方法即通过 checkedByteOffset 方法获取某数组元素的偏移地址，而后通过 CAS 实现原子性操作。
 
-![img](../../assets/160366b0fb2079ad897f6d6b1cb349cd426237.png)
+![img](../assets/160366b0fb2079ad897f6d6b1cb349cd426237.png)
 
 ### 内存屏障
 
@@ -262,13 +262,13 @@ public native void fullFence();
 
 在 Java 8 中引入了一种锁的新机制 ——StampedLock，它可以看成是读写锁的一个改进版本。StampedLock 提供了一种乐观读锁的实现，这种乐观读锁类似于无锁的操作，完全不会阻塞写线程获取写锁，从而缓解读多写少时写线程 “饥饿” 现象。由于 StampedLock 提供的乐观读锁不阻塞写线程获取读锁，当线程共享变量从主内存 load 到线程工作内存时，会存在数据不一致问题，所以当使用 StampedLock 的乐观读锁时，需要遵从如下图用例中使用的模式来确保数据的一致性。
 
-![img](../../assets/839ad79686d06583296f3abf1bec27e3320222.png)
+![img](../assets/839ad79686d06583296f3abf1bec27e3320222.png)
 
 如上图用例所示计算坐标点 Point 对象，包含点移动方法 move 及计算此点到原点的距离的方法 distanceFromOrigin。在方法 distanceFromOrigin 中，首先，通过 tryOptimisticRead 方法获取乐观读标记；然后从主内存中加载点的坐标值 (x,y)；而后通过 StampedLock 的 validate 方法校验锁状态，判断坐标点 (x,y) 从主内存加载到线程工作内存过程中，主内存的值是否已被其他线程通过 move 方法修改，如果 validate 返回值为 true，证明 (x, y) 的值未被修改，可参与后续计算；否则，需加悲观读锁，再次从主内存加载 (x,y) 的最新值，然后再进行距离计算。其中，校验锁状态这步操作至关重要，需要判断锁状态是否发生改变，从而判断之前 copy 到线程工作内存中的值是否与主内存的值存在不一致。
 
 下图为 StampedLock.validate 方法的源码实现，通过锁标记与相关常量进行位运算、比较来校验锁状态，在校验逻辑之前，会通过 Unsafe 的 loadFence 方法加入一个 load 内存屏障，目的是避免上图用例中步骤②和 StampedLock.validate 中锁状态校验运算发生重排序导致锁状态校验不准确的问题。
 
-![img](../../assets/256f54b037d07df53408b5eea9436b34135955.png)
+![img](../assets/256f54b037d07df53408b5eea9436b34135955.png)
 
 ### 系统相关
 
@@ -285,7 +285,7 @@ public native int pageSize();
 
 如下图所示的代码片段，为 java.nio 下的工具类 Bits 中计算待申请内存所需内存页数量的静态方法，其依赖于 Unsafe 中 pageSize 方法获取系统内存页大小实现后续计算逻辑。
 
-![img](../../assets/262470b0c3e79b8f4f7b0c0280b1cc5362454.png)
+![img](../assets/262470b0c3e79b8f4f7b0c0280b1cc5362454.png)
 
 ## 结语
 

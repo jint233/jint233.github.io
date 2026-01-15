@@ -33,9 +33,9 @@ Spring Batch 的文档很全面，但对于初学者来说，整个文档读完�
 
 #### 架构图
 
-![在这里插入图片描述](../assets/8bd2ac90-2f8f-11ea-a6f3-07a41d160500.png)
+![img](../assets/8bd2ac90-2f8f-11ea-a6f3-07a41d160500.png)
 
-![在这里插入图片描述](../assets/96a647d0-2f8f-11ea-a6f3-07a41d160500.png)
+![img](../assets/96a647d0-2f8f-11ea-a6f3-07a41d160500.png)
 
 第一张图是架构图，第二张分区处理图。
 
@@ -421,7 +421,7 @@ JobExecution abandon(long var1) throws NoSuchJobExecutionException, JobExecution
 ```
 
 在 Spring Batch 的 Admin 管理系统中主要就是通过这个类来获取任务的执行情况。**9. 总结** 通过上面的演示可以清楚的看到 Spring Batch 的执行逻辑，Spring Batch 定义了模板，我们在使用过程中只需要按照接口提供相应的数据来源和输出的接口即可。其他的事务处理，多线程池，批量处理，内存控制都由框架来完成。那么 Spring Batch 是怎么样保证在大数据量级的情况下，内存不溢出然后又保证性能的呢，下面用一张图进行展示 Spring Batch 是通过怎么的处理，保证在数据量巨大的情况下，高性能的进行数据的读写的。
-![在这里插入图片描述](../assets/d9d2ef90-2f8f-11ea-b7a2-bd62e8fb625b.png)
+![img](../assets/d9d2ef90-2f8f-11ea-b7a2-bd62e8fb625b.png)
 
 #### 其他业务场景的扩展
 

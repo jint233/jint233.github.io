@@ -75,7 +75,7 @@ mysql> select * from information_schema.collations;
 mysql> show variables like 'character%';
 ```
 
-![在这里插入图片描述](../assets/8d9f1a10-436e-11eb-8894-3bfce9c9c7d8)
+![img](../assets/8d9f1a10-436e-11eb-8894-3bfce9c9c7d8.png)
 
 参数解释：
 
@@ -104,7 +104,7 @@ DML 字符集选择：
 mysql> show variables like 'collation%';
 ```
 
-![在这里插入图片描述](../assets/0404e580-4370-11eb-b1e3-0b8acb9b8f06)
+![img](../assets/0404e580-4370-11eb-b1e3-0b8acb9b8f06.png)
 
 参数说明：
 
