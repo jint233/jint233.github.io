@@ -8,9 +8,7 @@
 
 HTTP 响应码是 Web 服务器告诉客户端当前服务器的运行状况的标识。
 
-<figure markdown="span">
-<img src="../assets/dd89b870-5d62-11ea-977e-4f3bc8d9c4fd.jpg" alt="img">
-</figure>
+![img](../assets/dd89b870-5d62-11ea-977e-4f3bc8d9c4fd.jpg)
 
 - 200：成功，Web 服务器成功处理了客户端的请求。
 - 301：永久重定向，当客户端请求一个网址的时候，Web 服务器会将当前请求重定向到另一个网址，搜索引擎会抓取重定向后网页的内容并且将旧的网址替换为重定向后的网址。
@@ -309,15 +307,11 @@ public class UDPClientTest {
 
 UDP 服务端执行结果：
 
-<figure markdown="span">
-<img src="../assets/98f77a10-607f-11ea-861e-fb2bdb9ba1ba.jpg" alt="img">
-</figure>
+![img](../assets/98f77a10-607f-11ea-861e-fb2bdb9ba1ba.jpg)
 
 UDP 客户端执行结果：
 
-<figure markdown="span">
-<img src="../assets/aee46c20-607f-11ea-974c-2bc8ec103edb.jpg" alt="img">
-</figure>
+![img](../assets/aee46c20-607f-11ea-974c-2bc8ec103edb.jpg)
 
 TCP 服务端代码：
 
@@ -380,15 +374,11 @@ public class TCPClientTest {
 
 TCP 服务端执行结果：
 
-<figure markdown="span">
-<img src="../assets/b279eac0-6086-11ea-974c-2bc8ec103edb.jpg" alt="img">
-</figure>
+![img](../assets/b279eac0-6086-11ea-974c-2bc8ec103edb.jpg)
 
 TCP 客户端执行结果：
 
-<figure markdown="span">
-<img src="../assets/bc813550-6086-11ea-974c-2bc8ec103edb.jpg" alt="img">
-</figure>
+![img](../assets/bc813550-6086-11ea-974c-2bc8ec103edb.jpg)
 
 ## 7. TCP 为什么要三次握手，两次不行吗？为什么？
 
@@ -400,9 +390,7 @@ TCP 客户端执行结果：
 
 从三次握手的过程可以看出如果只有两次握手，那么客户端的起始序列号可以确认，服务端的起始序列号将得不到确认。
 
-<figure markdown="span">
-<img src="../assets/2cfd0790-6141-11ea-ada6-a35ea24e6ce6.jpg" alt="img">
-</figure>
+![img](../assets/2cfd0790-6141-11ea-ada6-a35ea24e6ce6.jpg)
 
 ## 8. 说一下 TCP 粘包是怎么产生的？怎么解决粘包问题的？
 
@@ -410,25 +398,17 @@ TCP 客户端执行结果：
 
 接下来看下 TCP 传输数据的几种情况，首先第一种情况是正常的，既没有发送粘包也没有发生拆包。
 
-<figure markdown="span">
-<img src="../assets/cd2e13b0-6148-11ea-974c-2bc8ec103edb.jpg" alt="img">
-</figure>
+![img](../assets/cd2e13b0-6148-11ea-974c-2bc8ec103edb.jpg)
 
 第二种情况发生了明显的粘包现象，这种情况对于数据接收方来说很难处理。
 
-<figure markdown="span">
-<img src="../assets/a1433fa0-6148-11ea-8032-6b1a3b46917c.jpg" alt="img">
-</figure>
+![img](../assets/a1433fa0-6148-11ea-8032-6b1a3b46917c.jpg)
 
 接下来的两种情况发生了粘包和拆包的现象，接收端收到的数据包要么是不完整的要么是多出来一块儿。
 
-<figure markdown="span">
-<img src="../assets/4bb54820-6149-11ea-be13-9d4b32a4c9f6.jpg" alt="img">
-</figure>
+![img](../assets/4bb54820-6149-11ea-be13-9d4b32a4c9f6.jpg)
 
-<figure markdown="span">
-<img src="../assets/8d53aec0-6149-11ea-8710-d9de95ee7855.jpg" alt="img">
-</figure>
+![img](../assets/8d53aec0-6149-11ea-8710-d9de95ee7855.jpg)
 
 造成粘包和拆包现象的原因：
 
@@ -465,9 +445,7 @@ TCP 客户端执行结果：
 
 可以看到滑动窗口的固定大小是 5，滑动窗口的大小等于未确认的包 + 已经准备好但是未发送的包，每次收到 ACK 就会增加一个红色的数据包，然后滑动窗口向右移动一位，即最左边的绿色数据包移出滑动窗口变成红色，下一个紫色的数据包进入滑动窗口变成蓝色准备发送。
 
-<figure markdown="span">
-<img src="../assets/c64a25f0-6208-11ea-a668-f192d436bd20.jpg" alt="img">
-</figure>
+![img](../assets/c64a25f0-6208-11ea-a668-f192d436bd20.jpg)
 
 再看下接收端的接收情况：
 
@@ -477,27 +455,19 @@ TCP 客户端执行结果：
 
 在接收端这边可以看到滑动窗口内有一个虚线的数据包，表示该数据包还没有收到，该数据包可能发生了丢包的情况或者乱序了，这个时候接收端会先将该数据包缓存着，等待发送端超时重发。
 
-<figure markdown="span">
-<img src="../assets/c2a24c40-620b-11ea-a953-eb2d85b71649.jpg" alt="img">
-</figure>
+![img](../assets/c2a24c40-620b-11ea-a953-eb2d85b71649.jpg)
 
 当发送端发送数据包速度过快，导致接收端的缓存空间不够用，或者接收端一直不读取缓存空间中的数据包，接收端可以改变滑动窗口的大小甚至变为 0，让发送端停止发送数据包，从下图可以看出滑动窗口并没有向右移动，而是滑动窗口左边界向右移动了一格。
 
-<figure markdown="span">
-<img src="../assets/2c6481f0-620e-11ea-a8ef-2f0233a71edf.jpg" alt="img">
-</figure>
+![img](../assets/2c6481f0-620e-11ea-a8ef-2f0233a71edf.jpg)
 
 这种情况下接收端的滑动窗口的大小变成了 0，发送端也不再发送新的数据包，但是发送端会定时发送窗口探测数据包，和接收端商量是否可以改变滑动窗口的大小，接收端在窗口大小比较小的情况下不会立马回复发送端可以改变窗口大小，而是等到接收端的缓存空间为空的时候再改变窗口大小。
 
-<figure markdown="span">
-<img src="../assets/a70d1ca0-620e-11ea-b926-c1b076d2949e.jpg" alt="img">
-</figure>
+![img](../assets/a70d1ca0-620e-11ea-b926-c1b076d2949e.jpg)
 
 接下来再分析下拥塞控制的原理，先看下图这种极端情况，管道中能容纳 6 个数据包，有 3 个未接收的数据包和 3 个 ack 数据包，正好把管道撑满，如果再往管道中发送数据，那么数据包会被缓存在设备中增加时延或者丢弃多余的包，而 TCP 面对丢包的问题只能重发数据，重发数据又导致了更严重的延迟和更多的丢包，从而造成恶心循环，而拥塞控制就是为了处理时延带来的超时重传和丢包问题的。
 
-<figure markdown="span">
-<img src="../assets/dac94110-6211-11ea-8203-f9436e7f1e6d.jpg" alt="img">
-</figure>
+![img](../assets/dac94110-6211-11ea-8203-f9436e7f1e6d.jpg)
 
 先来看下拥塞窗口和发送端实际可用的窗口大小的联系：
 
@@ -520,9 +490,7 @@ TCP 客户端执行结果：
 - 当执行慢开始的时候，收到了 3 个重复的 ack 包，表示现在的网络环境没有那么拥塞了，可以进入快速恢复的状态啦；
 - 这个时候 ssthresh = 当前 cwnd/2，cwnd 重置为新的 ssthresh，即 cwnd = ssthresh ，然后进入拥塞避免状态。
 
-<figure markdown="span">
-<img src="../assets/6dc6f000-6219-11ea-b926-c1b076d2949e.jpg" alt="img">
-</figure>
+![img](../assets/6dc6f000-6219-11ea-b926-c1b076d2949e.jpg)
 
 ## 11. OSI 的七层模型都有哪些？
 
@@ -534,9 +502,7 @@ TCP 客户端执行结果：
 - 数据链路层：物理寻址，同时将原始比特流转变为逻辑传输路线，比如 XTP 压缩传输协议、PPTP 点对点隧道协议等等。
 - 物理层：机械、电子、定时接口通信信道上的原始比特流传输，比如 IEEE802.2 等等。
 
-<figure markdown="span">
-<img src="../assets/cdca1570-6220-11ea-908f-45592ed2b610.jpg" alt="img">
-</figure>
+![img](../assets/cdca1570-6220-11ea-908f-45592ed2b610.jpg)
 
 ## 12. 网络浏览器访问一个网址的整个过程？
 
@@ -546,9 +512,7 @@ TCP 客户端执行结果：
 
 2. 浏览器得到网址对应的服务器的 IP 地址后，通过与服务器三次握手建立 TCP 连接。
 
-    <figure markdown="span">
-    <img src="../assets/140b6fd0-62e8-11ea-9b06-5f146ad63a8a.jpg" alt="img">
-    </figure>
+![img](../assets/140b6fd0-62e8-11ea-9b06-5f146ad63a8a.jpg)
 
 3. 浏览器与服务器建立好 TCP 连接后，就会发送 HTTP 请求。
 
@@ -557,31 +521,23 @@ TCP 客户端执行结果：
    - 然后在网络层将 TCP 数据包嵌入到 IP 报文段中；
    - 最后将 IP 数据包嵌入到以太网数据包中在网络中传输。
 
-    <figure markdown="span">
-    <img src="../assets/87baf4e0-62e9-11ea-94d9-09523e73926b.jpg" alt="img">
-    </figure>
+![img](../assets/87baf4e0-62e9-11ea-94d9-09523e73926b.jpg)
 
 4. 服务器处理浏览器发送的 HTTP 请求。
 
     浏览器向 Web 服务器如 Nginx 发送 HTTP 请求，Nginx 将请求转发给 Tomcat 服务器，Tomcat 服务器请求 MySQL、Redis 等 DB 服务器，得到结果后将 Velocity 模板引擎和数据整合，将生成的静态页面文件通过 Nginx 返回给浏览器。
 
-    <figure markdown="span">
-    <img src="../assets/87580d00-62ec-11ea-af20-4f6854ce034d.jpg" alt="img">
-    </figure>
+![img](../assets/87580d00-62ec-11ea-af20-4f6854ce034d.jpg)
 
 5. 服务器返回响应结果。
 
     在响应头中返回了 HTTP 状态码、HTTP 协议版本、是否为长连接、文本编码类型、日期等等。
 
-    <figure markdown="span">
-    <img src="../assets/c8b83cb0-62ed-11ea-b0ad-ffc9490087fa.jpg" alt="img">
-    </figure>
+![img](../assets/c8b83cb0-62ed-11ea-b0ad-ffc9490087fa.jpg)
 
 6. 浏览器和者服务器通过四次挥手关闭 TCP。
 
-    <figure markdown="span">
-    <img src="../assets/42851d60-62ee-11ea-94d9-09523e73926b.jpg" alt="img">
-    </figure>
+![img](../assets/42851d60-62ee-11ea-94d9-09523e73926b.jpg)
 
 7. 浏览器解析 HTML、CSS、JS 等进行页面渲染。
 

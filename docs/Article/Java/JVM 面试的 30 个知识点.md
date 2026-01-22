@@ -6,9 +6,7 @@ Java 虚拟机是一个可以执行 Java 字节码的虚拟机进程。Java 源�
 
 ## 2. Java 内存结构？
 
-<figure markdown="span">
-<img src="../assets/c5238280-5a00-11ea-aae6-17c0629b6dc0.jpg" alt="img">
-</figure>
+![img](../assets/c5238280-5a00-11ea-aae6-17c0629b6dc0.jpg)
 
 方法区和对是所有线程共享的内存区域；而 java 栈、本地方法栈和程序员计数器是运行是线程私有的内存区域。
 
@@ -85,9 +83,7 @@ jstack 可以看当前栈的情况，jmap 查看内存，jhat 进行 dump 堆的
 
 ## 13. 类加载器
 
-<figure markdown="span">
-<img src="../assets/a3cc3370-5a00-11ea-8155-9d6d04886d5b.jpg" alt="img">
-</figure>
+![img](../assets/a3cc3370-5a00-11ea-8155-9d6d04886d5b.jpg)
 
 - 启动类加载器：Bootstrap ClassLoader，负责加载存放在 JDK\\jre\\lib (JDK 代表 JDK 的安装目录，下同) 下，或被 - Xbootclasspath 参数指定的路径中的，并且能被虚拟机识别的类库
 - 扩展类加载：Extension ClassLoader，该加载器由 sun.misc.Launcher$ExtClassLoader 实现，它负责加载 DK\\jre\\lib\\ext 目录中，或者由 java.ext.dirs 系统变量指定的路径中的所有类库（如 javax.\* 开头的类），开发者可以直接使用扩展类加载器。
@@ -124,9 +120,7 @@ JVM 中类的装载是由类加载器（ClassLoader）和它的子类来实现�
 
 类的生命周期包括这几个部分，加载、连接、初始化、使用和卸载，其中前三部是类的加载的过程，如下图；
 
-<figure markdown="span">
-<img src="../assets/d2940fc0-5a00-11ea-a695-8f4c079b036d.jpg" alt="img">
-</figure>
+![img](../assets/d2940fc0-5a00-11ea-a695-8f4c079b036d.jpg)
 
 java 类加载需要经历以下 几个过程：
 

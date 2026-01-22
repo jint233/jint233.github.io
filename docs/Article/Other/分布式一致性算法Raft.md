@@ -51,7 +51,7 @@ Raft 将共识问题分解三个子问题：
 
     ![img](../assets/v2-537082d871c75e59f6b7556b48cee932_1440w.jpg)
 
-    Raft 算法把时间轴划分为不同任期 Term。每个任期 Term 都有自己的编号 TermId，该编号全局唯一且单调递增。如下图，每个任务的开始都 **Leader Election 领导选举** 。如果选举成功，则进入维持任务 Term 阶段，此时 leader 负责接收客户端请求并，负责复制日志。Leader 和所有 follower 都保持通信，如果 follower 发现通信超时，TermId 递增并发起新的选举。如果选举成功，则进入新的任期。如果选举失败，TermId 递增，然后重新发起选举直到成功。
+    Raft 算法把时间轴划分为不同任期 Term。每个任期 Term 都有自己的编号 TermId，该编号全局唯一且单调递增。如下图，每个任务的开始都 **Leader Election 领导选举**。如果选举成功，则进入维持任务 Term 阶段，此时 leader 负责接收客户端请求并，负责复制日志。Leader 和所有 follower 都保持通信，如果 follower 发现通信超时，TermId 递增并发起新的选举。如果选举成功，则进入新的任期。如果选举失败，TermId 递增，然后重新发起选举直到成功。
 
     举个例子，参考下图，Term N 选举成功，Term N+1 和 Term N+2 选举失败，Term N+3 重新选举成功。
 

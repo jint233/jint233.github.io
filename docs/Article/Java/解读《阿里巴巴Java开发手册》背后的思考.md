@@ -16,9 +16,7 @@
 
 ## 为什么禁止工程师直接使用日志系统 (Log4j、Logback) 中的 API
 
-<figure markdown="span">
-<img src="../assets/a5f68f40-63f4-11e9-a3c7-cd698ad2fb06.jpg" alt="img">
-</figure>
+![img](../assets/a5f68f40-63f4-11e9-a3c7-cd698ad2fb06.jpg)
 
 作为 Java 程序员，我想很多人都知道日志对于一个程序的重要性，尤其是 Web 应用。很多时候，日志可能是我们了解应用程序如何执行的唯一方式。
 
@@ -32,17 +30,13 @@ Java 语言之所以强大，就是因为他很成熟的生态体系。包括日
 
 #### j.u.l
 
-<figure markdown="span">
-<img src="../assets/15430468008617.png" alt="img">
-</figure>
+![img](../assets/15430468008617.png)
 
 j.u.l 是 java.util.logging 包的简称，是 JDK 在 1.4 版本中引入的 Java 原生日志框架。Java Logging API 提供了七个日志级别用来控制输出。这七个级别分别是：SEVERE、WARNING、INFO、CONFIG、FINE、FINER、FINEST
 
 #### Log4j
 
-<figure markdown="span">
-<img src="../assets/15430468310499.png" alt="img">
-</figure>
+![img](../assets/15430468310499.png)
 
 Log4j 是 Apache 的一个开源项目，通过使用 Log4j，我们可以控制日志信息输送的目的地是控制台、文件、GUI 组件，甚至是套接口服务器、NT 的事件记录器、UNIX Syslog 守护进程等；我们也可以控制每一条日志的输出格式；通过定义每一条日志信息的级别，我们能够更加细致地控制日志的生成过程。最令人感兴趣的就是，这些可以通过一个配置文件来灵活地进行配置，而不需要修改应用的代码。
 
@@ -50,9 +44,7 @@ Log4 也有七种日志级别：OFF、FATAL、ERROR、WARN、INFO、DEBUG 和 TR
 
 #### LogBack
 
-<figure markdown="span">
-<img src="../assets/15430469302562.jpg" alt="img">
-</figure>
+![img](../assets/15430469302562.jpg)
 
 LogBack 也是一个很成熟的日志框架，其实 LogBack 和 Log4j 出自一个人之手，这个人就是 Ceki Gülcü。
 
@@ -68,9 +60,7 @@ logback 当前分成三个模块：logback-core,logback- classic 和 logback-acc
 
 不知道有多少人看过《阿里巴巴 Java 开发手册》，其中有一条规范做了『强制』要求：
 
-<figure markdown="span">
-<img src="../assets/15430457243811.jpg" alt="img">
-</figure>
+![img](../assets/15430457243811.jpg)
 
 说好了以上四种常用的日志框架是给 Java 应用提供的方便进行记录日志的，那为什么又不让在应用中直接使用其 API 呢？这里面推崇使用的 SLF4J 是什么呢？所谓的门面模式又是什么东西呢？
 
@@ -80,9 +70,7 @@ logback 当前分成三个模块：logback-core,logback- classic 和 logback-acc
 
 门面模式（Facade Pattern），也称之为外观模式，其核心为：外部与一个子系统的通信必须通过一个统一的外观对象进行，使得子系统更易于使用。
 
-<figure markdown="span">
-<img src="../assets/15430470508468.png" alt="img">
-</figure>
+![img](../assets/15430470508468.png)
 
 就像前面介绍的几种日志框架一样，每一种日志框架都有自己单独的 API，要使用对应的框架就要使用其对应的 API，这就大大的增加应用程序代码对于日志框架的耦合性。
 
@@ -112,9 +100,7 @@ logback 当前分成三个模块：logback-core,logback- classic 和 logback-acc
 
 #### SLF4J
 
-<figure markdown="span">
-<img src="../assets/15430470902836.jpg" alt="img">
-</figure>
+![img](../assets/15430470902836.jpg)
 
 Java 简易日志门面（Simple Logging Facade for Java，缩写 SLF4J），是一套包装 Logging 框架的界面程式，以外观模式实现。可以在软件部署的时候决定要使用的 Logging 框架，目前主要支援的有 Java Logging API、Log4j 及 logback 等框架。以 MIT 授权方式发布。
 
@@ -146,9 +132,7 @@ SLF4J 的作者就是 Log4j 的作者 Ceki Gülcü，他宣称 SLF4J 比 Log4j �
 
 #### commons-logging
 
-<figure markdown="span">
-<img src="../assets/15430471808825.png" alt="img">
-</figure>
+![img](../assets/15430471808825.png)
 
 Apache Commons Logging 是一个基于 Java 的日志记录实用程序，是用于日志记录和其他工具包的编程模型。它通过其他一些工具提供 API，日志实现和包装器实现。
 
@@ -168,9 +152,7 @@ commons-logging 和 SLF4J 的功能是类似的，主要是用来做日志门面
 
 ## 为什么禁止开发人员使用 isSuccess 作为变量名
 
-<figure markdown="span">
-<img src="../assets/15449439364854.jpg" alt="img">
-</figure>
+![img](../assets/15449439364854.jpg)
 
 在日常开发中，我们会经常要在类中定义布尔类型的变量，比如在给外部系统提供一个 RPC 接口的时候，我们一般会定义一个字段表示本次请求是否成功的。
 
@@ -199,9 +181,7 @@ Boolean isSuccess
 
 在阿里巴巴 Java 开发手册中关于这一点，有过一个『强制性』规定：
 
-<figure markdown="span">
-<img src="../assets/15449439364854-1584374811825.jpg" alt="img">
-</figure>
+![img](../assets/15449439364854-1584374811825.jpg)
 
 那么，为什么会有这样的规定呢？我们看一下 POJO 中布尔类型变量不同的命名有什么区别吧。
 
@@ -267,9 +247,7 @@ public boolean is<PropertyName>();
 public void set<PropertyName>(boolean m);
 ```
 
-<figure markdown="span">
-<img src="../assets/15449455942045.jpg" alt="img">
-</figure>
+![img](../assets/15449455942045.jpg)
 
 通过对照这份 JavaBeans 规范，我们发现，在 Model4 中，变量名为 isSuccess，如果严格按照规范定义的话，他的 getter 方法应该叫 isIsSuccess。但是很多 IDE 都会默认生成为 isSuccess。
 
@@ -379,9 +357,7 @@ Model3[isSuccess=false]
 
 引用以下 [R 大关于阿里巴巴 Java 开发手册这条规定的评价](https://www.zhihu.com/question/55642203)
 
-<figure markdown="span">
-<img src="../assets/15449492627754.jpg" alt="img">
-</figure>
+![img](../assets/15449492627754.jpg)
 
 所以，**在定义 POJO 中的布尔类型的变量时，不要使用 isSuccess 这种形式，而要直接使用 success！**
 
@@ -446,9 +422,7 @@ default model : Model[success=null, failure=false]
 
 在阿里巴巴 Java 开发手册中，对于 POJO 中如何选择变量的类型也有着一些规定：
 
-<figure markdown="span">
-<img src="../assets/640.jpeg" alt="img">
-</figure>
+![img](../assets/640.jpeg)
 
 这里建议我们使用包装类型，原因是什么呢？
 
@@ -466,7 +440,7 @@ default model : Model[success=null, failure=false]
 
 后来，作者单独和《阿里巴巴 Java 开发手册》、《码出高效》的作者 —— 孤尽 单独 1V1 (qing) Battle (jiao) 了一下。
 
-最终达成共识，还是 **尽量使用包装类型** 。**但是，作者还是想强调一个我的观点，尽量避免在你的代码中出现不确定的 null 值。**  **null 何罪之有？**
+最终达成共识，还是 **尽量使用包装类型**。**但是，作者还是想强调一个我的观点，尽量避免在你的代码中出现不确定的 null 值。**  **null 何罪之有？**
 
 关于 null 值的使用，我在 [使用 Optional 避免 NullPointerException](https://www.hollischuang.com/archives/883)、[9 Things about Null in Java](https://www.hollischuang.com/archives/74) 等文中就介绍过。
 
@@ -474,9 +448,7 @@ default model : Model[success=null, failure=false]
 
 图灵奖得主 Tony Hoare 曾经公开表达过 `null` 是一个糟糕的设计。
 
-<figure markdown="span">
-<img src="../assets/15449430847727.jpg" alt="img">
-</figure>
+![img](../assets/15449430847727.jpg)
 
 > 我把 null 引用称为自己的十亿美元错误。它的发明是在 1965 年，那时我用一个面向对象语言 (ALGOL W) 设计了第一个全面的引用类型系统。我的目的是确保所有引用的使用都是绝对安全的，编译器会自动进行检查。但是我未能抵御住诱惑，加入了 Null 引用，仅仅是因为实现起来非常容易。它导致了数不清的错误、漏洞和系统崩溃，可能在之后 40 年中造成了十亿美元的损失。
 
@@ -502,9 +474,7 @@ default model : Model[success=null, failure=false]
 
 但是，还有一个知识点并未展开介绍，那就是关于 `serialVersionUID` 。这个字段到底有什么用？如果不设置会怎么样？为什么《阿里巴巴 Java 开发手册》中有以下规定：
 
-<figure markdown="span">
-<img src="../assets/15455608799770-1590419303239.jpg" alt="img">
-</figure>
+![img](../assets/15455608799770-1590419303239.jpg)
 
 ### 背景知识 - Serializable 和 Externalizable
 
@@ -555,9 +525,7 @@ Java 中还提供了 `Externalizable` 接口，也可以实现它来提供序列
 
 我们随便找几个 Java 中实现了序列化接口的类，如 String、Integer 等，我们可以发现一个细节，那就是这些类除了实现了 `Serializable` 外，还定义了一个 `serialVersionUID`
 
-<figure markdown="span">
-<img src="../assets/15455622116411.jpg" alt="img">
-</figure>
+![img](../assets/15455622116411.jpg)
 
 那么，到底什么是 `serialVersionUID` 呢？为什么要设置这样一个字段呢？
 
@@ -656,7 +624,7 @@ java.io.InvalidClassException: com.hollis.User1; local class incompatible: strea
 
 这是因为，在进行反序列化时，JVM 会把传来的字节流中的 `serialVersionUID` 与本地相应实体类的 `serialVersionUID` 进行比较，如果相同就认为是一致的，可以进行反序列化，否则就会出现序列化版本不一致的异常，即是 `InvalidCastException`。
 
-这也是《阿里巴巴 Java 开发手册》中规定，在兼容性升级中，在修改类的时候，不要修改 `serialVersionUID` 的原因。**除非是完全不兼容的两个版本** 。所以，**serialVersionUID 其实是验证版本一致性的。** 如果读者感兴趣，可以把各个版本的 JDK 代码都拿出来看一下，那些向下兼容的类的 `serialVersionUID` 是没有变化过的。比如 String 类的 `serialVersionUID` 一直都是 `-6849794470754667710L`。
+这也是《阿里巴巴 Java 开发手册》中规定，在兼容性升级中，在修改类的时候，不要修改 `serialVersionUID` 的原因。**除非是完全不兼容的两个版本**。所以，**serialVersionUID 其实是验证版本一致性的。** 如果读者感兴趣，可以把各个版本的 JDK 代码都拿出来看一下，那些向下兼容的类的 `serialVersionUID` 是没有变化过的。比如 String 类的 `serialVersionUID` 一直都是 `-6849794470754667710L`。
 
 但是，作者认为，这个规范其实还可以再严格一些，那就是规定：
 
@@ -730,9 +698,7 @@ ObjectInputStream.readObject -> readObject0 -> readOrdinaryObject -> readClassDe
 
 在 `initNonProxy` 中 ，关键代码如下：
 
-<figure markdown="span">
-<img src="../assets/15455655236269.jpg" alt="img">
-</figure>
+![img](../assets/15455655236269.jpg)
 
 在反序列化过程中，对 `serialVersionUID` 做了比较，如果发现不相等，则直接抛出异常。
 
@@ -762,21 +728,15 @@ ObjectInputStream.readObject -> readObject0 -> readOrdinaryObject -> readClassDe
 
 为了确保我们不会忘记定义 `serialVersionUID`，可以调节一下 Intellij IDEA 的配置，在实现 `Serializable` 接口后，如果没定义 `serialVersionUID` 的话，IDEA（eclipse 一样）会进行提示：
  
-<figure markdown="span">
-<img src="../assets/15455657868672.jpg" alt="img">
-</figure>
+![img](../assets/15455657868672.jpg)
 
 并且可以一键生成一个：
 
-<figure markdown="span">
-<img src="../assets/15455658088098.jpg" alt="img">
-</figure>
+![img](../assets/15455658088098.jpg)
 
 当然，这个配置并不是默认生效的，需要手动到 IDEA 中设置一下：
 
-<figure markdown="span">
-<img src="../assets/15455659620042.jpg" alt="img">
-</figure>
+![img](../assets/15455659620042.jpg)
 
 在图中标号 3 的地方（Serializable class without serialVersionUID 的配置），打上勾，保存即可。
 
@@ -790,9 +750,7 @@ ObjectInputStream.readObject -> readObject0 -> readOrdinaryObject -> readClassDe
 
 ## 为什么不建议在 for 循环中使用 "+" 进行字符串拼接
 
-<figure markdown="span">
-<img src="../assets/15472850170230.jpg" alt="img">
-</figure>
+![img](../assets/15472850170230.jpg)
 
 字符串，是 Java 中最常用的一个数据类型了。关于字符串的知识，作者已经发表过几篇文章介绍过很多，如：
 
@@ -833,9 +791,7 @@ ObjectInputStream.readObject -> readObject0 -> readOrdinaryObject -> readClassDe
 
 其实最后我们得到的 s 已经是一个新的字符串了。如下图
 
-<figure markdown="span">
-<img src="../assets/15472897908391.jpg" alt="img">
-</figure>
+![img](../assets/15472897908391.jpg)
 
 s 中保存的是一个重新创建出来的 String 对象的引用。
 
@@ -849,7 +805,7 @@ String introduce = "每日更新 Java 相关技术文章";
 String hollis = wechat + "," + introduce;
 ```
 
-这里要特别说明一点，有人把 Java 中使用 `+` 拼接字符串的功能理解为 **运算符重载** 。其实并不是，**Java 是不支持运算符重载的** 。这其实只是 Java 提供的一个 **语法糖** 。后面再详细介绍。
+这里要特别说明一点，有人把 Java 中使用 `+` 拼接字符串的功能理解为 **运算符重载**。其实并不是，**Java 是不支持运算符重载的**。这其实只是 Java 提供的一个 **语法糖**。后面再详细介绍。
 
 > 运算符重载：在计算机程序设计中，运算符重载（英语：operator overloading）是多态的一种。运算符重载，就是对已有的运算符重新进行定义，赋予其另一种功能，以适应不同的数据类型。
 >
@@ -902,9 +858,7 @@ System.out.println(result);
 
 以上就是比较常用的五种在 Java 种拼接字符串的方式，那么到底哪种更好用呢？为什么阿里巴巴 Java 开发手册中不建议在循环体中使用 `+` 进行字符串拼接呢？
 
-<figure markdown="span">
-<img src="../assets/15472850170230-1584374811824.jpg" alt="img">
-</figure>
+![img](../assets/15472850170230-1584374811824.jpg)
 
 (阿里巴巴 Java 开发手册中关于字符串拼接的规约)
 
@@ -1123,9 +1077,7 @@ System.out.println((new StringBuilder()).append("+ cost:").append(t2 - t1).toStr
 
 ## 为什么禁止在 foreach 循环里进行元素的 remove/add 操作
 
-<figure markdown="span">
-<img src="../assets/15497724883532-1.jpg" alt="img">
-</figure>
+![img](../assets/15497724883532-1.jpg)
 
 ### foreach 循环
 
@@ -1285,9 +1237,7 @@ public static void main(String[] args) {
 
 然后运行以上代码，同样会抛出异常。我们来看一下 ConcurrentModificationException 的完整堆栈：
 
-<figure markdown="span">
-<img src="../assets/15515088749690-1.jpg)" alt="img">
-</figure>
+![img](../assets/15515088749690-1.jpg)
 
 通过异常堆栈我们可以到，异常发生的调用链 ForEachDemo 的第 23 行，`Iterator.next` 调用了 `Iterator.checkForComodification` 方法 ，而异常就是 checkForComodification 方法中抛出的。
 
@@ -1336,9 +1286,7 @@ public static void main(String[] args) {
 
 通过翻阅代码，我们也可以发现，remove 方法核心逻辑如下：
 
-<figure markdown="span">
-<img src="../assets/15515151811228-1.jpg" alt="img">
-</figure>
+![img](../assets/15515151811228-1.jpg)
 
 可以看到，它只修改了 modCount，并没有对 expectedModCount 做任何操作。
 
@@ -1389,9 +1337,7 @@ public static void main(String[] args) {
 
 如果直接使用 Iterator 提供的 remove 方法，那么就可以修改到 expectedModCount 的值。那么就不会再抛出异常了。其实现代码如下：
 
-<figure markdown="span">
-<img src="../assets/15515125763808-1.jpg" alt="img">
-</figure>
+![img](../assets/15515125763808-1.jpg)
 
 **3、使用 Java 8 中提供的 filter 过滤** Java 8 中可以把集合转换成流，对于流有一种 filter 操作， 可以对原始 Stream 进行某项测试，通过测试的元素被留下来生成一个新 Stream。
 
@@ -1456,9 +1402,7 @@ java.util.concurrent 包下的容器都是安全失败，可以在多线程下�
 
 ## 为什么建议集合初始化时，指定集合容量大小
 
-<figure markdown="span">
-<img src="../assets/15551485633238.jpg" alt="img">
-</figure>
+![img](../assets/15551485633238.jpg)
 ￼
 集合是 Java 开发日常开发中经常会使用到的。在之前的一些文章中，我们介绍过一些关于使用集合类应该注意的事项，如《为什么阿里巴巴禁止在 foreach 循环里进行元素的 remove/add 操作》。
 
@@ -1552,9 +1496,7 @@ System.out.println("capacity : " + capacity.invoke(map));
 
 聪明的读者们，如果让你设计这个算法你准备如何计算？如果你想到二进制的话，那就很简单了。举几个例子看一下：
 
-<figure markdown="span">
-<img src="../assets/QQ20180527-173743.png" alt="img">
-</figure>
+![img](../assets/QQ20180527-173743.png)
 
 请关注上面的几个例子中，蓝色字体部分的变化情况，或许你会发现些规律。5->8、9->16、19->32、37->64 都是主要经过了两个阶段。
 
@@ -1641,9 +1583,7 @@ int n = cap - 1;
 
 关于这个值的设置，在《阿里巴巴 Java 开发手册》有以下建议：
 
-<figure markdown="span">
-<img src="../assets/Demo.png" alt="img">
-</figure>
+![img](../assets/Demo.png)
 
 这个值，并不是阿里巴巴的工程师原创的，在 guava（21.0 版本）中也使用的是这个值。
 

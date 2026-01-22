@@ -226,7 +226,7 @@ Successfully built ce88644a7395
 invalid argument: can't use stdin for both build context and dockerfile
 ```
 
-就会报错了。所以，**不能同时使用 stdin 读取 Dockerfile 和 build context** 。
+就会报错了。所以，**不能同时使用 stdin 读取 Dockerfile 和 build context**。
 
 - **build context 支持四种行为。** 
 
@@ -248,7 +248,7 @@ invalid argument: can't use stdin for both build context and dockerfile
 从 `stdin` 传入，上文已经演示过了，传递给 `stdin` 的是 `tar` 归档文件；
 当然也可以是指定一个具体的 `PATH`，我们通常使用的 `docker build .` 便是这种用法；
 或者可以指定一个 `git` 仓库的地址，CLI 会调用 `git` 命令将仓库 `clone` 至一个临时目录，进行使用；
-最后一种是，给定一个 `URL` 地址，该地址可以是 **一个具体的 Dockerfile 文件地址** 或者是 **一个 tar 归档文件的下载地址** 。
+最后一种是，给定一个 `URL` 地址，该地址可以是 **一个具体的 Dockerfile 文件地址** 或者是 **一个 tar 归档文件的下载地址**。
 这几种基本就是字面上的区别，至于 CLI 的行为差异，主要是最后一种，当 `URL` 地址是一个具体的 `Dockerfile` 文件地址，在这种情况下 `build context` 相当于只有 `Dockerfile` 自身，所以并不能使用 `COPY` 之类的指定，至于 `ADD` 也只能使用可访问的外部地址。
 * **可使用 .dockerignore 忽略不需要的文件** 我在之前的 Chat \[高效构建 Docker 镜像的最佳实践\] 中有分享过相关的内容。这里我们看看它的实现逻辑。
 

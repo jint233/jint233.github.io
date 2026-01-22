@@ -32,7 +32,7 @@ server-uuid=a126fcb6-3706-11e8-b1d5-000c294ebf0d
 
 # 2.gtid的生命周期
 
-**gtid的生命周期对于配置和维护基于gtid的复制至关重要** 。所以，请尽可能理解以下几个过程。
+**gtid的生命周期对于配置和维护基于gtid的复制至关重要**。所以，请尽可能理解以下几个过程。
 
 gtid在master和slave上是一直 **持久化保存** (即使删除了日志，也会记录到Previous_GTID中)的。它在master和slave上的生命周期如下：
 

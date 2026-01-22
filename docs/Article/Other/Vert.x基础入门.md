@@ -70,7 +70,7 @@ Vert.x Core 作为最核心部分，提供了以下功能：
 
 Vert.x Core 只包含一个非常轻量级的 jar 包，里面有以上的核心功能。
 
-Vert.x Web 基于 Vert.x Core，提供了一系列更丰富的功能以便更容易地开发实际的 Web 应用。它继承了 Vert.x 2.x 里的 [Yoke](https://pmlopes.github.io/yoke/) 的特点，灵感来自于 Node.js 的框架 [Express](https://expressjs.com/) 和 Ruby 的框架 [Sinatra](http://www.sinatrarb.com/) 等等。Vert.x Web 的设计是强大的，非侵入式的，并且是完全可插拔的。Vert.x Web 非常适合编写 **RESTful HTTP 微服务** 。
+Vert.x Web 基于 Vert.x Core，提供了一系列更丰富的功能以便更容易地开发实际的 Web 应用。它继承了 Vert.x 2.x 里的 [Yoke](https://pmlopes.github.io/yoke/) 的特点，灵感来自于 Node.js 的框架 [Express](https://expressjs.com/) 和 Ruby 的框架 [Sinatra](http://www.sinatrarb.com/) 等等。Vert.x Web 的设计是强大的，非侵入式的，并且是完全可插拔的。Vert.x Web 非常适合编写 **RESTful HTTP 微服务**。
 
 Vert.x Stack 包含一系列提供鉴权、网络、数据访问等的官方扩展 jar 包。
 
@@ -99,7 +99,7 @@ server.requestHandler(request -> {
 
 这样引入的优势是，Vert.x 可以通过少量的线程，处理大量的并发事件。如果这里面并发事件同时出现了与线程数相同的阻塞操作，例如读取文件，那么所有线程都被阻塞，整个程序就被挂起、拒绝服务了。
 
-在大部分情况下，Vert.x 在一个线程里调用对应的 handlers，这个线程就叫做一个 **Event Loop** 。
+在大部分情况下，Vert.x 在一个线程里调用对应的 handlers，这个线程就叫做一个 **Event Loop**。
 
 ![img](../assets/event-loop.png)
 
@@ -137,7 +137,7 @@ public class BlockWarningDemo extends AbstractVerticle {
 1. 进行消耗很多时间的大量计算；
 1. 文件句柄的获取与读写。
 
-那么这些阻塞的操作我们怎么做呢？使用 vertx.executeBlocking 或者使用一类新的 Verticle ， 叫做 **Worker Verticle** 。
+那么这些阻塞的操作我们怎么做呢？使用 vertx.executeBlocking 或者使用一类新的 Verticle ， 叫做 **Worker Verticle**。
 
 根本上就是让这些阻塞操作在一组内部或者自定义的线程池上执行，而不要在处理事件的 Event Loop 操作。待处理完毕后，再通过 future 对应的 handler 来回调 _Event Loop_ 进行后续处理。
 

@@ -67,9 +67,7 @@ class ConnectIOnHandler extends Thread{
 
 下图是几种常见 I/O 模型的对比：
 
-<figure markdown="span">
-<img src="../assets/v2-f47206d5b5e64448744b85eaf568f92d_1440w.jpg" alt="img">
-</figure>
+![img](../assets/v2-f47206d5b5e64448744b85eaf568f92d_1440w.jpg)
 
 以 socket.read () 为例子：
 
@@ -152,9 +150,7 @@ Java 的 Selector 对于 Linux 系统来说，有一个致命限制：同一个 
 
 另外连接的处理和读写的处理通常可以选择分开，这样对于海量连接的注册和读写就可以分发。虽然 read () 和 write () 是比较高效无阻塞的函数，但毕竟会占用 CPU，如果面对更高的并发则无能为力。
 
-<figure markdown="span">
-<img src="../assets/v2-22efc734724d07251f8293e2f1143639_1440w.png" alt="img">
-</figure>
+![img](../assets/v2-22efc734724d07251f8293e2f1143639_1440w.png)
 
 ## NIO 在客户端的魔力
 

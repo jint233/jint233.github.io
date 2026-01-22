@@ -4,7 +4,7 @@
 
 通过之前的学习，我们已经知道 Dockerfile 是一种可用于镜像构建，具备特定语法的文本文件。而 Docker 自身在使用此文件进行构建镜像的过程中，遵循其固定的行为。
 
-比如在上次 [Chat](https://gitbook.cn/gitchat/activity/5cd527e864de19331ba79278) 提到的 **缓存** 。
+比如在上次 [Chat](https://gitbook.cn/gitchat/activity/5cd527e864de19331ba79278) 提到的 **缓存**。
 
 Docker 构建系统中，默认情况下为了加快构建的速度，会将构建过程中的每层都进行缓存，我们建议在编写 Dockerfile 的时候，将更新最为频繁的步骤写到最后面，以避免因为该步骤的内容变更，进而导致后续步骤的缓存失效（缓存的控制是 Docker 固定的行为，我们在之后的 Chat 中会进一步深入内部进行分析）。
 
@@ -216,9 +216,9 @@ IMAGE               CREATED             CREATED BY                              
 ...
 ```
 
-很明显，刚才增加的 ENV 可以直接通过 docker history/docker image history 看到。**不建议真的这样做** 。
+很明显，刚才增加的 ENV 可以直接通过 docker history/docker image history 看到。**不建议真的这样做**。
 
-由此，得出了我们的第一个结论，**Docker 镜像的构建历史是不安全的，通过 ENV 设置的信息可在 history 中看到** 。
+由此，得出了我们的第一个结论，**Docker 镜像的构建历史是不安全的，通过 ENV 设置的信息可在 history 中看到**。
 
 这也引出了我们的第一个问题： **Docker 镜像的构建记录是可查看的，如何管理构建过程中需要的密码/密钥等敏感信息？** ### 高阶特性：密码管理
 
