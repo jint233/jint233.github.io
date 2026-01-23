@@ -30,9 +30,9 @@ Vert.x 是一个轻量级、高性能、模块化的响应式编程技术，天�
 其次，它可以用来构建反应式应用的，在其官网右上角有[反应式宣言](https://www.reactivemanifesto.org/zh-CN)，声明了反应式系统的特质：
 
 1. 即时响应性
-1. 回弹性
-1. 弹性
-1. 消息驱动
+2. 回弹性
+3. 弹性
+4. 消息驱动
 
 文中链接有对应宣言的翻译解释链接，限于篇幅，就不在此探讨了。
 
@@ -57,16 +57,16 @@ Vert.x 生态系统是由一系列模块组成的，一部分是官方维护，�
 Vert.x Core 作为最核心部分，提供了以下功能：
 
 1. TCP 客户端和服务器；
-1. HTTP 客户端和服务器，并且支持 WebSocket ，这部分我们会在下面 **常用两个协议 ( HTTP & WebSocket )** 进一步展开讲；
-1. 事件总线，用来进行信息传递，实质是一种基于 TCP 连接的消息队列，支持点对点和发布订阅两种机制；
-1. 共享数据,通过本地的 map 结构和集群级别的分布式 map；
-1. 定时器和延迟操作，通过 vertx.setPeriodic 实现周期定时执行， vertx.setTimer 来实现一次性的调用（延时操作）；
-1. 装载、卸载部署单元；
-1. UDP 数据报文；
-1. DNS 客户端；
-1. 访问文件系统；
-1. 高可用；
-1. 集群化。
+2. HTTP 客户端和服务器，并且支持 WebSocket ，这部分我们会在下面 **常用两个协议 ( HTTP & WebSocket )** 进一步展开讲；
+3. 事件总线，用来进行信息传递，实质是一种基于 TCP 连接的消息队列，支持点对点和发布订阅两种机制；
+4. 共享数据,通过本地的 map 结构和集群级别的分布式 map；
+5. 定时器和延迟操作，通过 vertx.setPeriodic 实现周期定时执行， vertx.setTimer 来实现一次性的调用（延时操作）；
+6. 装载、卸载部署单元；
+7. UDP 数据报文；
+8. DNS 客户端；
+9. 访问文件系统；
+10. 高可用；
+11. 集群化。
 
 Vert.x Core 只包含一个非常轻量级的 jar 包，里面有以上的核心功能。
 
@@ -132,10 +132,10 @@ public class BlockWarningDemo extends AbstractVerticle {
 默认 _Event Loop_ 的线程执行时间是 2 秒，上面的代码让线程睡了三秒就直接被检查出来了。与此类似的还有以下的阻塞操作：
 
 1. 等待锁；
-1. 等待互斥锁或者同步代码块；
-1. 数据库长时间查询；
-1. 进行消耗很多时间的大量计算；
-1. 文件句柄的获取与读写。
+2. 等待互斥锁或者同步代码块；
+3. 数据库长时间查询；
+4. 进行消耗很多时间的大量计算；
+5. 文件句柄的获取与读写。
 
 那么这些阻塞的操作我们怎么做呢？使用 vertx.executeBlocking 或者使用一类新的 Verticle ， 叫做 **Worker Verticle**。
 
@@ -423,6 +423,6 @@ StaticHandler 会去找 webroot 的静态资源，直接对外提供服务。
 ### 学习资料
 
 1. 我们可以通过 Vert.x 的官方文档系统学习它，地址为：<https://vertx.io/docs/>
-1. 同时github上有人翻译了中文版：<https://vertxchina.github.io/vertx-translation-chinese/>
-1. 官网同时有一本电子书《使用Java构建响应式微服务》，大家可以学习参考：<https://developers.redhat.com/promotions/building-reactive-microservices-in-java/>
-1. Vert.x生态的各种信息和例子，都可以从这个项目里找到：<https://github.com/vert-x3/vertx-awesome>
+2. 同时github上有人翻译了中文版：<https://vertxchina.github.io/vertx-translation-chinese/>
+3. 官网同时有一本电子书《使用Java构建响应式微服务》，大家可以学习参考：<https://developers.redhat.com/promotions/building-reactive-microservices-in-java/>
+4. Vert.x生态的各种信息和例子，都可以从这个项目里找到：<https://github.com/vert-x3/vertx-awesome>

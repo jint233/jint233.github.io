@@ -8,8 +8,10 @@
 
 另外，2018 年 9 月 22 日，在 2018 杭州云栖大会上，召开《码出高效：Java 开发手册》新书发布会，并宣布将图书所有收益均捐赠于技术公益项目 “83 行代码计划”。该书也推荐大家阅读。
 
-豆瓣介绍：[https://book.douban.com/subject/30333948/](https://book.douban.com/subject/30333948/)
+豆瓣介绍：[https://book.douban.com/subject/30333948](https://book.douban.com/subject/30333948)
+
 京东地址：[https://item.jd.com/31288905323.html](https://item.jd.com/31288905323.html)
+
 当当地址：[http://product.dangdang.com/25346848.html](http://product.dangdang.com/25346848.html)
 
 下面开始展开正文。
@@ -1410,7 +1412,7 @@ java.util.concurrent 包下的容器都是安全失败，可以在多线程下�
 
 ### 为什么要设置 HashMap 的初始化容量
 
-我们先来写一段代码在 JDK 1.7 （jdk1.7.0\_79）下面来分别测试下，在不指定初始化容量和指定初始化容量的情况下性能情况如何。（jdk 8 结果会有所不同，我会在后面的文章中分析）
+我们先来写一段代码在 JDK 1.7 （jdk1.7.0_79）下面来分别测试下，在不指定初始化容量和指定初始化容量的情况下性能情况如何。（jdk 8 结果会有所不同，我会在后面的文章中分析）
 
 ```java
 public static void main(String[] args) {

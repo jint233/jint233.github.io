@@ -185,55 +185,56 @@ NESTING_EVENT_TYPE: STATEMENT
 ```
 
 多执行几次，发现数据是有变化的，这些内容代表了什么呢？
-*   THREAD\_ID：线程 ID
-*   EVENT\_ID：事件 ID
-*   END\_EVENT\_ID：结束事件 ID
-*   EVENT\_NAME：事件名称，说明了当前执行的事件
+*   THREAD_ID：线程 ID
+*   EVENT_ID：事件 ID
+*   END_EVENT_ID：结束事件 ID
+*   EVENT_NAME：事件名称，说明了当前执行的事件
 *   SOURCE：源码位置
-*   TIMER\_START：事件开始时间（皮秒）
-*   TIMER\_END：事件结束时间（皮秒，如果没有执行完成，时间就是当前之间）
-*   TIMER\_WAIT：事件等待事件（皮秒）
-*   WORK\_COMPLETED：任务完成情况
-*   WORK\_ESTIMATED：任务估算情况
-*   NESTING\_EVENT\_ID：事件对应的父事件 ID
-*   NESTING\_EVENT\_TYPE：父事件类型（STATEMENT、STAGE、WAIT）
+*   TIMER_START：事件开始时间（皮秒）
+*   TIMER_END：事件结束时间（皮秒，如果没有执行完成，时间就是当前之间）
+*   TIMER_WAIT：事件等待事件（皮秒）
+*   WORK_COMPLETED：任务完成情况
+*   WORK_ESTIMATED：任务估算情况
+*   NESTING_EVENT_ID：事件对应的父事件 ID
+*   NESTING_EVENT_TYPE：父事件类型（STATEMENT、STAGE、WAIT）
+
 ### 收下这个常用的 SQL
-1.  查看事件任务完成情况：
 
-```sql
-mysql> SELECT pt.INFO, ec.THREAD_ID, ec.EVENT_NAME, ec.WORK_COMPLETED, ec.WORK_ESTIMATED, pt.STATE FROM performance_schema.events_stages_current ec left join performance_schema.threads th on ec.thread_id = th.thread_id left join information_schema.PROCESSLIST pt on th.PROCESSLIST_ID = pt.ID where pt.INFO like 'ALTER%';
+1. 查看事件任务完成情况：
 
-+-------------------------------------------+-----------+------------------------------------------------------+----------------+----------------+----------------+
+    ```sql
+    mysql> SELECT pt.INFO, ec.THREAD_ID, ec.EVENT_NAME, ec.WORK_COMPLETED, ec.WORK_ESTIMATED, pt.STATE FROM performance_schema.events_stages_current ec left join performance_schema.threads th on ec.thread_id = th.thread_id left join information_schema.PROCESSLIST pt on th.PROCESSLIST_ID = pt.ID where pt.INFO like 'ALTER%';
+    
+    +-------------------------------------------+-----------+------------------------------------------------------+----------------+----------------+----------------+
+    
+    | INFO                                      | THREAD_ID | EVENT_NAME                                           | WORK_COMPLETED | WORK_ESTIMATED | STATE          |
+    
+    +-------------------------------------------+-----------+------------------------------------------------------+----------------+----------------+----------------+
+    
+    | alter table sbtest.sbtest1 add d char(20) |        28 | stage/innodb/alter table (read PK and internal sort) |         201496 |         308223 | altering table |
+    
+    +-------------------------------------------+-----------+------------------------------------------------------+----------------+----------------+----------------+
+    
+    1 row in set (0.25 sec)
+    ```
 
-| INFO                                      | THREAD_ID | EVENT_NAME                                           | WORK_COMPLETED | WORK_ESTIMATED | STATE          |
+2. 查看任务完成事件：
 
-+-------------------------------------------+-----------+------------------------------------------------------+----------------+----------------+----------------+
-
-| alter table sbtest.sbtest1 add d char(20) |        28 | stage/innodb/alter table (read PK and internal sort) |         201496 |         308223 | altering table |
-
-+-------------------------------------------+-----------+------------------------------------------------------+----------------+----------------+----------------+
-
-1 row in set (0.25 sec)
-```
-
-2.  查看任务完成事件：
-
-```sql
-mysql> select stmt.sql_text as sql_text, concat(work_completed, '/' , work_estimated) as progress, (stage.timer_end - stmt.timer_start) / 1e12 as current_seconds, (stage.timer_end - stmt.timer_start) / 1e12 * (work_estimated-work_completed) / work_completed as remaining_seconds from performance_schema.events_stages_current stage, performance_schema.events_statements_current stmt where stage.thread_id = stmt.thread_id and stage.nesting_event_id = stmt.event_id;
-
-+-------------------------------------------+---------------+-----------------+--------------------+
-
-| sql_text                                  | progress      | current_seconds | remaining_seconds  |
-
-+-------------------------------------------+---------------+-----------------+--------------------+
-
-| alter table sbtest.sbtest1 add d char(20) | 135192/308223 |   102.461512532 | 131.13954949201502 |
-
-+-------------------------------------------+---------------+-----------------+--------------------+
-
-1 row in set (0.00 sec)
-```
+    ```sql
+    mysql> select stmt.sql_text as sql_text, concat(work_completed, '/' , work_estimated) as progress, (stage.timer_end - stmt.timer_start) / 1e12 as current_seconds, (stage.timer_end - stmt.timer_start) / 1e12 * (work_estimated-work_completed) / work_completed as remaining_seconds from performance_schema.events_stages_current stage, performance_schema.events_statements_current stmt where stage.thread_id = stmt.thread_id and stage.nesting_event_id = stmt.event_id;
+    
+    +-------------------------------------------+---------------+-----------------+--------------------+
+    
+    | sql_text                                  | progress      | current_seconds | remaining_seconds  |
+    
+    +-------------------------------------------+---------------+-----------------+--------------------+
+    
+    | alter table sbtest.sbtest1 add d char(20) | 135192/308223 |   102.461512532 | 131.13954949201502 |
+    
+    +-------------------------------------------+---------------+-----------------+--------------------+
+    
+    1 row in set (0.00 sec)
+    ```
 
 ### 总结
 这样我们通过 MySQL 的这个数据字典就可以很直观地看到 ALTER 的执行情况了，当你看到这样的执行进度，是不是就不那么慌了。
-```

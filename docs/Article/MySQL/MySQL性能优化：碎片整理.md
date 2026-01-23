@@ -104,8 +104,8 @@ Comment:
 1 row in set (0.00 sec)
 ```
 
-data_length 表数据大小 index_length 表索引大小 data\_free 碎片大小
-根据返回信息，我们知道碎片大小为 4194304（单位 B） **2. 通过数据库视图信息查看** 查询 information\_schema.tables 的 data\_free 列的值：
+data_length 表数据大小 index_length 表索引大小 data_free 碎片大小
+根据返回信息，我们知道碎片大小为 4194304（单位 B） **2. 通过数据库视图信息查看** 查询 information_schema.tables 的 data_free 列的值：
 
 ```python
 mysql> select
@@ -132,7 +132,7 @@ where t.table_schema = 'employees';
 8 rows in set (0.01 sec)
 ```
 
-根据结果显示，data\_free 列数据就是我们要查询的表的碎片大小内容，是 4M。
+根据结果显示，data_free 列数据就是我们要查询的表的碎片大小内容，是 4M。
 ### 如何清理碎片
 找到表碎片了，我们如何清理呢？有两种方法。**1. 分析表** 命令：
 

@@ -110,12 +110,12 @@ T1 先获取了表中这一行数据，执行了 update，未提交；T2 获取�
 
 事务隔离级别，拆分来看，事务、隔离、级别，故是三个概念的集合，是保证事务之间相互隔离互不影响的，有多个级别。事务在执行过程中可能会出现脏读、不可重复读、幻读，那么 MySQL 的事务隔离级别到底有怎样的表现呢？
 
-| 事务隔离级别                | 脏读   | 不可重复读 | 幻读   |
-|-----------------------------|--------|------------|--------|
-| 读未提交(Read-Uncommited)   | 可能   | 可能       | 可能   |
-| 读提交(Read-Commited)       | 不可能 | 可能       | 可能   |
-| 可重复读交(Repeatable-Read) | 不可能 | 不可能     | 可能   |
-| 序列化(Serializable)        | 不可能 | 不可能     | 不可能 |
+| 事务隔离级别                 | 脏读  | 不可重复读 | 幻读  |
+|------------------------|-----|-------|-----|
+| 读未提交(Read-Uncommited)  | 可能  | 可能    | 可能  |
+| 读提交(Read-Commited)     | 不可能 | 可能    | 可能  |
+| 可重复读交(Repeatable-Read) | 不可能 | 不可能   | 可能  |
+| 序列化(Serializable)      | 不可能 | 不可能   | 不可能 |
 
 那么到底什么是脏读、不可重复读、幻读呢？
 
@@ -157,18 +157,18 @@ mysql>  SELECT @@tx_isolation;
 
 环境：用户 A 有 100 元钱，给用户 A 增加 100 元，然后用户 A 转账给用户 B。
 
-|事务 1|事务 2|
-|--|--|
-|begin;|begin;|
-|update t\_account set balance=balance+100 where name='A'; #给用户 A 增加 100 元
+| 事务 1                                                                      | 事务 2   |
+|---------------------------------------------------------------------------|--------|
+| begin;                                                                    | begin; |
+| update t_account set balance=balance+100 where name='A'; #给用户 A 增加 100 元 |        |
 
-select balance from t\_account where name='A'; #转账前查询用户 A 余额为 200 元
+select balance from t_account where name='A'; #转账前查询用户 A 余额为 200 元
 
 rollback; #决定不给用户 A 增加 100 元了，事务回滚|
 
-update t\_account set balance=balance-200 where name='A'; #用户 A 继续给用户 B 转账，用户 A 减 200 元
+update t_account set balance=balance-200 where name='A'; #用户 A 继续给用户 B 转账，用户 A 减 200 元
 
-update t\_account set balance=balance+200 where name='B'; #用户 A 继续给用户 B 转账，用户 B 加 200 元
+update t_account set balance=balance+200 where name='B'; #用户 A 继续给用户 B 转账，用户 B 加 200 元
 
 commit; #提交事务|
 
@@ -219,13 +219,13 @@ begin;
 
 begin;
 
-update t\_account set balance=balance+100 where name='A'; #给用 A 增加 100 元
+update t_account set balance=balance+100 where name='A'; #给用 A 增加 100 元
 
-select \* from t\_account where name='A'; #事务 2 查用户的余额，因事务 1 未提交，仍为 100 元
+select \* from t_account where name='A'; #事务 2 查用户的余额，因事务 1 未提交，仍为 100 元
 
 commit;
 
-select \* from t\_account where name='A'; #事务 2 查用户的余额，事务 1 已提交，变为 200 元
+select \* from t_account where name='A'; #事务 2 查用户的余额，事务 1 已提交，变为 200 元
 
 一个事务重新读取前面读取过的数据时，发现该数据已经被修改了，其实已被另一个已提交的事务操作了。
 
@@ -263,15 +263,15 @@ begin;
 
 begin;
 
-select \* from t\_account where name='A'; #事务 2 查用户的余额，为 100 元
+select \* from t_account where name='A'; #事务 2 查用户的余额，为 100 元
 
-update t\_account set balance=balance+100 where name='A'; #给用 A 增加 100 元
+update t_account set balance=balance+100 where name='A'; #给用 A 增加 100 元
 
-select \* from t\_account where name='A'; #事务 2 查用户的余额，因事务 1 未提交，仍为 100 元
+select \* from t_account where name='A'; #事务 2 查用户的余额，因事务 1 未提交，仍为 100 元
 
 commit;
 
-select \* from t\_account where name='A'; #事务 2 查用户的余额，事务 1 已提交，仍为 100 元
+select \* from t_account where name='A'; #事务 2 查用户的余额，事务 1 已提交，仍为 100 元
 
 这就能看出来，事务 2 开启后读取了用户 A 的余额，即使事务 1 修改了数据，不管提交与否，事务 2 读取的数据一直是之前第一次读取的数据。继续操作。
 
@@ -281,7 +281,7 @@ select \* from t\_account where name='A'; #事务 2 查用户的余额，事务 
 
 commit;
 
-select \* from t\_account where name='A'; ##事务 2 查用户的余额，为 200 元
+select \* from t_account where name='A'; ##事务 2 查用户的余额，为 200 元
 
 为什么现在变成了 200 元了，因为事务 2 已经 commit，再次 select 是一个新的事务，读取数据当然又变为第一次获取数据（此时的数据是最新的数据）。
 
@@ -301,23 +301,23 @@ begin;
 
 begin;
 
-select \* from t\_account; #有一行数据，用户 A，余额 100 元
+select \* from t_account; #有一行数据，用户 A，余额 100 元
 
-insert into t\_account values('B',100); #增加用户 B，余额 100 元
-
-commit;
-
-select \* from t\_account where name='B'; #无返回行，查询不到用户 B
-
-update t\_account set balance=balance+100 where name='B'; #神奇，更新成功了
-
-select \* from t\_account; #用户 A 余额 100，用户 B 余额 200
-
-select \* from t\_account; #用户 A 余额 100，用户 B 余额 100
+insert into t_account values('B',100); #增加用户 B，余额 100 元
 
 commit;
 
-select \* from t\_account; #用户 A 余额 100，用户 B 余额 200
+select \* from t_account where name='B'; #无返回行，查询不到用户 B
+
+update t_account set balance=balance+100 where name='B'; #神奇，更新成功了
+
+select \* from t_account; #用户 A 余额 100，用户 B 余额 200
+
+select \* from t_account; #用户 A 余额 100，用户 B 余额 100
+
+commit;
+
+select \* from t_account; #用户 A 余额 100，用户 B 余额 200
 
 delete 操作：
 
@@ -329,23 +329,23 @@ begin;
 
 begin;
 
-select \* from t\_account; #有 2 行数据，用户 A 余额 100 元，用户 B 余额 200
+select \* from t_account; #有 2 行数据，用户 A 余额 100 元，用户 B 余额 200
 
-insert into t\_account values('C',100); #增加用户 C，余额 100 元
-
-commit;
-
-select \* from t\_account where name='C'; #无返回行，查询不到用户 C
-
-delete from t\_account where name='C'; #神奇，删除成功了
-
-select \* from t\_account; #用户 A 余额 100，用户 B 余额 200
-
-select \* from t\_account; #用户 A 余额 100，用户 B 余额 200，用户 C 余额 100
+insert into t_account values('C',100); #增加用户 C，余额 100 元
 
 commit;
 
-select \* from t\_account; #户 A 余额 100，用户 B 余额 200
+select \* from t_account where name='C'; #无返回行，查询不到用户 C
+
+delete from t_account where name='C'; #神奇，删除成功了
+
+select \* from t_account; #用户 A 余额 100，用户 B 余额 200
+
+select \* from t_account; #用户 A 余额 100，用户 B 余额 200，用户 C 余额 100
+
+commit;
+
+select \* from t_account; #户 A 余额 100，用户 B 余额 200
 
 通过这两个例子你是不是了解了一个事务的 update 和 delete 操作了另外一个事务提交的数据，会使得这些数据在当前事务变得可见。就像幻影一下出现了！
 
@@ -381,23 +381,23 @@ begin;
 
 begin;
 
-select \* from t\_account where name='A'; #查询用户余额
+select \* from t_account where name='A'; #查询用户余额
 
-update t\_account set balance=balance+100 where name='A'; #给用户 A 增加 100 元，执行一直处于等待
+update t_account set balance=balance+100 where name='A'; #给用户 A 增加 100 元，执行一直处于等待
 
 commit;
 
 update 成功返回
 
-select \* from t\_account where name='A'; #用户 A 余额为 100，因为事务 2 还未提交，获取的是 undo 中的历史版本数据
+select \* from t_account where name='A'; #用户 A 余额为 100，因为事务 2 还未提交，获取的是 undo 中的历史版本数据
 
 begin;
 
-select \* from t\_account where name='A'; #新开一个事务，由于事务 2 还未提交，此查询锁等
+select \* from t_account where name='A'; #新开一个事务，由于事务 2 还未提交，此查询锁等
 
 commit;
 
-select \* from t\_account where name='A'; #用户 A 余额 200
+select \* from t_account where name='A'; #用户 A 余额 200
 
 好了，实例讲解到此结束，是否已经帮你理解了 MySQL 事务隔离级别。
 

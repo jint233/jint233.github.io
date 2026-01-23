@@ -108,7 +108,7 @@ curl -X GET "localhost:9200/_search?pretty" -H 'Content-Type: application/json' 
 '
 ```
 
-在一个或者多个索引库或者所有的 \_type 中查询：
+在一个或者多个索引库或者所有的 _type 中查询：
 
 ```plaintext
 GET /index_2014*/type1,type2/_search
@@ -468,7 +468,7 @@ curl -X PUT "localhost:9200/my_index/_mapping/my_type?pretty" -H 'Content-Type: 
 
 ##### **Lucene 如何处理文档** 在 Lucene 中一个文档由键值对组成。在索引文档的时候，每个字段的值都会添加到相关字段的倒排序中
 
-##### **类型如何实现** 每个文档的类型名称将会保存在 \_type 字段上，当要检索字段的时候，ES 会自动在 \_type 字段上检索
+##### **类型如何实现** 每个文档的类型名称将会保存在 _type 字段上，当要检索字段的时候，ES 会自动在 _type 字段上检索
 
 例如在 User 类型中，name 字段会映射声明为 string 类型，并索引到 name 的倒排序中，需要使用 whitespace 分词器分析。
 
@@ -481,7 +481,7 @@ curl -X PUT "localhost:9200/my_index/_mapping/my_type?pretty" -H 'Content-Type: 
 
 ##### **Lucene 索引的每个字段都包含一个单一的扁平的模式**
 
-在 Lucene 中，一个特定的字段可以映射到 string 类型或者是 number 类型，但是不能两者兼具。因为 ES 添加的优于 lucene 的额外机制（以元数据 \_type 字段的形式。）在 ES 中所有类型都最终共享相同的映射。
+在 Lucene 中，一个特定的字段可以映射到 string 类型或者是 number 类型，但是不能两者兼具。因为 ES 添加的优于 lucene 的额外机制（以元数据 _type 字段的形式。）在 ES 中所有类型都最终共享相同的映射。
 
 ```plaintext
 {

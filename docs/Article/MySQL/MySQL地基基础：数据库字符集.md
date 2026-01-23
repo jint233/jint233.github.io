@@ -51,19 +51,19 @@ mysql> select * from information_schema.collations;
 
 在客户端和服务器端之期间的数据请求与反馈，会经历一系列的转换，从而保证数据的正确无误无乱码，下面具体说一下这个请求的过程。
 
-\\1. MySQL client 发送请求（字符集为 character_set_client） character_set_client 就是客户端字符集。
+1. MySQL client 发送请求（字符集为 character_set_client） character_set_client 就是客户端字符集。
 
-\\2. MySQL Server 收到请求，将请求数据从 character_set_client 转换为 character_set_connection 通常情况下 character_set_connection 字符集同 character_set_client 字符集一致。
+2. MySQL Server 收到请求，将请求数据从 character_set_client 转换为 character_set_connection 通常情况下 character_set_connection 字符集同 character_set_client 字符集一致。
 
-\\3. MySQL Server 将请求数据从 character_set_connection 转换为内部操作字符集。
+3. MySQL Server 将请求数据从 character_set_connection 转换为内部操作字符集。
 
-何为内部操作字符集，其实就是前面说的列字符集、表字符集、数据库字符集、服务器字符集这四个。这一步操作会使用每个数据字段的 CHARACTER SET 设定值：
+    何为内部操作字符集，其实就是前面说的列字符集、表字符集、数据库字符集、服务器字符集这四个。这一步操作会使用每个数据字段的 CHARACTER SET 设定值：
 
-- 如果 CHARACTER SET 不存在，使用表字符集
-- 如果表字符集不存在，使用数据库字符集
-- 如果数据库字符集不存在，使用服务器字符集
+   - 如果 CHARACTER SET 不存在，使用表字符集
+   - 如果表字符集不存在，使用数据库字符集
+   - 如果数据库字符集不存在，使用服务器字符集
 
-\\4. MySQL Server 将操作结果从内部操作字符集转换为 character_set_results character_set_results 就是结果内容的字符集。
+4. MySQL Server 将操作结果从内部操作字符集转换为 character_set_results character_set_results 就是结果内容的字符集。
 
 ### 字符集与校对规则分析
 
@@ -71,7 +71,7 @@ mysql> select * from information_schema.collations;
 
 查看数据库字符集：
 
-```plaintext
+```shell
 mysql> show variables like 'character%';
 ```
 
@@ -122,9 +122,9 @@ mysql> show variables like 'collation%';
 
 字符集名称_语言_后缀，其中后缀有三种写法：
 
-- \_ci：不区分大小写
-- \_cs：区分大小写
-- \_bin：二进制
+- _ci：不区分大小写
+- _cs：区分大小写
+- _bin：二进制
 
 ### 如何更改 MySQL 字符集
 

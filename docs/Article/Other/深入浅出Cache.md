@@ -122,7 +122,7 @@ cache.setex(String.valueOf(user.getId()), 300, user.toString()); // TTL, 可以�
 算法有以下常见的两种比较:
 
 1. Hashing
-1. Consistent Hashing (using virtual nodes)
+2. Consistent Hashing (using virtual nodes)
    - servers = \[‘cache-server1.yuozan.com:6379’, ‘cache-server2.youzan.com:6379’\];
    - server_index = hash(key) % servers.length; server = servers\[server_index;
 
@@ -134,9 +134,9 @@ cache.setex(String.valueOf(user.getId()), 300, user.toString()); // TTL, 可以�
 ##### Consistent Hashing简化算法流程的描述
 
 1. 将keys和servers都进行看成一个ring(常被称为 continuum)
-1. 将keys和servers的hash值分隔成多个的slots
-1. 将servers的virtual nodes按照顺时针顺序分别映射到slots上
-1. 将key进行hash按照顺时针顺序查找最近的一个virtual node
+2. 将keys和servers的hash值分隔成多个的slots
+3. 将servers的virtual nodes按照顺时针顺序分别映射到slots上
+4. 将key进行hash按照顺时针顺序查找最近的一个virtual node
 
 ## ⑦ Cache痛点和关注点
 

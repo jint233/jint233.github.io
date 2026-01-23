@@ -10,7 +10,7 @@
 
 ## 原子操作
 
-现代的cpu提供了对单一变量简单操作的原子指令，即这个变量的这些简单操作只需要一条cpu指令即可完成，这样就不用对这个操作加互斥锁了，在锁冲突不激烈的情况下，减少了用户态和内核态的切换，化悲观锁为乐观锁，从而提高了效率。此外，现在外面很火的所谓无锁编程（类似CAS操作），底层就是用了这些原子操作。gcc为了方便程序员使用这些cpu原子操作，提供了一系列\_\_sync开头的函数，这些函数如果包含内存屏障语义，则同时禁止编译器指令重排和cpu乱序执行。 InnoDB针对不同的操作系统以及编译器环境，自己封装了一套原子操作，在头文件os0sync.h中。下面的操作基于Linux x86 64位环境， gcc 4.1以上的版本进行分析。 `os_compare_and_swap_xxx(ptr, old_val, new_val)`类型的操作底层都使用了gcc包装的`__sync_bool_compare_and_swap(ptr, old_val, new_val)`函数，语义为，交换成功则返回true，ptr是交换后的值，old_val是之前的值，new_val是交换后的预期值。这个原子操作是个内存屏障（full memory barrier）。 `os_atomic_increment_xxx`类型的操作底层使用了函数`__sync_add_and_fetch`，`os_atomic_decrement_xxx`类型的操作使用了函数`__sync_sub_and_fetch`，分别表示原子递增和原子递减。这个两个原子操作也都是内存屏障（full memory barrier）。 另外一个比较重要的原子操作是`os_atomic_test_and_set_byte(ptr, new_val)`，这个操作使用了`__sync_lock_test_and_set(ptr, new_val)`这个函数，语义为，把ptr设置为new_val，同时返回旧的值。这个操作提供了原子改变某个变量值的操作，InnoDB锁实现的同步机制中，大量的用了这个操作，因此比较重要。需要注意的是，参看gcc文档，这个操作不是full memory barrier，只是一个acquire barrier，简单的说就是，代码中`__sync_lock_test_and_set`之后操作不能被乱序或者重排到`__sync_lock_test_and_set`之前，但是`__sync_lock_test_and_set`之前的操作可能被重排到其之后。 关于内存屏障的专门指令，MySQL 5.7提供的比较完善。`os_rmb`表示acquire barrier，`os_wmb`表示release barrier。如果在编程时，需要在某个位置准确的读取一个变量的值时，记得在读取之前加上os_rmb，同理，如果需要在某个位置保证一个变量已经被写了，记得在写之后调用os_wmb。
+现代的cpu提供了对单一变量简单操作的原子指令，即这个变量的这些简单操作只需要一条cpu指令即可完成，这样就不用对这个操作加互斥锁了，在锁冲突不激烈的情况下，减少了用户态和内核态的切换，化悲观锁为乐观锁，从而提高了效率。此外，现在外面很火的所谓无锁编程（类似CAS操作），底层就是用了这些原子操作。gcc为了方便程序员使用这些cpu原子操作，提供了一系列__sync开头的函数，这些函数如果包含内存屏障语义，则同时禁止编译器指令重排和cpu乱序执行。 InnoDB针对不同的操作系统以及编译器环境，自己封装了一套原子操作，在头文件os0sync.h中。下面的操作基于Linux x86 64位环境， gcc 4.1以上的版本进行分析。 `os_compare_and_swap_xxx(ptr, old_val, new_val)`类型的操作底层都使用了gcc包装的`__sync_bool_compare_and_swap(ptr, old_val, new_val)`函数，语义为，交换成功则返回true，ptr是交换后的值，old_val是之前的值，new_val是交换后的预期值。这个原子操作是个内存屏障（full memory barrier）。 `os_atomic_increment_xxx`类型的操作底层使用了函数`__sync_add_and_fetch`，`os_atomic_decrement_xxx`类型的操作使用了函数`__sync_sub_and_fetch`，分别表示原子递增和原子递减。这个两个原子操作也都是内存屏障（full memory barrier）。 另外一个比较重要的原子操作是`os_atomic_test_and_set_byte(ptr, new_val)`，这个操作使用了`__sync_lock_test_and_set(ptr, new_val)`这个函数，语义为，把ptr设置为new_val，同时返回旧的值。这个操作提供了原子改变某个变量值的操作，InnoDB锁实现的同步机制中，大量的用了这个操作，因此比较重要。需要注意的是，参看gcc文档，这个操作不是full memory barrier，只是一个acquire barrier，简单的说就是，代码中`__sync_lock_test_and_set`之后操作不能被乱序或者重排到`__sync_lock_test_and_set`之前，但是`__sync_lock_test_and_set`之前的操作可能被重排到其之后。 关于内存屏障的专门指令，MySQL 5.7提供的比较完善。`os_rmb`表示acquire barrier，`os_wmb`表示release barrier。如果在编程时，需要在某个位置准确的读取一个变量的值时，记得在读取之前加上os_rmb，同理，如果需要在某个位置保证一个变量已经被写了，记得在写之后调用os_wmb。
 
 ## 条件通知机制
 
@@ -82,14 +82,14 @@ goto loop1;
 代码还是有点小复杂的。这里分析几点如下：
 
 1. SPIN_ROUNDS控制了在放弃cpu时间片（yield_cpu）之前，一共进行多少次忙等，这个参数就是对外可配置的innodb_sync_spin_loops，而SPIN_WAIT_DELAY控制了每次忙等的时间，这个参数也就是对外可配置的innodb_spin_wait_delay。这两个参数一起决定了自旋的时间。Heikki Tuuri建议在单处理器的机器上调小spin的时间，在对称多处理器的机器上，可以适当调大。比较有意思的是innodb_spin_wait_delay的单位，这个是100MHZ的奔腾处理器处理1毫秒的时间，默认innodb_spin_wait_delay配置成6，表示最多在100MHZ的奔腾处理器上自旋6毫秒。由于现在cpu都是按照GHZ来计算的，所以按照默认配置自旋时间往往很短。此外，自旋不真是cpu傻傻的在那边100%的跑，在现代的cpu上，给自旋专门提供了一条指令，在笔者的测试环境下，这条指令是pause，查看Intel的文档，其对pause的解释是：不会发生用户态和内核态的切换，cpu在用户态自旋，因此不会发生上下文切换，同时这条指令不会消耗太多的能耗。。。所以那些说spin lock太浪费电的不攻自破了。。。另外，编译器也不会把ut_delay给优化掉，因为其里面估计修改了一个全局变量。
-1. yield_cpu 操作在笔者的环境中，就是调用了pthread_yield函数，这个函数把放弃当前cpu的时间片，然后把当前线程放到cpu可执行队列的末尾。
-1. 在指示点1后面的循环，没有采用原子操作读取数据，是因为，Heikki Tuuri认为由于原子操作在内存和cpu cache之间会产生过的数据交换，如果只是读本地的cache，可以减少总线的争用。即使本地读到脏的数据，也没关系，因为在跳出循环的指示点2，依然会再一次使用原子操作进行校验。
-1. get cell这个操作是从sync array执行的，sync array详见辅助数据结构这一节，简单的说就是提供给监控线程使用的。
-1. 注意一下，os_event_reset和os_event_wait这两个函数的调用位置，另外，有一点必须清楚，就是os_event_set（锁持有者释放所后会调用这个函数通知所有等待者）可能在这整段代码执行到任意位置出现，有可能出现在指示点4的位置，这样就构成了条件变量通知在条件变量等待之前，会造成无限等待。为了解决这个问题，才有了指示点3下面的代码，需要重新再次检测一下lock_word，另外，即使os_event_set发生在os_event_reset之后，有了这些代码，也能让当前线程提前拿到锁，不用执行后续os_event_wait的代码，一定程度上提高了效率。
+2. yield_cpu 操作在笔者的环境中，就是调用了pthread_yield函数，这个函数把放弃当前cpu的时间片，然后把当前线程放到cpu可执行队列的末尾。
+3. 在指示点1后面的循环，没有采用原子操作读取数据，是因为，Heikki Tuuri认为由于原子操作在内存和cpu cache之间会产生过的数据交换，如果只是读本地的cache，可以减少总线的争用。即使本地读到脏的数据，也没关系，因为在跳出循环的指示点2，依然会再一次使用原子操作进行校验。
+4. get cell这个操作是从sync array执行的，sync array详见辅助数据结构这一节，简单的说就是提供给监控线程使用的。
+5. 注意一下，os_event_reset和os_event_wait这两个函数的调用位置，另外，有一点必须清楚，就是os_event_set（锁持有者释放所后会调用这个函数通知所有等待者）可能在这整段代码执行到任意位置出现，有可能出现在指示点4的位置，这样就构成了条件变量通知在条件变量等待之前，会造成无限等待。为了解决这个问题，才有了指示点3下面的代码，需要重新再次检测一下lock_word，另外，即使os_event_set发生在os_event_reset之后，有了这些代码，也能让当前线程提前拿到锁，不用执行后续os_event_wait的代码，一定程度上提高了效率。
 
 mutex_exit的伪代码就简单多了，如下：
 
-```plaintext
+```shell
 __sync_lock_test_and_set(mutex->lock_word, 0);
 /* A problem: we assume that mutex_reset_lock word                                                                     
         is a memory barrier, that is when we read the waiters                                                                  
@@ -108,15 +108,15 @@ if (mutex->waiter != 0) {
 ```
 
 1. waiter是ib_mutex_t中的一个变量，用来表示当前是否有线程在等待这个锁。整个代码逻辑很简单，就是先把lock_word设置为0，然后如果发现有等待者，就把所有等待者给唤醒。facebook的mark callaghan在2014年测试过，相比现在已经比较完善的pthread库，InnoDB自旋互斥锁只在并发量相对较低（小于256线程）和锁等待时间比较短的情况下有优势，在高并发且较长的锁等待时间情况下，退化比较严重，其中一个很重要的原因就是InnoDB自旋互斥锁在锁释放的时候需要唤醒所有等待者。由于os_event_ret底层通过pthread_cond_boardcast来通知所有的等待者，一种改进是把pthread_cond_boardcast改成pthread_cond_signal，即只唤醒一个线程，但Inaam Rana Mark测试后发现，如果只唤醒一个线程的话，在高并发的情况下，这个线程可能不会立刻被cpu调度到。。由此看来，似乎唤醒一个特定数量的等待者是一个比较好的选择。
-1. 伪代码中的这段注释笔者估计加上去的，大意是由于编译器或者cpu的指令重排乱序执行，mutex->waiter这个变量的读取可能在发生在原子操作之前，从而导致一些无线等待的问题。然后还专门开了一个叫做sync_arr_wake_threads_if_sema_free的函数来做清理。这个函数是在后台线程srv_error_monitor_thread中做的，每隔1秒钟执行一次。在现代的cpu和编译器上，完全可以用内存屏障的技术来防止指令重排和乱序执行，这个函数可以被去掉，官方的意见貌似是，不要这么激进，万一其他地方还需要这个函数呢。。详见BUG #79477。
+2. 伪代码中的这段注释笔者估计加上去的，大意是由于编译器或者cpu的指令重排乱序执行，mutex->waiter这个变量的读取可能在发生在原子操作之前，从而导致一些无线等待的问题。然后还专门开了一个叫做sync_arr_wake_threads_if_sema_free的函数来做清理。这个函数是在后台线程srv_error_monitor_thread中做的，每隔1秒钟执行一次。在现代的cpu和编译器上，完全可以用内存屏障的技术来防止指令重排和乱序执行，这个函数可以被去掉，官方的意见貌似是，不要这么激进，万一其他地方还需要这个函数呢。。详见BUG #79477。
 
 总体来说，InnoDB自旋互斥锁的底层实现还是比较有意思的，非常适合学习研究。这套锁机制在现在完善的Pthread库和高达4GMHZ的cpu下，已经有点力不从心了，mark callaghan研究发现，在高负载的压力下，使用这套锁机制的InnoDB，大部分cpu时间都给了sys和usr，基本没有空闲，而pthread mutex在相同情况下，却有平均80%的空闲。同时，由于ib_mutex_t这个结构体体积比较庞大，当buffer pool比较大的时候，会发现锁占用了很多的内存。最后，从代码风格上来说，有不少代码没有解耦，如果需要把锁模块单独打成一个函数库，比较困难。 基于上述几个缺陷，MySQL 5.7及后续的版本中，对互斥锁进行了大量的重新，包括以下几点(WL#6044)：
 
 1. 使用了C++中的类继承关系，系统互斥锁和InnoDB自己实现的自旋互斥锁都是一个父类的子类。
-1. 由于bool pool的锁对性能要求比较高，因此使用静态继承（也就是模板）的方式来减少继承中虚指针造成的开销。
-1. 保留旧的InnoDB自旋互斥锁，并实现了一种基于futex的锁。简单的说，futex锁与上述的原子操作类似，能减少用户态和内核态切换的开销，但同时保留类似mutex的使用方法，大大降低了程序编写的难度。
+2. 由于bool pool的锁对性能要求比较高，因此使用静态继承（也就是模板）的方式来减少继承中虚指针造成的开销。
+3. 保留旧的InnoDB自旋互斥锁，并实现了一种基于futex的锁。简单的说，futex锁与上述的原子操作类似，能减少用户态和内核态切换的开销，但同时保留类似mutex的使用方法，大大降低了程序编写的难度。
 
-## InnoDB读写锁
+## InnoDB 读写锁
 
 与条件变量、互斥锁不同，InnoDB里面没有Pthread库的读写锁的包装，其完全依赖依赖于原子操作和InnoDB的条件变量，甚至都不需要依赖InnoDB的自旋互斥锁。此外，读写锁还实现了写操作的递归锁，即同一个线程可以多次获得写锁，但是同一个线程依然不能同时获得读锁和写锁。InnoDB读写锁的核心数据结构rw_lock_t中，并没有等待队列的信息，因此不能保证先到的请求一定会先进入临界区。这与系统互斥量用PTHREAD_MUTEX_ADAPTIVE_NP来初始化有异曲同工之妙。 InnoDB读写锁的核心实现在源文件sync0rw.cc和sync0rw.ic中，核心数据结构rw_lock_t定义在sync0rw.h中。使用方法与InnoDB自旋互斥锁很类似，只不过读请求和写请求要调用不同的函数。加读锁调用`rw_lock_s_lock`, 加写锁调用`rw_lock_x_lock`，释放读锁调用`rw_lock_s_unlock`, 释放写锁调用`rw_lock_x_unlock`，创建读写锁调用`rw_lock_create`，释放读写锁调用`rw_lock_free`。函数`rw_lock_x_lock_nowait`和`rw_lock_s_lock_nowait`表示，当加读写锁失败的时候，直接返回，而不是自旋等待。
 
@@ -127,14 +127,14 @@ rw_lock_t中，核心的成员有以下几个：lock_word, event, waiters, wait_
 接下来，我们来详细介绍一下lock_word的变化规则：
 
 1. 当有一个读请求加锁成功时，lock_word原子递减1。
-1. 当有一个写请求加锁成功时，lock_word原子递减X_LOCK_DECR。
-1. 如果读写锁支持递归写，那么第一个递归写锁加锁成功时，lock_word依然原子递减X_LOCK_DECR，而后续的递归写锁加锁成功是，lock_word只是原子递减1。 在上述的变化规则约束下，lock_word会形成以下几个区间： lock_word == X_LOCK_DECR: 表示锁空闲，即当前没有线程获得了这个锁。 0 \< lock_word \< X_LOCK_DECR: 表示当前有X_LOCK_DECR - lock_word个读锁 lock_word == 0: 表示当前有一个写锁 -X_LOCK_DECR \< lock_word \< 0: 表示当前有-lock_word个读锁，他们还没完成，同时后面还有一个写锁在等待 lock_word \<= -X_LOCK_DECR: 表示当前处于递归锁模式，同一个线程加了2 - (lock_word + X_LOCK_DECR)次写锁。 另外，还可以得出以下结论
-1. 由于lock_word的范围被限制（rw_lock_validate）在(-2X_LOCK_DECR, X_LOCK_DECR\]中，结合上述规则，可以推断出，一个读写锁最多能加X_LOCK_DECR个读锁。在开启递归写锁的模式下，一个线程最多同时加X_LOCK_DECR+1个写锁。
-1. 在读锁释放之前，lock_word一定处于(-X_LOCK_DECR, 0)U(0, X_LOCK_DECR)这个范围内。
-1. 在写锁释放之前，lock_word一定处于(-2\*X_LOCK_DECR, -X_LOCK_DECR\]或者等于0这个范围内。
-1. 只有在lock_word大于0的情况下才可以对它递减。有一个例外，就是同一个线程需要加递归写锁的时候，lock_word可以在小于0的情况下递减。
+2. 当有一个写请求加锁成功时，lock_word原子递减X_LOCK_DECR。
+3. 如果读写锁支持递归写，那么第一个递归写锁加锁成功时，lock_word依然原子递减X_LOCK_DECR，而后续的递归写锁加锁成功是，lock_word只是原子递减1。 在上述的变化规则约束下，lock_word会形成以下几个区间： lock_word == X_LOCK_DECR: 表示锁空闲，即当前没有线程获得了这个锁。 0 \< lock_word \< X_LOCK_DECR: 表示当前有X_LOCK_DECR - lock_word个读锁 lock_word == 0: 表示当前有一个写锁 -X_LOCK_DECR \< lock_word \< 0: 表示当前有-lock_word个读锁，他们还没完成，同时后面还有一个写锁在等待 lock_word \<= -X_LOCK_DECR: 表示当前处于递归锁模式，同一个线程加了2 - (lock_word + X_LOCK_DECR)次写锁。 另外，还可以得出以下结论
+4. 由于lock_word的范围被限制（rw_lock_validate）在(-2X_LOCK_DECR, X_LOCK_DECR\]中，结合上述规则，可以推断出，一个读写锁最多能加X_LOCK_DECR个读锁。在开启递归写锁的模式下，一个线程最多同时加X_LOCK_DECR+1个写锁。
+5. 在读锁释放之前，lock_word一定处于(-X_LOCK_DECR, 0)U(0, X_LOCK_DECR)这个范围内。
+6. 在写锁释放之前，lock_word一定处于(-2\*X_LOCK_DECR, -X_LOCK_DECR\]或者等于0这个范围内。
+7. 只有在lock_word大于0的情况下才可以对它递减。有一个例外，就是同一个线程需要加递归写锁的时候，lock_word可以在小于0的情况下递减。
 
-接下来，举个读写锁加锁的例子，方便读者理解读写锁底层加锁的原理。假设有读写加锁请求按照以下顺序依次到达：R1->R2->W1->R3->W2->W3->R4，其中W2和W3是属于同一个线程的写加锁请求，其他所有读写请求均来自不同线程。初始化后，lock_word的值为X_LOCK_DECR（十进制值为1048576）。R1读加锁请求首先到，其发现lock_word大于0，表示可以加读锁，同时lock_word递减1，结果为1048575，R2读加锁请求接着来到，发现lock_word依然大于0，继续加读锁并递减lock_word，最终结果为1048574。注意，如果R1和R2几乎是同时到达，即使时序上是R1先请求，但是并不保证R1首先递减，有可能是R2首先拿到原子操作的执行权限。如果在R1或者R2释放锁之前，写加锁请求W1到来，他发现lock_word依旧大于0，于是递减X_LOCK_DECR，并把自己的线程id记录在writer_thread这个变量里，再检查lock_word的值（此时为-2），由于结果小于0，表示前面有未完成的读加锁请求，于是其等待在wait_ex_event这个条件变量上。后续的R3, W2, W3, R4请求发现lock_word小于0，则都等待在条件变量event上，并且设置waiter为1，表示有等待者。假设R1先释放读锁(lock_word递增1)，R2后释放(lock_word再次递增1)。R2释放后，由于lock_word变为0了，其会在wait_ex_event上调用os_event_set，这样W3就被唤醒了，他可以执行临界区内的代码了。W3执行完后，lock_word被恢复为X_LOCK_DECR，然后其发现waiter为1，表示在其后面有新的读写加锁请求在等待，然后在event上调用os_event_set，这样R3, W2, W3, R4同时被唤醒，进行原子操作执行权限争抢(可以简单的理解为谁先得到cpu调度)。假设W2首先抢到了执行权限，其会把lock_word再次递减为0并自己的线程id记录在writer_thread这个变量里，当检查lock_word的时候，发现值为0，表示前面没有读请求了，于是其就进入临界区执行代码了。假设此时，W3得到了cpu的调度，由于lock_word只有在大于0的情况下才能递减，所以其递减lock_word失败，但是其通过对比writer_thread和自己的线程id，发现前面的写锁是自己加的，如果这个时候开启了递归写锁，即recursive值为true，他把lock_word再次递减X_LOCK_DECR（现在lock_word变为-X_LOCK_DECR了），然后进入临界区执行代码。这样就保证了同一个线程多次加写锁也不发生死锁，也就是递归锁的概念。后续的R3和R4发现lock_word小于等于0，就直接等待在event条件变量上，并设置waiter为1。直到W2和W3都释放写锁，lock_word又变为X_LOCK_DECR，最后一个释放的，检查waiter变量发现非0，就会唤醒event上的所有等待者，于是R3和R4就可以执行了。 读写锁的核心函数函数结构跟InnoDB自旋互斥锁的基本相同，主要的区别就是用rw_lock_x_lock_low和rw_lock_s_lock_low替换了\_\_sync_lock_test_and_set原子操作。rw_lock_x_lock_low和rw_lock_s_lock_low就按照上述的lock_word的变化规则来原子的改变（依然使用了\_\_sync_lock_test_and_set）lock_word这个变量。
+接下来，举个读写锁加锁的例子，方便读者理解读写锁底层加锁的原理。假设有读写加锁请求按照以下顺序依次到达：R1->R2->W1->R3->W2->W3->R4，其中W2和W3是属于同一个线程的写加锁请求，其他所有读写请求均来自不同线程。初始化后，lock_word的值为X_LOCK_DECR（十进制值为1048576）。R1读加锁请求首先到，其发现lock_word大于0，表示可以加读锁，同时lock_word递减1，结果为1048575，R2读加锁请求接着来到，发现lock_word依然大于0，继续加读锁并递减lock_word，最终结果为1048574。注意，如果R1和R2几乎是同时到达，即使时序上是R1先请求，但是并不保证R1首先递减，有可能是R2首先拿到原子操作的执行权限。如果在R1或者R2释放锁之前，写加锁请求W1到来，他发现lock_word依旧大于0，于是递减X_LOCK_DECR，并把自己的线程id记录在writer_thread这个变量里，再检查lock_word的值（此时为-2），由于结果小于0，表示前面有未完成的读加锁请求，于是其等待在wait_ex_event这个条件变量上。后续的R3, W2, W3, R4请求发现lock_word小于0，则都等待在条件变量event上，并且设置waiter为1，表示有等待者。假设R1先释放读锁(lock_word递增1)，R2后释放(lock_word再次递增1)。R2释放后，由于lock_word变为0了，其会在wait_ex_event上调用os_event_set，这样W3就被唤醒了，他可以执行临界区内的代码了。W3执行完后，lock_word被恢复为X_LOCK_DECR，然后其发现waiter为1，表示在其后面有新的读写加锁请求在等待，然后在event上调用os_event_set，这样R3, W2, W3, R4同时被唤醒，进行原子操作执行权限争抢(可以简单的理解为谁先得到cpu调度)。假设W2首先抢到了执行权限，其会把lock_word再次递减为0并自己的线程id记录在writer_thread这个变量里，当检查lock_word的时候，发现值为0，表示前面没有读请求了，于是其就进入临界区执行代码了。假设此时，W3得到了cpu的调度，由于lock_word只有在大于0的情况下才能递减，所以其递减lock_word失败，但是其通过对比writer_thread和自己的线程id，发现前面的写锁是自己加的，如果这个时候开启了递归写锁，即recursive值为true，他把lock_word再次递减X_LOCK_DECR（现在lock_word变为-X_LOCK_DECR了），然后进入临界区执行代码。这样就保证了同一个线程多次加写锁也不发生死锁，也就是递归锁的概念。后续的R3和R4发现lock_word小于等于0，就直接等待在event条件变量上，并设置waiter为1。直到W2和W3都释放写锁，lock_word又变为X_LOCK_DECR，最后一个释放的，检查waiter变量发现非0，就会唤醒event上的所有等待者，于是R3和R4就可以执行了。 读写锁的核心函数函数结构跟InnoDB自旋互斥锁的基本相同，主要的区别就是用rw_lock_x_lock_low和rw_lock_s_lock_low替换了__sync_lock_test_and_set原子操作。rw_lock_x_lock_low和rw_lock_s_lock_low就按照上述的lock_word的变化规则来原子的改变（依然使用了__sync_lock_test_and_set）lock_word这个变量。
 
 在MySQL 5.7中，读写锁除了可以加读锁(Share lock)请求和加写锁(exclusive lock)请求外，还可以加share exclusive锁请求，锁兼容性如下：
 
@@ -152,7 +152,7 @@ rw_lock_t中，核心的成员有以下几个：lock_word, event, waiters, wait_
 
 InnoDB同步机制中，还有很多使用的辅助结构，他们的作用主要是为了监控方便和死锁的预防和检测。这里主要介绍sync array, sync thread level array和srv_error_monitor_thread。 sync array主要的数据结构是sync_array_t，可以把他理解为一个数据，数组中的元素为sync_cell_t。当一个锁（InnoDB自旋互斥锁或者InnoDB读写锁，下同）需要发生`os_event_wait`等待时，就需要在sync array中申请一个sync_cell_t来保存当前的信息，这些信息包括等待锁的指针（便于死锁检测），在哪一个文件以及哪一行发生了等待（也就是mutex_enter, rw_lock_s_lock或者rw_lock_x_lock被调用的地方，只在debug模式下有效），发生等待的线程（便于死锁检测）以及等待开始的时间（便于统计等待的时间）。当锁释放的时候，就把相关联的sync_cell_t重置为空，方便复用。sync_cell_t在sync_array_t中的个数，是在初始化同步模块时候就指定的，其个数一般为OS_THREAD_MAX_N，而OS_THREAD_MAX_N是在InnoDB初始化的时候被计算，其包括了系统后台开启的所有线程，以及max_connection指定的个数，还预留了一些。由于一个线程在某一个时刻最多只能发生一个锁等待，所以不用担心sync_cell_t不够用。从上面也可以看出，在每个锁进行等待和释放的时候，都需要对sync array操作，因此在高并发的情况下，单一的sync array可能成为瓶颈，在MySQL 5.6中，引入了多sync array, 个数可以通过innodb_sync_array_size进行控制，这个值默认为1，在高并发的情况下，建议调高。 InnoDB作为一个成熟的存储引擎，包含了完善的死锁预防机制和死锁检测机制。在每次需要锁等待时，即调用`os_event_wait`之前，需要启动死锁检测机制来保证不会出现死锁，从而造成无限等待。在每次加锁成功（lock_word递减后，函数返回之前）时，都会启动死锁预防机制，降低死锁出现的概率。当然，由于死锁预防机制和死锁检测机制需要扫描比较多的数据，算法上也有递归操作，所以只在debug模式下开启。 死锁检测机制主要依赖sync array中保存的信息以及死锁检测算法来实现。死锁检测机制通过sync_cell_t保存的等待锁指针和发生等待的线程以及教科书上的有向图环路检测算法来实现，具体实现在`sync_array_deadlock_step`和`sync_array_detect_deadlock`中实现，仔细研究后发现个小问题，由于`sync_array_find_thread`函数仅仅在当前的sync array中遍历，当有多个sync array时（innodb_sync_array_size > 1）,如果死锁发生在不同的sync array上，现有的死锁检测算法将无法发现这个死锁。 死锁预防机制是由sync thread level array和全局锁优先级共同保证的。InnoDB为了降低死锁发生的概率，上层的每种类型的锁都有一个优先级。例如回滚段锁的优先级就比文件系统page页的优先级高，虽然两者底层都是InnoDB互斥锁或者InnoDB读写锁。有了这个优先级，InnoDB规定，每个锁创建是必须制定一个优先级，同一个线程的加锁顺序必须从优先级高到低，即如果一个线程目前已经加了一个低优先级的锁A，在释放锁A之前，不能再请求优先级比锁A高(或者相同)的锁。形成死锁需要四个必要条件，其中一个就是不同的加锁顺序，InnoDB通过锁优先级来降低死锁发生的概率，但是不能完全消除。原因是可以把锁设置为SYNC_NO_ORDER_CHECK这个优先级，这是最高的优先级，表示不进行死锁预防检查，如果上层的程序员把自己创建的锁都设置为这个优先级，那么InnoDB提供的这套机制将完全失效，所以要养成给锁设定优先级的好习惯。sync thread level array是一个数组，每个线程单独一个，在同步模块初始化时分配了OS_THREAD_MAX_N个，所以不用担心不够用。这个数组中记录了某个线程当前锁拥有的所有锁，当新加了一个锁B时，需要扫描一遍这个数组，从而确定目前线程所持有的锁的优先级都比锁B高。 最后，我们来讲讲srv_error_monitor_thread这个线程。这是一个后台线程，在InnoDB启动的时候启动，每隔1秒钟执行一下指定的操作。跟同步模块相关的操作有两点，去除无限等待的锁和报告长时间等待的异常锁。 去除无线等待的锁，如上文所属，就是sync_arr_wake_threads_if_sema_free这个函数。这个函数通过遍历sync array，如果发现锁已经可用(`sync_arr_cell_can_wake_up`)，但是依然有等待者，则直接调用`os_event_set`把他们唤醒。这个函数是为了解决由于cpu乱序执行或者编译器指令重排导致锁无限等待的问题，但是可以通过内存屏障技术来避免，所以可以去掉。 报告长时间等待的异常锁，通过sync_cell_t里面记录的锁开始等待时间，我们可以很方便的统计锁等待发生的时间。在目前的实现中，当锁等待超过240秒的时候，就会在错误日志中看到信息。如果同一个锁被检测到等到超过600秒且连续10次被检测到，则InnoDB会通过assert来自杀。。。相信当做运维DBA的同学一定看到过如下的报错：
 
-```javascript
+```shell
 InnoDB: Warning: a long semaphore wait:
 --Thread 139774244570880 has waited at log0read.h line 765 for 241.00 seconds the semaphore:
 Mutex at 0x30c75ca0 created file log0read.h line 522, lock var 1 

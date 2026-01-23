@@ -157,15 +157,15 @@ CREATE TABLE IF NOT EXISTS `worker_node_tab`
 服务启动流程：
 
 1. 往 worker_node_tab 插入自己的 IP&Port 等信息，获取 DB 自增 id，设置 workerId = id % 1024
-1. 从 worker_node_tab 获取最大的 last_timestamp(max_last_timestamp)，并设置 timestamp = max_last_timestamp + duration_step
+2. 从 worker_node_tab 获取最大的 last_timestamp(max_last_timestamp)，并设置 timestamp = max_last_timestamp + duration_step
 
 备注：因为百度 UidGenerator workerId 不会重复，因此不用担心 timestamp 重复；我们需要复用 workerId，因此必须要保证 timestamp 是趋势递增的
 
 生成 Id 流程：
 
 1. sequence += 1
-1. 如果 sequence 还没超过 MAX_SEQUENCE(2^12)，则跳到(3)直接生成 Id；如果 sequence 大于等于 MAX_SEQUENCE，则设置 timestamp += 1, sequence = 0，然后跳到(3)生成 Id（timestamp 在本地自增，因此不用担心时间回拨的问题）
-1. 生成 Id：Id = timestamp \<\< (10 + 12) | workerId \<\< 12 | sequence
+2. 如果 sequence 还没超过 MAX_SEQUENCE(2^12)，则跳到(3)直接生成 Id；如果 sequence 大于等于 MAX_SEQUENCE，则设置 timestamp += 1, sequence = 0，然后跳到(3)生成 Id（timestamp 在本地自增，因此不用担心时间回拨的问题）
+3. 生成 Id：Id = timestamp \<\< (10 + 12) | workerId \<\< 12 | sequence
 
 duration_step 可以设置为两天（或更长），每隔一天异步到 DB 申请一个时间号段（即设置 DB last_timestamp += duration_step）；可以做到弱依赖 DB
 

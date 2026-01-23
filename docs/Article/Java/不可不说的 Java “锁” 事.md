@@ -106,9 +106,9 @@ CAS 虽然很高效，但是它也存在三大问题，这里也简单说一下�
 
    - JDK 从 1.5 开始提供了 AtomicStampedReference 类来解决 ABA 问题，具体操作封装在 compareAndSet () 中。compareAndSet () 首先检查当前引用和当前标志与预期引用和预期标志是否相等，如果都相等，则以原子方式将引用值和标志的值设置为给定的更新值。
 
-1. **循环时间长开销大**。CAS 操作如果长时间不成功，会导致其一直自旋，给 CPU 带来非常大的开销。
+2. **循环时间长开销大**。CAS 操作如果长时间不成功，会导致其一直自旋，给 CPU 带来非常大的开销。
 
-1. 只能保证一个共享变量的原子操作
+3. 只能保证一个共享变量的原子操作
 
    。对一个共享变量执行操作时，CAS 能够保证原子操作，但是对多个共享变量操作时，CAS 是无法保证操作的原子性的。
 
@@ -407,12 +407,12 @@ protected final int tryAcquireShared(int unused) {
 ## 参考资料
 
 1. 《Java 并发编程艺术》
-1. [Java 中的锁](https://blog.csdn.net/u013256816/article/details/51204385)
-1. [Java CAS 原理剖析](https://juejin.im/post/5a73cbbff265da4e807783f5)
-1. [Java 并发 —— 关键字 synchronized 解析](https://juejin.im/post/5b42c2546fb9a04f8751eabc)
-1. [Java synchronized 原理总结](https://zhuanlan.zhihu.com/p/29866981)
-1. [聊聊并发（二）——Java SE1.6 中的 Synchronized](http://www.infoq.com/cn/articles/java-se-16-synchronized)
-1. [深入理解读写锁 —ReadWriteLock 源码分析](https://blog.csdn.net/qq_19431333/article/details/70568478)
-1. [【JUC】JDK1.8 源码分析之 ReentrantReadWriteLock](https://www.cnblogs.com/twoheads/p/9635309.html)
-1. [Java 多线程（十）之 ReentrantReadWriteLock 深入分析](https://my.oschina.net/adan1/blog/158107)
-1. [Java–读写锁的实现原理](https://mrdear.cn/2018/06/23/java/java--readwritelock)
+2. [Java 中的锁](https://blog.csdn.net/u013256816/article/details/51204385)
+3. [Java CAS 原理剖析](https://juejin.im/post/5a73cbbff265da4e807783f5)
+4. [Java 并发 —— 关键字 synchronized 解析](https://juejin.im/post/5b42c2546fb9a04f8751eabc)
+5. [Java synchronized 原理总结](https://zhuanlan.zhihu.com/p/29866981)
+6. [聊聊并发（二）——Java SE1.6 中的 Synchronized](http://www.infoq.com/cn/articles/java-se-16-synchronized)
+7. [深入理解读写锁 —ReadWriteLock 源码分析](https://blog.csdn.net/qq_19431333/article/details/70568478)
+8. [【JUC】JDK1.8 源码分析之 ReentrantReadWriteLock](https://www.cnblogs.com/twoheads/p/9635309.html)
+9. [Java 多线程（十）之 ReentrantReadWriteLock 深入分析](https://my.oschina.net/adan1/blog/158107)
+10. [Java–读写锁的实现原理](https://mrdear.cn/2018/06/23/java/java--readwritelock)

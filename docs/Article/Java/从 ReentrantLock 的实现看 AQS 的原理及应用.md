@@ -139,31 +139,31 @@ AQS 使用一个 Volatile 的 int 类型的成员变量来表示同步状态，�
 
 解释一下几个方法和属性值的含义：
 
-| 方法和属性值 | 含义                                                                                             |
-|--------------|--------------------------------------------------------------------------------------------------|
-| waitStatus   | 当前节点在队列中的状态                                                                           |
-| thread       | 表示处于该节点的线程                                                                             |
-| prev         | 前驱指针                                                                                         |
-| predecessor  | 返回前驱节点，没有的话抛出 npe                                                                   |
-| nextWaiter   | 指向下一个处于 CONDITION 状态的节点（由于本篇文章不讲述 Condition Queue 队列，这个指针不多介绍） |
-| next         | 后继指针                                                                                         |
+| 方法和属性值      | 含义                                                             |
+|-------------|----------------------------------------------------------------|
+| waitStatus  | 当前节点在队列中的状态                                                    |
+| thread      | 表示处于该节点的线程                                                     |
+| prev        | 前驱指针                                                           |
+| predecessor | 返回前驱节点，没有的话抛出 npe                                              |
+| nextWaiter  | 指向下一个处于 CONDITION 状态的节点（由于本篇文章不讲述 Condition Queue 队列，这个指针不多介绍） |
+| next        | 后继指针                                                           |
 
 线程两种锁的模式：
 
-| 模式      | 含义                           |
-|-----------|--------------------------------|
-| SHARED    | 表示线程以共享的模式等待锁     |
+| 模式        | 含义              |
+|-----------|-----------------|
+| SHARED    | 表示线程以共享的模式等待锁   |
 | EXCLUSIVE | 表示线程正在以独占的方式等待锁 |
 
 waitStatus 有下面几个枚举值：
 
-| 枚举      | 含义                                               |
-|-----------|----------------------------------------------------|
-| 0         | 当一个 Node 被初始化的时候的默认值                 |
-| CANCELLED | 为 1，表示线程获取锁的请求已经取消了               |
-| CONDITION | 为 - 2，表示节点在等待队列中，节点线程等待唤醒     |
+| 枚举        | 含义                              |
+|-----------|---------------------------------|
+| 0         | 当一个 Node 被初始化的时候的默认值            |
+| CANCELLED | 为 1，表示线程获取锁的请求已经取消了             |
+| CONDITION | 为 - 2，表示节点在等待队列中，节点线程等待唤醒       |
 | PROPAGATE | 为 - 3，当前线程处在 SHARED 情况下，该字段才会使用 |
-| SIGNAL    | 为 - 1，表示线程已经准备好了，就等资源释放了       |
+| SIGNAL    | 为 - 1，表示线程已经准备好了，就等资源释放了        |
 
 #### 2.1.2 同步状态 State
 
@@ -176,10 +176,10 @@ private volatile int state;
 
 下面提供了几个访问这个字段的方法：
 
-| 方法名                                                             | 描述                    |
-|--------------------------------------------------------------------|-------------------------|
-| protected final int getState ()                                     | 获取 State 的值         |
-| protected final void setState (int newState)                        | 设置 State 的值         |
+| 方法名                                                                 | 描述                |
+|---------------------------------------------------------------------|-------------------|
+| protected final int getState ()                                     | 获取 State 的值       |
+| protected final void setState (int newState)                        | 设置 State 的值       |
 | protected final boolean compareAndSetState (int expect, int update) | 使用 CAS 方式更新 State |
 
 这几个方法都是 Final 修饰的，说明子类中无法重写它们。我们可以通过修改 State 字段表示的同步状态来实现多线程的独占模式和共享模式（加锁过程）。
@@ -194,13 +194,13 @@ private volatile int state;
 
 从架构图中可以得知，AQS 提供了大量用于自定义同步器实现的 Protected 方法。自定义同步器实现的相关方法也只是为了通过修改 State 字段来实现多线程的独占模式或者共享模式。自定义同步器需要实现以下方法（ReentrantLock 需要实现的方法如下，并不是全部）：
 
-| 方法名                                        | 描述                                                                                                   |
-|----------------------------------------------|-------------------------------------------------------------------------------------------------------|
-| protected boolean isHeldExclusively ()       | 该线程是否正在独占资源。只有用到 Condition 才需要去实现它。                                                   |
-| protected boolean tryAcquire (int arg)       | 独占方式。arg 为获取锁的次数，尝试获取资源，成功则返回 True，失败则返回 False。                                  |
-| protected boolean tryRelease (int arg)       | 独占方式。arg 为释放锁的次数，尝试释放资源，成功则返回 True，失败则返回 False。                                  |
-| protected int tryAcquireShared (int arg)     | 共享方式。arg 为获取锁的次数，尝试获取资源。负数表示失败；0 表示成功，但没有剩余可用资源；正数表示成功，且有剩余资源。   |
-| protected boolean tryReleaseShared (int arg) | 共享方式。arg 为释放锁的次数，尝试释放资源，如果释放后允许唤醒后续等待结点返回 True，否则返回 False。                |
+| 方法名                                          | 描述                                                             |
+|----------------------------------------------|----------------------------------------------------------------|
+| protected boolean isHeldExclusively ()       | 该线程是否正在独占资源。只有用到 Condition 才需要去实现它。                            |
+| protected boolean tryAcquire (int arg)       | 独占方式。arg 为获取锁的次数，尝试获取资源，成功则返回 True，失败则返回 False。                |
+| protected boolean tryRelease (int arg)       | 独占方式。arg 为释放锁的次数，尝试释放资源，成功则返回 True，失败则返回 False。                |
+| protected int tryAcquireShared (int arg)     | 共享方式。arg 为获取锁的次数，尝试获取资源。负数表示失败；0 表示成功，但没有剩余可用资源；正数表示成功，且有剩余资源。 |
+| protected boolean tryReleaseShared (int arg) | 共享方式。arg 为释放锁的次数，尝试释放资源，如果释放后允许唤醒后续等待结点返回 True，否则返回 False。     |
 
 一般来说，自定义同步器要么是独占方式，要么是共享方式，它们也只需实现 tryAcquire-tryRelease、tryAcquireShared-tryReleaseShared 中的一种即可。
 
@@ -880,13 +880,13 @@ private volatile int state;
 
 除了上边 ReentrantLock 的可重入性的应用，AQS 作为并发编程的框架，为很多其他同步工具提供了良好的解决方案。下面列出了 JUC 中的几种同步工具，大体介绍一下 AQS 的应用场景：
 
-| 同步工具               | 同步工具与 AQS 的关联                                                                                                                    |
-|------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| 同步工具                   | 同步工具与 AQS 的关联                                                                           |
+|------------------------|-----------------------------------------------------------------------------------------|
 | ReentrantLock          | 使用 AQS 保存锁重复持有的次数。当一个线程获取锁时，ReentrantLock 记录当前获得锁的线程标识，用于检测是否重复获取，以及错误线程试图解锁操作时异常情况的处理。 |
-| Semaphore              | 使用 AQS 同步状态来保存信号量的当前计数。tryRelease 会增加计数，acquireShared 会减少计数。                                                     |
-| CountDownLatch         | 使用 AQS 同步状态来表示计数。计数为 0 时，所有的 Acquire 操作（CountDownLatch 的 await 方法）才可以通过。                                       |
-| ReentrantReadWriteLock | 使用 AQS 同步状态中的 16 位保存写锁持有的次数，剩下的 16 位用于保存读锁的持有次数。                                                              |
-| ThreadPoolExecutor     | Worker 利用 AQS 同步状态实现对独占线程变量的设置（tryAcquire 和 tryRelease）。                                                               |
+| Semaphore              | 使用 AQS 同步状态来保存信号量的当前计数。tryRelease 会增加计数，acquireShared 会减少计数。                            |
+| CountDownLatch         | 使用 AQS 同步状态来表示计数。计数为 0 时，所有的 Acquire 操作（CountDownLatch 的 await 方法）才可以通过。                |
+| ReentrantReadWriteLock | 使用 AQS 同步状态中的 16 位保存写锁持有的次数，剩下的 16 位用于保存读锁的持有次数。                                        |
+| ThreadPoolExecutor     | Worker 利用 AQS 同步状态实现对独占线程变量的设置（tryAcquire 和 tryRelease）。                                |
 
 ### 3.3 自定义同步工具
 

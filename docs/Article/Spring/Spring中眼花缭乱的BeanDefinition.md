@@ -222,32 +222,32 @@ CodeBear
 来分析下代码：
 
 1. 创建了GenericBeanDefinition对象parentBeanDefinition，设置为了单例模式，设置了Attribute，声明了构造方法的两个参数值；
-1. 创建了GenericBeanDefinition对象childBeanDefinition，设置parentName为parent，BeanClass为ChildService；
-1. 注册parentBeanDefinition，beanName为parent，childBeanDefinition，beanName为child；
-1. 刷新容器；
-1. 从mergedBeanDefinitions取出了child，mergedBeanDefinitions存放的是合并后的BeanDefinition；
-1. 打印出child的attribute、scope、构造方法的两个参数值。
+2. 创建了GenericBeanDefinition对象childBeanDefinition，设置parentName为parent，BeanClass为ChildService；
+3. 注册parentBeanDefinition，beanName为parent，childBeanDefinition，beanName为child；
+4. 刷新容器；
+5. 从mergedBeanDefinitions取出了child，mergedBeanDefinitions存放的是合并后的BeanDefinition；
+6. 打印出child的attribute、scope、构造方法的两个参数值。
 
 大家可以看到，childBeanDefinition继承了parentBeanDefinition。
 
 如果没有父子关系，单独作为BeanDefinition，也可以用GenericBeanDefinition来表示：
 
 ```java
-       AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-        GenericBeanDefinition genericBeanDefinition = new GenericBeanDefinition();
-        genericBeanDefinition.setBeanClass(AuthorService.class);
-        genericBeanDefinition.setScope(BeanDefinition.SCOPE_PROTOTYPE);
-        context.registerBeanDefinition("authorService", genericBeanDefinition);
-        context.refresh();
-        BeanDefinition mergedBeanDefinition = context.getBeanFactory().getMergedBeanDefinition("authorService");
-        BeanDefinition beanDefinition = context.getBeanFactory().getMergedBeanDefinition("authorService");
-        System.out.println(mergedBeanDefinition);
-        System.out.println(beanDefinition);
+   AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+    GenericBeanDefinition genericBeanDefinition = new GenericBeanDefinition();
+    genericBeanDefinition.setBeanClass(AuthorService.class);
+    genericBeanDefinition.setScope(BeanDefinition.SCOPE_PROTOTYPE);
+    context.registerBeanDefinition("authorService", genericBeanDefinition);
+    context.refresh();
+    BeanDefinition mergedBeanDefinition = context.getBeanFactory().getMergedBeanDefinition("authorService");
+    BeanDefinition beanDefinition = context.getBeanFactory().getMergedBeanDefinition("authorService");
+    System.out.println(mergedBeanDefinition);
+    System.out.println(beanDefinition);
 ```
 
 运行结果：
 
-```plaintext
+```shell
 Root bean: class [com.codebear.springcycle.AuthorService]; scope=prototype; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null
 Root bean: class [com.codebear.springcycle.AuthorService]; scope=prototype; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null
 ```

@@ -10,7 +10,7 @@
 
 以下操作会刷新日志文件，刷新日志文件时会关闭旧的日志文件并重新打开日志文件。对于有些日志类型，如二进制日志，刷新日志会滚动日志文件，而不仅仅是关闭并重新打开。
 
-```plaintext
+```shell
 mysql> FLUSH LOGS;
 shell> mysqladmin flush-logs
 shell> mysqladmin refresh
@@ -26,7 +26,7 @@ shell> mysqladmin refresh
 
 如果不知道错误日志的位置，可以查看变量log_error来查看。
 
-```plaintext
+```shell
 mysql> show variables like 'log_error';
 +---------------+----------------------------------------+
 | Variable_name | Value                                  |
@@ -41,7 +41,7 @@ mysql> show variables like 'log_error';
 
 以下是MySQL 5.6.35启动的日志信息。
 
-```cpp
+```shell
 2017-03-29 01:15:14 2362 [Note] Plugin 'FEDERATED' is disabled.
 2017-03-29 01:15:14 2362 [Note] InnoDB: Using atomics to ref count buffer pool pages
 2017-03-29 01:15:14 2362 [Note] InnoDB: The InnoDB memory heap is disabled
@@ -74,7 +74,7 @@ Version: '5.6.35'  socket: '/mydata/data/mysql.sock'  port: 3306  MySQL Communit
 
 和查询日志有关的变量有：
 
-```plaintext
+```shell
 `long_query_time = 10 ``# 指定慢查询超时时长，超出此时长的属于慢查询，会记录到慢查询日志中``log_output={TABLE|FILE|NONE}  ``# 定义一般查询日志和慢查询日志的输出格式，不指定时默认为file`
 ```
 
@@ -82,7 +82,7 @@ TABLE表示记录日志到表中，FILE表示记录日志到文件中，NONE表�
 
 和一般查询日志相关的变量有：
 
-```plaintext
+```shell
 `general_log=off ``# 是否启用一般查询日志，为全局变量，必须在global上修改。``sql_log_off=off ``# 在session级别控制是否启用一般查询日志，默认为off，即启用``general_log_file=``/mydata/data/hostname``.log  ``# 默认是库文件路径下主机名加上.log`
 ```
 
@@ -92,16 +92,16 @@ TABLE表示记录日志到表中，FILE表示记录日志到文件中，NONE表�
 
 首先开启一般查询日志。
 
-```plaintext
+```shell
 mysql> set @@global.general_log=1;
-[[email protected] data]# ll *.log
+ll *.log
 -rw-rw---- 1 mysql mysql 5423 Mar 20 16:29 mysqld.log
 -rw-rw---- 1 mysql mysql  262 Mar 29 09:31 xuexi.log
 ```
 
 执行几个语句。
 
-```sql
+```shell
 mysql> select host,user from mysql.user;
 mysql> show variables like "%error%";
 mysql> insert into ttt values(233);
@@ -111,8 +111,8 @@ mysql> set @a:=3;
 
 查看一般查询日志的内容。
 
-```sql
-[[email protected] data]# cat xuexi.log 
+```shell
+cat xuexi.log 
 /usr/local/mysql/bin/mysqld, Version: 5.6.35-log (MySQL Community Server (GPL)). started with:
 Tcp port: 3306  Unix socket: /mydata/data/mysql.sock
 Time                Id Command    Argument
@@ -137,31 +137,31 @@ mysql记录慢查询日志是在查询执行完毕且已经完全释放锁之后
 
 和慢查询有关的变量：
 
-```plaintext
+```shell
 `long_query_time=10 ``# 指定慢查询超时时长(默认10秒)，超出此时长的属于慢查询``log_output={TABLE|FILE|NONE} ``# 定义一般查询日志和慢查询日志的输出格式，默认为file``log_slow_queries={``yes``|no}    ``# 是否启用慢查询日志，默认不启用``slow_query_log={1|ON|0|OFF}  ``# 也是是否启用慢查询日志，此变量和log_slow_queries修改一个另一个同时变化``slow_query_log_file=``/mydata/data/hostname-slow``.log  ``#默认路径为库文件目录下主机名加上-slow.log``log_queries_not_using_indexes=OFF ``# 查询没有使用索引的时候是否也记入慢查询日志`
 ```
 
 现在启用慢查询日志。
 
-```plaintext
+```shell
 mysql> set @@global.slow_query_log=on;
 ```
 
 因为默认超时时长为10秒，所以进行一个10秒的查询。
 
-```sql
+```shell
 mysql> select sleep(10);
 ```
 
 查看慢查询日志文件。这里看到虽然sleep了10秒，但是最后查询时间超出了847微秒，因此这里也记录了该查询。
 
 ```sql
-[[email protected] data]# cat xuexi-slow.log 
+cat xuexi-slow.log 
 /usr/local/mysql/bin/mysqld, Version: 5.6.35-log (MySQL Community Server (GPL)). started with:
 Tcp port: 3306  Unix socket: /mydata/data/mysql.sock
 Time                 Id Command    Argument
 # Time: 170329  9:55:58
-# [email protected]: root[root] @ localhost []  Id:     1
+# root[root] @ localhost []  Id:     1
 # Query_time: 10.000847  Lock_time: 0.000000 Rows_sent: 1  Rows_examined: 0
 use test;
 SET timestamp=1490752558;
@@ -170,18 +170,26 @@ select sleep(10);
 
 随着时间的推移，慢查询日志文件中的记录可能会变得非常多，这对于分析查询来说是非常困难的。好在提供了一个专门归类慢查询日志的工具mysqldumpslow。
 
-```plaintext
-`[[email protected] data]``# mysqldumpslow --help``  ``-d           debug ``  ``-``v`           `verbose：显示详细信息``  ``-t NUM       just show the ``top` `n queries：仅显示前n条查询``  ``-a           don``'t abstract all numbers to N and strings to '``S'：归类时不要使用N替换数字，S替换字符串``  ``-g PATTERN   ``grep``: only consider stmts that include this string：通过``grep``来筛选``select``语句。`
+```shell
+[root@xuexi data] mysqldumpslow --help
 ```
+| 选项           | 说明                                                                                                                                                          |
+|--------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `-d`         | Debug 模式：显示内部解析过程，用于调试。                                                                                                                                     |
+| `-v`         | Verbose（详细）模式：显示每条查询的详细统计信息（如总时间、平均时间、锁定时间、返回行数等）。                                                                                                          |
+| `-t NUM`     | Top N 查询：仅显示排序后最“突出”的前 `NUM` 条慢查询（默认按总耗时排序）。                                                                                                                |
+| `-a`         | 禁用抽象归一化：<br>默认情况下，`mysqldumpslow` 会将 SQL 中的数字统一替换为 `N`，字符串替换为 `'S'`，以便合并相似语句（例如 `WHERE id = 100` 和 `WHERE id = 200` 被视为同一条）。<br>使用 `-a` 后，保留原始数值和字符串，不进行归类。 |
+| `-g PATTERN` | 正则筛选（类似 grep）：<br>仅处理包含匹配 `PATTERN`（Perl 兼容正则表达式）的语句。<br>⚠️ 注意：并非仅用于筛选 `SELECT`，可匹配任意内容，如 `-g 'SELECT'`、`-g 'user_id'`、`-g '^UPDATE'` 等。                    |
 
 该工具归类的时候，默认会将 **同文本但变量值不同的查询语句视为同一类，并使用N代替其中的数值变量，使用S代替其中的字符串变量**。可以使用-a来禁用这种替换。如：
 
-```sql
-[[email protected] data]# mysqldumpslow xuexi-slow.log 
+```shell
+[root@xuexi data]# mysqldumpslow xuexi-slow.log 
 Reading mysql slow query log from xuexi-slow.log
 Count: 1  Time=10.00s (10s)  Lock=0.00s (0s)  Rows=1.0 (1), root[root]@localhost
   select sleep(N)
-[[email protected] data]#  mysqldumpslow -a xuexi-slow.log   
+
+[root@xuexi data]#  mysqldumpslow -a xuexi-slow.log   
 Reading mysql slow query log from xuexi-slow.log
 Count: 1  Time=10.00s (10s)  Lock=0.00s (0s)  Rows=1.0 (1), root[root]@localhost
   select sleep(10)
@@ -189,14 +197,14 @@ Count: 1  Time=10.00s (10s)  Lock=0.00s (0s)  Rows=1.0 (1), root[root]@localhost
 
 显然，这里归类后的结果只是精确到0.01秒的，如果想要显示及其精确的秒数，则使用-d选项启用调试功能。
 
-```sql
-[[email protected] data]#  mysqldumpslow -d xuexi-slow.log   
+```shell
+[root@xuexi data]#  mysqldumpslow -d xuexi-slow.log   
 Reading mysql slow query log from xuexi-slow.log
 [[/usr/local/mysql/bin/mysqld, Version: 5.6.35-log (MySQL Community Server (GPL)). started with:
 Tcp port: 3306  Unix socket: /mydata/data/mysql.sock
 Time                 Id Command    Argument
 # Time: 170329  9:55:58
-# [email protected]: root[root] @ localhost []  Id:     1
+# User@Host: root[root] @ localhost []  Id:     1
 # Query_time: 10.000847  Lock_time: 0.000000 Rows_sent: 1  Rows_examined: 0
 use test;
 SET timestamp=1490752558;
@@ -204,20 +212,21 @@ select sleep(10);
 ]]
 <<>>
 <<# Time: 170329  9:55:58
-# [email protected]: root[root] @ localhost []  Id:     1
+# User@Host: root[root] @ localhost []  Id:     1
 # Query_time: 10.000847  Lock_time: 0.000000 Rows_sent: 1  Rows_examined: 0
 use test;
 SET timestamp=1490752558;
 select sleep(10);
 >> at /usr/local/mysql/bin/mysqldumpslow line 97, <> chunk 1.
 [[# Time: 170329  9:55:58
-# [email protected]: root[root] @ localhost []  Id:     1
+# User@Host: root[root] @ localhost []  Id:     1
 # Query_time: 10.000847  Lock_time: 0.000000 Rows_sent: 1  Rows_examined: 0
 use test;
 SET timestamp=1490752558;
 select sleep(10);
 ]]
 {{  select sleep(N)}}
+
 Count: 1  Time=10.00s (10s)  Lock=0.00s (0s)  Rows=1.0 (1), root[root]@localhost
   select sleep(N)
 ```
@@ -242,8 +251,8 @@ MariaDB/MySQL默认没有启动二进制日志，要启用二进制日志使用 
 
 或者在配置文件中的\[mysqld\]部分设置log-bin也可以。注意：对于mysql 5.7，直接启动binlog可能会导致mysql服务启动失败，这时需要在配置文件中的mysqld为mysql实例分配server_id。
 
-```plaintext
-`[mysqld]``# server_id=1234``log-bin=[on|filename]`
+```shell
+[mysqld]# server_id=1234``log-bin=[on|filename]`
 ```
 
 mysqld还 **创建一个二进制日志索引文件**，当二进制日志文件滚动的时候会向该文件中写入对应的信息。所以该文件包含所有使用的二进制日志文件的文件名。默认情况下该文件与二进制日志文件的文件名相同，扩展名为'.index'。要指定该文件的文件名使用 --log-bin-index\[=file_name\] 选项。当mysqld在运行时不应手动编辑该文件，免得mysqld变得混乱。
@@ -614,7 +623,7 @@ mysql> show master status;
 mysql> reset master;
 ```
 
-**2.PURGE { BINARY | MASTER } LOGS { TO 'log_name' | BEFORE datetime_expr }** purge master logs to "binlog\_name.00000X" 将会清空00000X之前的所有日志文件。例如删除000006之前的日志文件。
+**2.PURGE { BINARY | MASTER } LOGS { TO 'log_name' | BEFORE datetime_expr }** purge master logs to "binlog_name.00000X" 将会清空00000X之前的所有日志文件。例如删除000006之前的日志文件。
 
 ```plaintext
 mysql> purge master logs to "mysql-bin.000006";
@@ -639,7 +648,7 @@ mysql> show warnings;
 
 在MySQL 5.1之前，MySQL只有一种基于语句statement形式的日志记录格式。即将所有的相关操作记录为SQL语句形式。但是这样的记录方式对某些特殊信息无法同步记录，例如uuid，now()等这样动态变化的值。
 从MySQL 5.1开始，MySQL支持statement、row、mixed三种形式的记录方式。row形式是基于行来记录，也就是将相关行的每一列的值都在日志中保存下来，这样的结果会导致日志文件变得非常大，但是保证了动态值的确定性。还有一种mixed形式，表示如何记录日志由MySQL自己来决定。
-日志的记录格式由变量 binlog\_format 来指定。其值有：row,statement,mixed。innodb引擎的创始人之一在博客上推荐使用row格式。
+日志的记录格式由变量 binlog_format 来指定。其值有：row,statement,mixed。innodb引擎的创始人之一在博客上推荐使用row格式。
 下面将记录格式改为row。
 
 ```sql
@@ -724,30 +733,30 @@ gPraWB4BAAAAOAAAADoBAAAAAF4AAAAAAAEAAgAE//AHAAAACXhpYW93b25pdQGZnDqBmCz35ow=
 ...后面省略...
 ```
 
-还有一种mixed模式。这种模式下默认会采用statement的方式记录，只有以下几种情况会采用row的形式来记录日志。 1.表的存储引擎为NDB，这时对表的DML操作都会以row的格式记录。 2.使用了uuid()、user()、current\_user()、found\_rows()、row\_count()等不确定函数。但测试发现对now()函数仍会以statement格式记录，而sysdate()函数会以row格式记录。 3.使用了insert delay语句。 4.使用了临时表。
+还有一种mixed模式。这种模式下默认会采用statement的方式记录，只有以下几种情况会采用row的形式来记录日志。 1.表的存储引擎为NDB，这时对表的DML操作都会以row的格式记录。 2.使用了uuid()、user()、current_user()、found_rows()、row_count()等不确定函数。但测试发现对now()函数仍会以statement格式记录，而sysdate()函数会以row格式记录。 3.使用了insert delay语句。 4.使用了临时表。
 
 ## 5.5 二进制日志相关的变量
 
-注意：在配置binlog相关变量的时候，相关变量名总是搞混，因为有的是binlog，有的是log\_bin，当他们分开的时候，log在前，当它们一起的时候，bin在前。在配置文件中也同样如此。
-- log\_bin = {on | off | base\_name} #指定是否启用记录二进制日志或者指定一个日志路径(路径不能加.否则.后的被忽略)
-- sql\_log\_bin ={ on | off } #指定是否启用记录二进制日志，只有在log\_bin开启的时候才有效
-- expire\_logs\_days = #指定自动删除二进制日志的时间，即日志过期时间
-- binlog\_do\_db = #明确指定要记录日志的数据库
-- binlog\_ignore\_db = #指定不记录二进制日志的数据库
-- log\_bin\_index = #指定mysql-bin.index文件的路径
-- binlog\_format = { mixed | row | statement } #指定二进制日志基于什么模式记录
-- binlog\_rows\_query\_log\_events = { 1|0 } # MySQL5.6.2添加了该变量，当binlog format为row时，默认不会记录row对应的SQL语句，设置为1或其他true布尔值时会记录，但需要使用mysqlbinlog -v查看，这些语句是被注释的，恢复时不会被执行。
-- max\_binlog\_size = #指定二进制日志文件最大值，超出指定值将自动滚动。但由于事务不会跨文件，所以并不一定总是精确。
-- binlog\_cache\_size = 32768 # **基于事务类型的日志会先记录在缓冲区**，当达到该缓冲大小时这些日志会写入磁盘
-- max\_binlog\_cache\_size = #指定二进制日志缓存最大大小，硬限制。默认4G，够大了，建议不要改
-- binlog\_cache\_use：使用缓存写二进制日志的次数(这是一个实时变化的统计值)
-- binlog\_cache\_disk\_use:使用临时文件写二进制日志的次数，当日志超过了binlog\_cache\_size的时候会使用临时文件写日志，如果该变量值不为0，则考虑增大binlog\_cache\_size的值
-- binlog\_stmt\_cache\_size = 32768 #一般等同于且决定binlog\_cache\_size大小，所以修改缓存大小时只需修改这个而不用修改binlog\_cache\_size
-- binlog\_stmt\_cache\_use：使用缓存写二进制日志的次数
-- binlog\_stmt\_cache\_disk\_use: 使用临时文件写二进制日志的次数，当日志超过了binlog\_cache\_size的时候会使用临时文件写日志，如果该变量值不为0，则考虑增大binlog\_cache\_size的值
-- sync\_binlog = { 0 | n } #这个参数直接影响mysql的性能和完整性
-  - sync\_binlog=0:不同步，日志何时刷到磁盘由FileSystem决定，这个性能最好。
-  - sync\_binlog=n:每写n次事务(注意，对于非事务表来说，是n次事件，对于事务表来说，是n次事务，而一个事务里可能包含多个二进制事件)，MySQL将执行一次磁盘同步指令fdatasync()将缓存日志刷新到磁盘日志文件中。Mysql中默认的设置是sync\_binlog=0，即不同步，这时性能最好，但风险最大。一旦系统奔溃，缓存中的日志都会丢失。**在innodb的主从复制结构中，如果启用了二进制日志(几乎都会启用)，要保证事务的一致性和持久性的时候，必须将sync_binlog的值设置为1，因为每次事务提交都会写入二进制日志，设置为1就保证了每次事务提交时二进制日志都会写入到磁盘中，从而立即被从服务器复制过去。** 5.6 二进制日志定点还原数据库
+注意：在配置binlog相关变量的时候，相关变量名总是搞混，因为有的是binlog，有的是log_bin，当他们分开的时候，log在前，当它们一起的时候，bin在前。在配置文件中也同样如此。
+- log_bin = {on | off | base_name} #指定是否启用记录二进制日志或者指定一个日志路径(路径不能加.否则.后的被忽略)
+- sql_log_bin ={ on | off } #指定是否启用记录二进制日志，只有在log_bin开启的时候才有效
+- expire_logs_days = #指定自动删除二进制日志的时间，即日志过期时间
+- binlog_do_db = #明确指定要记录日志的数据库
+- binlog_ignore_db = #指定不记录二进制日志的数据库
+- log_bin_index = #指定mysql-bin.index文件的路径
+- binlog_format = { mixed | row | statement } #指定二进制日志基于什么模式记录
+- binlog_rows_query_log_events = { 1|0 } # MySQL5.6.2添加了该变量，当binlog format为row时，默认不会记录row对应的SQL语句，设置为1或其他true布尔值时会记录，但需要使用mysqlbinlog -v查看，这些语句是被注释的，恢复时不会被执行。
+- max_binlog_size = #指定二进制日志文件最大值，超出指定值将自动滚动。但由于事务不会跨文件，所以并不一定总是精确。
+- binlog_cache_size = 32768 # **基于事务类型的日志会先记录在缓冲区**，当达到该缓冲大小时这些日志会写入磁盘
+- max_binlog_cache_size = #指定二进制日志缓存最大大小，硬限制。默认4G，够大了，建议不要改
+- binlog_cache_use：使用缓存写二进制日志的次数(这是一个实时变化的统计值)
+- binlog_cache_disk_use:使用临时文件写二进制日志的次数，当日志超过了binlog_cache_size的时候会使用临时文件写日志，如果该变量值不为0，则考虑增大binlog_cache_size的值
+- binlog_stmt_cache_size = 32768 #一般等同于且决定binlog_cache_size大小，所以修改缓存大小时只需修改这个而不用修改binlog_cache_size
+- binlog_stmt_cache_use：使用缓存写二进制日志的次数
+- binlog_stmt_cache_disk_use: 使用临时文件写二进制日志的次数，当日志超过了binlog_cache_size的时候会使用临时文件写日志，如果该变量值不为0，则考虑增大binlog_cache_size的值
+- sync_binlog = { 0 | n } #这个参数直接影响mysql的性能和完整性
+  - sync_binlog=0:不同步，日志何时刷到磁盘由FileSystem决定，这个性能最好。
+  - sync_binlog=n:每写n次事务(注意，对于非事务表来说，是n次事件，对于事务表来说，是n次事务，而一个事务里可能包含多个二进制事件)，MySQL将执行一次磁盘同步指令fdatasync()将缓存日志刷新到磁盘日志文件中。Mysql中默认的设置是sync_binlog=0，即不同步，这时性能最好，但风险最大。一旦系统奔溃，缓存中的日志都会丢失。**在innodb的主从复制结构中，如果启用了二进制日志(几乎都会启用)，要保证事务的一致性和持久性的时候，必须将sync_binlog的值设置为1，因为每次事务提交都会写入二进制日志，设置为1就保证了每次事务提交时二进制日志都会写入到磁盘中，从而立即被从服务器复制过去。** 5.6 二进制日志定点还原数据库
 
 ----------------
 只需指定二进制日志的起始位置（可指定终止位置）并将其保存到sql文件中，由mysql命令来载入恢复即可。当然直接通过管道送给mysql命令也可。

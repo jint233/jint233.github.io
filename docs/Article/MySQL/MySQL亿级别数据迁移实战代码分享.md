@@ -7,12 +7,12 @@
 在迁移大数据量的情况下面临的问题主要有如下几点：
 
 1. 怎么保证查询大数据量下没有性能的瓶颈。
-1. 不能影响正常的业务查询，不要有太多的性能损耗，可以灵活控制迁移的启动与停止。
-1. 实际的迁移参数可以动态的扩展，比如一次批量提交多少条数据，一次迁移多少，迁移过程中怎么转化数据。
-1. 对于一些错误可以容忍的话怎么跳过异常，比如可以容忍几条数据的失败。
-1. 测试环境和生产环境的测试实际一般很难达到百分百一致，如何在线上对迁移的性能进行可配置的控制。
-1. 事务的提交问题，因为数据量过大，不能将所有数据查询到内存之中，数据如何分而治之。
-1. 迁移的过程需要记录，比如每次的任务执行的多长时间，事务提交了多少次，这些都可以查询，根据这些指标再次动态调整。
+2. 不能影响正常的业务查询，不要有太多的性能损耗，可以灵活控制迁移的启动与停止。
+3. 实际的迁移参数可以动态的扩展，比如一次批量提交多少条数据，一次迁移多少，迁移过程中怎么转化数据。
+4. 对于一些错误可以容忍的话怎么跳过异常，比如可以容忍几条数据的失败。
+5. 测试环境和生产环境的测试实际一般很难达到百分百一致，如何在线上对迁移的性能进行可配置的控制。
+6. 事务的提交问题，因为数据量过大，不能将所有数据查询到内存之中，数据如何分而治之。
+7. 迁移的过程需要记录，比如每次的任务执行的多长时间，事务提交了多少次，这些都可以查询，根据这些指标再次动态调整。
 
 针对上面提出的问题，我们自己去写这样一个功能完整且稳定的功能，实际中还是比较困难的。按照通常的 Service 和 Dao 的写法，满足不了我们的需求。
 
@@ -23,11 +23,11 @@ Spring Batch 是 Spring 官方的一个专门用于处理大数据体量下数�
 #### 核心的功能和特点
 
 1. 事务管理
-1. 基于分块的处理
-1. 声明式 IO
-1. 可灵活控制开始、停止、重启
-1. 重试和跳过
-1. 基于网页的后台管理 Spring Cloud Data Flow
+2. 基于分块的处理
+3. 声明式 IO
+4. 可灵活控制开始、停止、重启
+5. 重试和跳过
+6. 基于网页的后台管理 Spring Cloud Data Flow
 
 Spring Batch 的文档很全面，但对于初学者来说，整个文档读完需要耗费比较长的时间，这里只看两张 Spring Batch 的架构图，后面我会通过实际工作中的迁移案例来讲解怎么使用它。
 
@@ -44,10 +44,10 @@ Spring Batch 的文档很全面，但对于初学者来说，整个文档读完�
 #### 核心组件
 
 1. Reader：负责数据的读取
-1. Processor：负责数据的处理
-1. Writer：负责数据的写出
-1. Step：流程编排
-1. Job：任务配置
+2. Processor：负责数据的处理
+3. Writer：负责数据的写出
+4. Step：流程编排
+5. Job：任务配置
 
 这些业务组件用我们生活中的例子来理解的话，可以想象一下如下的场景：
 
@@ -439,7 +439,7 @@ public class PayRecordExtProcessor implements ItemProcessor<PayRecord,PayRecordE
 }
 ```
 
-**2. 拆分为多表的场景** 系统有些情况下需要将单表拆分为多表，比如根据用户 id 分片，这种情况下 Spring Batch 提供了一个类 ClassifierCompositeItemWriter 可以根据条件动态选择 Writer，在这里我们模拟将 pay\_record 这个表拆分为两个表的场景 pay\_record\_1、pay\_record2。
+**2. 拆分为多表的场景** 系统有些情况下需要将单表拆分为多表，比如根据用户 id 分片，这种情况下 Spring Batch 提供了一个类 ClassifierCompositeItemWriter 可以根据条件动态选择 Writer，在这里我们模拟将 pay_record 这个表拆分为两个表的场景 pay_record_1、pay_record2。
 
 ```java
 create TABLE  pay_record_1 like  pay_record;
@@ -521,30 +521,30 @@ public LockProvider lockProvider(@Qualifier(value = "primaryDatasource") DataSou
 
 #### 哪些点可以优化
 
-\\1. 每次可以控制读取的条数，每次事务提交的个数，每个 Step 启用的线程数都可以进行配置，在本项目中提供了一个配置类，可以对这些配置项进行动态的配置。
+1. 每次可以控制读取的条数，每次事务提交的个数，每个 Step 启用的线程数都可以进行配置，在本项目中提供了一个配置类，可以对这些配置项进行动态的配置。
 
-```java
-@ConfigurationProperties(prefix = "migrate.config")
-@Data
-public class MigrateConfig {
-    // 每次读取数据条数
-    private Integer pageSize;
-    // 每次事务提交记录数
-    private Integer chunkSize;
-    private Integer threadSize;
-}
-```
+    ```java
+    @ConfigurationProperties(prefix = "migrate.config")
+    @Data
+    public class MigrateConfig {
+        // 每次读取数据条数
+        private Integer pageSize;
+        // 每次事务提交记录数
+        private Integer chunkSize;
+        private Integer threadSize;
+    }
+    ```
 
-\\2. 在迁移之前 MySQL 要查看连接情况，设置缓冲池大小等指标，这个也是在迁移之前要考虑的点。
+2. 在迁移之前 MySQL 要查看连接情况，设置缓冲池大小等指标，这个也是在迁移之前要考虑的点。
 
-```sql
-show processlist
-set global innodb_buffer_pool_size =  缓冲池大小；
-show variables like 'max_connections';
-set global max_connections= 最大连接数；
-```
+    ```sql
+    show processlist
+    set global innodb_buffer_pool_size =  缓冲池大小；
+    show variables like 'max_connections';
+    set global max_connections= 最大连接数；
+    ```
 
-\\3. 像上面提到的 Spring Batch 在迁移过程中会将任务的执行情况都初始化到数据库中，如果我们不想要这些数据持久化，那么我们可以选择内存数据库，这个会大大提升迁移的速度，更改数据源即可。
+3. 像上面提到的 Spring Batch 在迁移过程中会将任务的执行情况都初始化到数据库中，如果我们不想要这些数据持久化，那么我们可以选择内存数据库，这个会大大提升迁移的速度，更改数据源即可。
 
 ### Spring Cloud Data Flow 入门简介
 

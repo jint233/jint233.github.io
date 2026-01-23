@@ -530,15 +530,15 @@ mysql> show tables like '%summary%';
 
 这些 summary 表有很多，提供了一段时间内已经执行完成的事件的汇总情况，我们从不同的维度整理如下：
 
-- 按阶段事件的汇总摘要：events_stages_summary\_\*
-- 按语句事件的汇总摘要：events_statements_summary\_\*
-- 按事务事件的汇总摘要：events_transactions_summary\_\*
-- 按等待事件的汇总摘要：events_waits_summary\_\*
-- 按文件事件的汇总摘要：file_summary\_\*
-- 按内存事件的汇总摘要：memory_summary\_\*
+- 按阶段事件的汇总摘要：events_stages_summary_\*
+- 按语句事件的汇总摘要：events_statements_summary_\*
+- 按事务事件的汇总摘要：events_transactions_summary_\*
+- 按等待事件的汇总摘要：events_waits_summary_\*
+- 按文件事件的汇总摘要：file_summary_\*
+- 按内存事件的汇总摘要：memory_summary_\*
 - 按对象事件的汇总摘要：objects_summary_global_by_type
-- 按套接字事件的汇总摘要：socket_summary\_\*
-- 按表事件的汇总摘要：table_summary\_\*
+- 按套接字事件的汇总摘要：socket_summary_\*
+- 按表事件的汇总摘要：table_summary_\*
 
 #### other 表
 

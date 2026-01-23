@@ -122,9 +122,9 @@ public class Main {
 有很多小伙伴可能并不觉得可以循环依赖有多么神奇，那是因为不知道矛盾点在哪，接下来就来说说这个问题： 当beanA，beanB循环依赖：
 
 1. 创建beanA，发现依赖beanB；
-1. 创建beanB，发现依赖beanA；
-1. 创建beanA，发现依赖beanB；
-1. 创建beanB，发现依赖beanA。 ... 好了，死循环了。
+2. 创建beanB，发现依赖beanA；
+3. 创建beanA，发现依赖beanB；
+4. 创建beanB，发现依赖beanA。 ... 好了，死循环了。
 
 循环依赖的矛盾点就在于要创建beanA，它需要beanB，而创建beanB，又需要beanA，然后两个bean都创建不出来。
 
@@ -140,10 +140,10 @@ public class Main {
 我们可以这么做：
 
 1. 当我们创建完beanA，就把自己放到earlySingletonObjects，发现自己需要beanB，然后就去屁颠屁颠创建beanB；
-1. 当我们创建完beanB，就把自己放到earlySingletonObjects，发现自己需要beanA，然后就去屁颠屁颠创建beanA；
-1. 创建beanA前，先去earlySingletonObjects看一下，发现自己已经被创建出来了，把自己返回出去；
-1. beanB拿到了beanA，beanB创建完毕，把自己放入singletonObjects；
-1. beanA可以去singletonObjects拿到beanB了，beanA也创建完毕，把自己放到singletonObjects。 整个过程结束。
+2. 当我们创建完beanB，就把自己放到earlySingletonObjects，发现自己需要beanA，然后就去屁颠屁颠创建beanA；
+3. 创建beanA前，先去earlySingletonObjects看一下，发现自己已经被创建出来了，把自己返回出去；
+4. beanB拿到了beanA，beanB创建完毕，把自己放入singletonObjects；
+5. beanA可以去singletonObjects拿到beanB了，beanA也创建完毕，把自己放到singletonObjects。 整个过程结束。
 
 下面让我们来实现这个功能： 首先，自定义一个注解，字段上打上这个注解的，说明需要被Autowired：
 

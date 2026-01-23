@@ -21,7 +21,7 @@ MySQL 5.7对半同步复制作了大改进，新增了一个master线程。在My
 这个变量控制的是master何时提交、何时接收ack以及何时回复成功信息给客户端的时间点。
 
 1. `AFTER_SYNC`模式：master将新的事务写进binlog(buffer)，然后发送给slave，再sync到自己的binlog file(disk)。之后才允许接收slave的ack回复，接收到ack之后才会提交事务，并返回成功信息给客户端。
-1. `AFTER_COMMIT`模式：master将新的事务写进binlog(buffer)，然后发送给slave，再sync到自己的binlog file(disk)，然后直接提交事务。之后才允许接收slave的ack回复，然后再返回成功信息给客户端。
+2. `AFTER_COMMIT`模式：master将新的事务写进binlog(buffer)，然后发送给slave，再sync到自己的binlog file(disk)，然后直接提交事务。之后才允许接收slave的ack回复，然后再返回成功信息给客户端。
 
 画图理解就很清晰。(前提：已经设置了`sync_binlog=1`，否则binlog刷盘时间由操作系统决定)
 
@@ -196,7 +196,7 @@ mysql> show global variables like "%semi%";
 
    - ⑧.`rpl_semi_sync_master_wait_point`：控制master上commit、接收ack、返回消息给客户端的时间点。值为 _AFTER_SYNC_ 和 _AFTER_COMMIT_ ，该选项是MySQL5.7.2后引入的，默认值为 _AFTER_SYNC_ ，在此版本之前，等价于使用了 _AFTER_COMMIT_ 模式。关于这两种模式，见前文对两种半同步类型的分析。
 
-1. slave相关的变量：
+2. slave相关的变量：
 
    - ①.`rpl_semi_sync_slave_enabled`：slave是否开启半同步复制。
    - ②.`rpl_semi_sync_slave_trace_level`：slave的调试级别。

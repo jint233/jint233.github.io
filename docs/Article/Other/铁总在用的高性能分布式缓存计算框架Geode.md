@@ -35,21 +35,21 @@ Apache Geode 是一个数据管理平台，可在广泛分布的云架构中提�
 总体来说 Geode 的功能包含 Redis 的功能，但是还是有一些迥异点的。
 
 1. 定位不同：Geode 定位数据管理平台，强调实时一致性， Redis 高速缓存。
-1. 集群：Geode 天然支持集群，节点是对等的，Redis 集群去中心化，主从复制。
-1. 部署方式：Geode 有点对点方式、C/S 方式、WAN 多数据中心方式，而 Redis 是 C/S 主从方式、集群方式。
-1. 查询：Geode 支持 OQL 查询、函数计算、Redis KV 查询
-1. 发布订阅：Geode 支持稳定的时间订阅和连续查询， Redis 的发布订阅貌似用的并不多。
-1. 事务支持：Geode 支持的也是存内存的 ACID 事务，对落盘的事务支持也不行，Redis 支持的也是内存型事务，相对来说，ACID 更高级一些。
-1. Geode 支持 Redis 的协议模拟，有 Redis Adaper。
+2. 集群：Geode 天然支持集群，节点是对等的，Redis 集群去中心化，主从复制。
+3. 部署方式：Geode 有点对点方式、C/S 方式、WAN 多数据中心方式，而 Redis 是 C/S 主从方式、集群方式。
+4. 查询：Geode 支持 OQL 查询、函数计算、Redis KV 查询
+5. 发布订阅：Geode 支持稳定的时间订阅和连续查询， Redis 的发布订阅貌似用的并不多。
+6. 事务支持：Geode 支持的也是存内存的 ACID 事务，对落盘的事务支持也不行，Redis 支持的也是内存型事务，相对来说，ACID 更高级一些。
+7. Geode 支持 Redis 的协议模拟，有 Redis Adaper。
 
 ### Geode 集群搭建——四台虚拟机
 
 #### 前置说明
 
 1. 请确保服务器事先安装 JDK 8+ update > 121 的版本。
-1. 系统时间正确，可以使用 NTP 网络服务。
-1. 配置了正确的主机名。
-1. 禁用 TCP SYN cookie。大多数默认 Linux 安装，使用 SYN cookie 来保护系统免受泛滥 TCP SYN 数据包的恶意攻击，但此功能与稳定和繁忙的 Geode 集群不兼容。安全实现应该通过将 Geode 服务器集群置于高级防火墙保护之下来寻求防止攻击。
+2. 系统时间正确，可以使用 NTP 网络服务。
+3. 配置了正确的主机名。
+4. 禁用 TCP SYN cookie。大多数默认 Linux 安装，使用 SYN cookie 来保护系统免受泛滥 TCP SYN 数据包的恶意攻击，但此功能与稳定和繁忙的 Geode 集群不兼容。安全实现应该通过将 Geode 服务器集群置于高级防火墙保护之下来寻求防止攻击。
 
 **如何禁用 TCP SYN cookie：**
 
@@ -70,9 +70,9 @@ sysctl -p 重载
 准备好主机：
 
 1. 主机（192-168-33-15）：locator1 + server1
-1. 主机（192-168-33-20）：locator2 + server2
-1. 主机（192-168-33-23）：locator3 + server3
-1. 主机（192-168-33-29）：server4
+2. 主机（192-168-33-20）：locator2 + server2
+3. 主机（192-168-33-23）：locator3 + server3
+4. 主机（192-168-33-29）：server4
 
 分别在各主机创建 Geode 工作目录 /opt/geode_work，并在该目录中进入 gfsh 命令行。
 
@@ -188,31 +188,31 @@ gfsh start server --name=${servername} --locators=${locators} --locator-wait-tim
 
 #### 确定 locator leader 是那台机器
 
-\\1. 启动成功的时候观察日志：
+1. 启动成功的时候观察日志：
 
-```java
-[email protected]/0 # sh start_locator_33_20.sh
-Log File: /opt/geode_work18/locator_33_20/locator_33_20.log
-JVM Arguments: -Dgemfire.locators=192.168.33.15[10334],192.168.33.20[10334],192.168.33.23[10334] -Dgemfire.enable-cluster-configuration=true -Dgemfire.load-cluster-configuration-from-dir=false -Dgemfire.max-num-reconnect-tries=100 -Dgemfire.member-timeout=120000 -Dgemfire.distributed-system-id=254 -Xms512M -Xmx1G -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -Dgemfire.launcher.registerSignalHandlers=true -Djava.awt.headless=true -Dsun.rmi.dgc.server.gcInterval=9223372036854775806
-Class-Path: /opt/apache-geode-1.9.2/lib/geode-core-1.9.2.jar:/opt/apache-geode-1.9.2/lib/geode-dependencies.jar
-//重点关注这行
-Successfully connected to: JMX Manager [host=192.168.33.15, port=1099]
-Cluster configuration service is up and running.
-```
+    ```java
+    [email protected]/0 # sh start_locator_33_20.sh
+    Log File: /opt/geode_work18/locator_33_20/locator_33_20.log
+    JVM Arguments: -Dgemfire.locators=192.168.33.15[10334],192.168.33.20[10334],192.168.33.23[10334] -Dgemfire.enable-cluster-configuration=true -Dgemfire.load-cluster-configuration-from-dir=false -Dgemfire.max-num-reconnect-tries=100 -Dgemfire.member-timeout=120000 -Dgemfire.distributed-system-id=254 -Xms512M -Xmx1G -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -Dgemfire.launcher.registerSignalHandlers=true -Djava.awt.headless=true -Dsun.rmi.dgc.server.gcInterval=9223372036854775806
+    Class-Path: /opt/apache-geode-1.9.2/lib/geode-core-1.9.2.jar:/opt/apache-geode-1.9.2/lib/geode-dependencies.jar
+    //重点关注这行
+    Successfully connected to: JMX Manager [host=192.168.33.15, port=1099]
+    Cluster configuration service is up and running.
+    ```
+    
+    我们可以看到当我们启动的时候，打印的日志会告诉我们链接到了谁。
 
-我们可以看到当我们启动的时候，打印的日志会告诉我们链接到了谁。
+2. connect 到 locator 后的日志：
 
-\\2. connect 到 locator 后的日志：
-
-```plaintext
-gfsh>connect --locator=192.168.33.23[10334]
-Connecting to Locator at [host=192.168.33.23, port=10334] ..
-//请关注下边这行
-Connecting to Manager at [host=192.168.33.15, port=1099] ..
-Successfully connected to: [host=192.168.33.15, port=1099]
-```
-
-我们可以看到，当我们链接 33.23 的时候，它会转到 manager 地址，这就是当前的 locator leader 了。
+    ```plaintext
+    gfsh>connect --locator=192.168.33.23[10334]
+    Connecting to Locator at [host=192.168.33.23, port=10334] ..
+    //请关注下边这行
+    Connecting to Manager at [host=192.168.33.15, port=1099] ..
+    Successfully connected to: [host=192.168.33.15, port=1099]
+    ```
+    
+    我们可以看到，当我们链接 33.23 的时候，它会转到 manager 地址，这就是当前的 locator leader 了。
 
 #### 打开 pulse 控制台
 
@@ -310,7 +310,7 @@ gfsh>create region --name=test --type=PARTITION_REDUNDANT_PERSISTENT_OVERFLOW --
 *   PERSISTENT：持久化
 *   OVERFLOW：内存不足减少内存使用
 *   REDUNDANT：冗余 -> 可配置冗余数量，但是不知道是否会参与 read 不清楚
-*   HEAP\_LRU：最近最少使用清除内存
+*   HEAP_LRU：最近最少使用清除内存
 
 ```plaintext
 LOCAL                                     LOCAL_HEAP_LRU                            LOCAL_OVERFLOW                            LOCAL_PERSISTENT
@@ -1106,13 +1106,13 @@ gfsh>export cluster-configuration --zip-file-name=./cluster-config-back.zip
 File saved to /opt/./cluster-config-back.zip
 ```
 
-\\1. 查看 server 状态，实际上我们是想要备份下启动参数，但是我们前边对启动进行了脚本话，因此这里就没有必要在进行启动脚本备份了，如果你没有用脚本启动，最好还是备份下，另外一种查看方式就是：
+1. 查看 server 状态，实际上我们是想要备份下启动参数，但是我们前边对启动进行了脚本话，因此这里就没有必要在进行启动脚本备份了，如果你没有用脚本启动，最好还是备份下，另外一种查看方式就是：
 
-```plaintext
-ps -ef | grep geode //查看启动参数
-```
+   ```shell
+   ps -ef | grep geode //查看启动参数
+   ```
 
-\\2. 第二个导出配置文件，是一些常规配置，以前修改过的，关于 region 等的一些配置。
+2. 第二个导出配置文件，是一些常规配置，以前修改过的，关于 region 等的一些配置。
 
 ![img](../assets/c46bbda0-1688-11ea-981f-cdaafe390fdd.png)
 
@@ -1142,8 +1142,8 @@ rm -rf apache-geode-1.9.2.tgz
 
 ##### **停止旧的主 locator** 1.  链接上管理器
 
-2. 找到主 locator 的 name
-1. 执行 `stop locator --name=locator_33_15`
+1. 找到主 locator 的 name
+2. 执行 `stop locator --name=locator_33_15`
 
 停止主 locator 要特别注意，经常停止不了，要用 ps 来查看 `ps -ef | grep geode`，如果不能正常停止就用 `kill -9 {locator的PID}` 来强行停止。
 
@@ -1171,83 +1171,87 @@ rm -rf apache-geode-1.9.2.tgz
     gfsh>
 ```
 
-##### **修改 /etc/profile 更改环境变量** \\1. 执行 `vi /ect/profile`
+##### **修改 /etc/profile 更改环境变量** 
 
-\\2. 修改文件将原来 1.8 的版本改为 1.9.2
+1. 执行 `vi /ect/profile`
 
-```plaintext
-export PATH=JAVA_HOME/bin:/opt/apache-geode-1.9.2/bin:PATH
-```
+2. 修改文件将原来 1.8 的版本改为 1.9.2
 
-\\3. 执行生效 `source /etc/profile`
+    ```shell
+    export PATH=JAVA_HOME/bin:/opt/apache-geode-1.9.2/bin:PATH
+    ```
 
-\\4. 执行 `gfsh version --fule` 查看版本，确定是新版本生效
+3. 执行生效 `source /etc/profile`
 
-```plaintext
-Build-Date: 2019-10-15 06:08:13 -0700
-Build-Id: jdeppe 0
-Build-Java-Version: 1.8.0_221
-Build-Platform: Mac OS X 10.14.6 x86_64
-Product-Name: Apache Geode
-Product-Version: 1.9.2
-Source-Date: 2019-10-14 15:59:02 -0700
-Source-Repository: release/1.9.2
-Source-Revision: 63c8058f036316618b6cd78e6727106b7ac0a888
-Native version: native code unavailable
-Running on: /192.168.33.15, 4 cpu(s), amd64 Linux 2.6.32-696.23.1.el6.x86_64
-```
+4. 执行 `gfsh version --fule` 查看版本，确定是新版本生效
 
-##### **启动新 locator** \\1. 启动新的主 locator，执行启动脚本 start_locator_33_15.sh
+    ```shell
+    Build-Date: 2019-10-15 06:08:13 -0700
+    Build-Id: jdeppe 0
+    Build-Java-Version: 1.8.0_221
+    Build-Platform: Mac OS X 10.14.6 x86_64
+    Product-Name: Apache Geode
+    Product-Version: 1.9.2
+    Source-Date: 2019-10-14 15:59:02 -0700
+    Source-Repository: release/1.9.2
+    Source-Revision: 63c8058f036316618b6cd78e6727106b7ac0a888
+    Native version: native code unavailable
+    Running on: /192.168.33.15, 4 cpu(s), amd64 Linux 2.6.32-696.23.1.el6.x86_64
+    ```
 
-```java
-Locator in /opt/geode_work18/locator_33_15 on 192.168.33.15[10334] as locator_33_15 is currently online.
-Process ID: 30782
-Uptime: 10 seconds
-Geode Version: 1.9.2
-Java Version: 1.8.0_102
-Log File: /opt/geode_work18/locator_33_15/locator_33_15.log
-JVM Arguments: -Dgemfire.locators=192.168.33.15[10334],192.168.33.20[10334] -Dgemfire.enable-cluster-configuration=true -Dgemfire.load-cluster-configuration-from-dir=false -Dgemfire.max-num-reconnect-tries=100 -Dgemfire.member-timeout=120000 -Dgemfire.distributed-system-id=254 -Xms512M -Xmx1G -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -Dgemfire.launcher.registerSignalHandlers=true -Djava.awt.headless=true -Dsun.rmi.dgc.server.gcInterval=9223372036854775806
-Class-Path: /opt/apache-geode-1.9.2/lib/geode-core-1.9.2.jar:/opt/apache-geode-1.9.2/lib/geode-dependencies.jar
-Successfully connected to: JMX Manager [host=192.168.33.15, port=1099]
-Cluster configuration service is up and running.
-```
+##### **启动新 locator** 
 
-\\2. 校验新的 locator 是否正常。
+1. 启动新的主 locator，执行启动脚本 start_locator_33_15.sh
+    
+    ```java
+    Locator in /opt/geode_work18/locator_33_15 on 192.168.33.15[10334] as locator_33_15 is currently online.
+    Process ID: 30782
+    Uptime: 10 seconds
+    Geode Version: 1.9.2
+    Java Version: 1.8.0_102
+    Log File: /opt/geode_work18/locator_33_15/locator_33_15.log
+    JVM Arguments: -Dgemfire.locators=192.168.33.15[10334],192.168.33.20[10334] -Dgemfire.enable-cluster-configuration=true -Dgemfire.load-cluster-configuration-from-dir=false -Dgemfire.max-num-reconnect-tries=100 -Dgemfire.member-timeout=120000 -Dgemfire.distributed-system-id=254 -Xms512M -Xmx1G -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -Dgemfire.launcher.registerSignalHandlers=true -Djava.awt.headless=true -Dsun.rmi.dgc.server.gcInterval=9223372036854775806
+    Class-Path: /opt/apache-geode-1.9.2/lib/geode-core-1.9.2.jar:/opt/apache-geode-1.9.2/lib/geode-dependencies.jar
+    Successfully connected to: JMX Manager [host=192.168.33.15, port=1099]
+    Cluster configuration service is up and running.
+    ```
 
-```plaintext
-gfsh>connect --jmx-manager=192.168.33.15
-Connecting to Manager at [host=192.168.33.15, port=1099] ..
-Successfully connected to: [host=192.168.33.15, port=1099]
-Cluster-254 gfsh>
-```
+2. 校验新的 locator 是否正常。
 
-\\3. 按照如上步骤依次重启其他机器上的 locator。
+    ```plaintext
+    gfsh>connect --jmx-manager=192.168.33.15
+    Connecting to Manager at [host=192.168.33.15, port=1099] ..
+    Successfully connected to: [host=192.168.33.15, port=1099]
+    Cluster-254 gfsh>
+    ```
+
+3. 按照如上步骤依次重启其他机器上的 locator。
 
 #### 重启 server
 
 ##### **重启旧版本的 server**
 
-\\1. 停止 server
+1. 停止 server
 
-注意：要在主 locator 节点上的 gfsh 里执行，现在我们的主是 33.20 因此我们上到这台机器并连接 JMX 进行管理。
+    注意：要在主 locator 节点上的 gfsh 里执行，现在我们的主是 33.20 因此我们上到这台机器并连接 JMX 进行管理。
+    
+    ```plaintext
+    stop server --name=server_33_15
+    ```
 
-```plaintext
-stop server --name=server_33_15
-```
+2. 如果 server 没有与 locator 在一起的话， 需要按上边的步骤进行版本更新。
 
-\\2. 如果 server 没有与 locator 在一起的话， 需要按上边的步骤进行版本更新。
+   - 上传新版版
+   - 解压
+   - 更改 /etc/profile 配置
 
-- 上传新版版
-- 解压
-- 更改 /etc/profile 配置
+3. 去 33.15 机器上执行启动 server 的脚本。
+    
+    ```plaintext
+    sh start_server_33_15.sh
+    ```
 
-\\3. 去 33.15 机器上执行启动 server 的脚本。
-
-```plaintext
-sh start_server_33_15.sh
-```
-
-\\4. 其他 server 依次执行重启。
+4. 其他 server 依次执行重启。
 
 #### 检查
 
@@ -1528,14 +1532,14 @@ list is: [[ent(27134):60330/45855, ent(27130):60333/36743]]
 ### 目前我司使用情况
 
 1. 我司从 2018 年 7 月开始引入 Geode，当时版本是 1.5。
-1. 目前已经接入近 10 个功能点，读调用量高峰时期在 50000 ops 左右。
-1. 8 台 机器，8 个 server 3 个 locator。
-1. 通过 wan 有一组备份机器，有一些非实时性业务访问备份机器
-1. 其他业务线也正在尝试上 Geode。
-1. 稳定性 ok，目前线上没出过问题。
-1. 滚动升级很方便，升级对程序影响可忽略。
-1. 我们预备上更多的业务线，替下 Couchbase 大部分业务。
-1. 目前只用了 KV 的功能，后续尝试使用对象存储和 query 查询。
+2. 目前已经接入近 10 个功能点，读调用量高峰时期在 50000 ops 左右。
+3. 8 台 机器，8 个 server 3 个 locator。
+4. 通过 wan 有一组备份机器，有一些非实时性业务访问备份机器
+5. 其他业务线也正在尝试上 Geode。
+6. 稳定性 ok，目前线上没出过问题。
+7. 滚动升级很方便，升级对程序影响可忽略。
+8. 我们预备上更多的业务线，替下 Couchbase 大部分业务。
+9. 目前只用了 KV 的功能，后续尝试使用对象存储和 query 查询。
 
 ### 其他
 

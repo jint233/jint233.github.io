@@ -44,7 +44,7 @@ gtid在master和slave上是一直 **持久化保存** (即使删除了日志，�
 
    注意，**slave上replay的时候，gtid不是提交后才写到自己的binlog file的，而是判断gtid不存在后立即写入binlog file。** 通过这种在执行事务前先检查并写gtid到binlog的机制，不仅可以保证当前会话在此之前没有执行过该事务，还能保证没有其他会话读取了该gtid却没有提交。因为如果其他会话读取了该gtid会立即写入到binlog(不管是否已经开始执行事务)，所以当前会话总能读取到binlog中的该gtid，于是当前会话就会放弃该事务。总之，一个gtid事务是决不允许多次执行、多个会话并行执行的。
 
-1. slave在重放relay log中的事务时，不会自己生成gtid，所以所有的slave(无论是何种方式的一主一从或一主多从复制架构)通过重放relay log中事务获取的gtid都来源于master，并永久保存在slave上。
+2. slave在重放relay log中的事务时，不会自己生成gtid，所以所有的slave(无论是何种方式的一主一从或一主多从复制架构)通过重放relay log中事务获取的gtid都来源于master，并永久保存在slave上。
 
 # 3.基于gtid复制的好处
 
@@ -388,7 +388,7 @@ encrypted = N
 
 其中`binlog_pos`中的GTID对应的就是已备份的数据对应的事务。换句话说，这里的gtid集合1-54表示这54个事务不需要进行复制。
 
-或者在master上直接查看executed的值，注意不是gtid\_purged的值，master上的gtid\_purged表示的是曾经删除掉的binlog。
+或者在master上直接查看executed的值，注意不是gtid_purged的值，master上的gtid_purged表示的是曾经删除掉的binlog。
 
 ```plaintext
 mysql> show global variables like '%gtid%';
@@ -406,7 +406,7 @@ mysql> show global variables like '%gtid%';
 +----------------------------------+-------------------------------------------+
 ```
 
-可以 **在启动slave线程之前使用gtid_purged变量来指定需要跳过的gtid集合。** 但因为要设置gtid\_purged必须保证全局变量gtid\_executed为空，所以先在slave上执行`reset master`(注意，不是reset slave)，再设置gtid\_purged。
+可以 **在启动slave线程之前使用gtid_purged变量来指定需要跳过的gtid集合。** 但因为要设置gtid_purged必须保证全局变量gtid_executed为空，所以先在slave上执行`reset master`(注意，不是reset slave)，再设置gtid_purged。
 
 ```plaintext
 # slave2上执行
@@ -415,7 +415,7 @@ mysql> reset master;
 mysql> set @@global.gtid_purged='a659234f-6aea-11e8-a361-000c29ed4cf4:1-54';
 ```
 
-设置好gtid\_purged之后，就可以开启复制线程了。
+设置好gtid_purged之后，就可以开启复制线程了。
 
 ```plaintext
 mysql> change master to
@@ -429,7 +429,7 @@ mysql> start slave user='repl' password='\[email protected\]!';
 
 **4.回到master，purge掉已同步的binlog。**
 
-当slave指定gtid\_purged并实现了同步之后，为了下次重启mysqld实例不用再次设置gtid\_purged(甚至可能会在启动的时候自动开启复制线程)，所以应该去master上将已经同步的binlog给purged掉。
+当slave指定gtid_purged并实现了同步之后，为了下次重启mysqld实例不用再次设置gtid_purged(甚至可能会在启动的时候自动开启复制线程)，所以应该去master上将已经同步的binlog给purged掉。
 
 ```plaintext
 # master上执行
@@ -455,8 +455,8 @@ Auto_Position: 1
 
 其中：
 
-*   `Retrieved_Gtid_Set`：在开启了gtid复制(即gtid\_mode=on)时，slave在启动io线程的时候会检查自己的relay log，并从中检索出gtid集合。也就是说，这代表的是slave已经从master中复制了哪些事务过来。检索出来的gtid不会再请求master发送过来。
-*   `Executed_Gtid_Set`：在开启了gtid复制(即gtid\_mode=on)时，它表示已经向自己的binlog中写入了哪些gtid集合。注意，这个值是根据一些状态信息计算出来的，并非binlog中能看到的那些。举个特殊一点的例子，可能slave的binlog还是空的，但这里已经显示一些已执行gtid集合了。
+*   `Retrieved_Gtid_Set`：在开启了gtid复制(即gtid_mode=on)时，slave在启动io线程的时候会检查自己的relay log，并从中检索出gtid集合。也就是说，这代表的是slave已经从master中复制了哪些事务过来。检索出来的gtid不会再请求master发送过来。
+*   `Executed_Gtid_Set`：在开启了gtid复制(即gtid_mode=on)时，它表示已经向自己的binlog中写入了哪些gtid集合。注意，这个值是根据一些状态信息计算出来的，并非binlog中能看到的那些。举个特殊一点的例子，可能slave的binlog还是空的，但这里已经显示一些已执行gtid集合了。
 *   `Auto_Position`：开启gtid时是否自动获取binlog坐标。1表示开启，这是gtid复制的默认值。
 
 6.2 binlog中关于gtid的信息
@@ -530,20 +530,20 @@ DELIMITER ;
 # End of log file
 
 /_!50003 SET \[email protected\]_COMPLETION_TYPE_/;
-/_!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=0\_/;
+/_!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=0_/;
 ```
 
 其中：
 
 *   "注意行1"中`Previous-GTIDs`代表的gtid集合是曾经的gtid，换句话说是被purge掉的事务。
 *   "注意行2"和"注意行4"是两个事务的gtid信息。它们写在每个事务的前面。
-*   "注意行3"和"注意行5"设置了GTID\_NEXT的值，表示读取到了该事务后，那么必须要执行的是稍后列出的这个事务。
+*   "注意行3"和"注意行5"设置了GTID_NEXT的值，表示读取到了该事务后，那么必须要执行的是稍后列出的这个事务。
 *   "注意行6"是在所有事务执行结束时设置的，表示自动获取gtid的值。它对复制是隐身的(也就是说不会dump线程不会将它dump出去)，该行的结尾也说了，这一行是mysqlbinlog添加的。
 
 6.3 一些重要的变量
 -----------
 
-*   `gtid_mode`：是否开启gtid复制模式。只允许on/off类的布尔值，不允许其他类型(如1/0)的布尔值，实际上这个变量是枚举类型的。要设置 _gtid\_mode=on_ ，必须同时设置 _enforce\_gtid\_consistency_ 开。在MySQL 5.6中，还必须开启 _log\_slave\_updates_ ，即使是master也要开启。
+*   `gtid_mode`：是否开启gtid复制模式。只允许on/off类的布尔值，不允许其他类型(如1/0)的布尔值，实际上这个变量是枚举类型的。要设置 _gtid_mode=on_ ，必须同时设置 _enforce_gtid_consistency_ 开。在MySQL 5.6中，还必须开启 _log_slave_updates_ ，即使是master也要开启。
 
 *   
 
@@ -552,14 +552,14 @@ DELIMITER ;
 
     ：强制要求只允许复制事务安全的事务。
 
-    gtid\_mode=on时必须显式设置该项，如果不给定值，则默认为on。应该尽量将该选项放在gtid\_mode的前面，减少启动mysqld时的检查。
+    gtid_mode=on时必须显式设置该项，如果不给定值，则默认为on。应该尽量将该选项放在gtid_mode的前面，减少启动mysqld时的检查。
 
     *   不能在事务内部创建和删除临时表。只能在事务外部进行，且autocommit需要设置为1。
     *   不能执行 _create table ... select_ 语句。该语句除了创建一张新表并填充一些数据，其他什么事也没干。
     *   不能在事务内既更新事务表又更新非事务表。
 - `gtid_executed`：已经执行过的GTID。 _reset master_ 会清空该项的全局变量值。
 
-- `gtid_purged`：已经purge掉的gtid。要设置该项，必须先保证 _gtid\_executed_ 已经为空，这意味着也一定会同时设置该项为空。在slave上设置该项时，表示稍后启动io线程和SQL线程都跳过这些gtid，slave上设置时应该让此项的gtid集合等于master上 _gtid\_executed_ 的值。
+- `gtid_purged`：已经purge掉的gtid。要设置该项，必须先保证 _gtid_executed_ 已经为空，这意味着也一定会同时设置该项为空。在slave上设置该项时，表示稍后启动io线程和SQL线程都跳过这些gtid，slave上设置时应该让此项的gtid集合等于master上 _gtid_executed_ 的值。
 
 - `gtid_next`：表示下一个要执行的gtid事务。
 
@@ -567,7 +567,7 @@ DELIMITER ;
 
 还有一些变量，可能用到的不会多。如有需要，可翻官方手册。
 
-6.4 mysql.gtid\_executed表
+6.4 mysql.gtid_executed表
 -------------------------
 
 MySQL 5.7中添加了一张记录已执行gtid的表`mysql.gtid_executed`，所以slave上的binlog不是必须开启的。
@@ -594,9 +594,9 @@ mysql> select * from mysql.gtid_executed;
 
 假如当前master的gtid为A3，已经purge掉的gtid为"1-->A1"，备份到slave上的数据为1-A2部分。
 
-如果`A1 = 0`，表示master的binlog没有被Purge过。slave可以直接开启gtid复制，但这样可能速度较慢，因为slave要复制所有binlog。也可以将master数据备份到slave上，然后设置 _gtid\_purged_ 跳过备份结束时的gtid，这样速度较快。
+如果`A1 = 0`，表示master的binlog没有被Purge过。slave可以直接开启gtid复制，但这样可能速度较慢，因为slave要复制所有binlog。也可以将master数据备份到slave上，然后设置 _gtid_purged_ 跳过备份结束时的gtid，这样速度较快。
 
-如果`A1 != 0`，表示master上的binlog中删除了一部分gtid。此时slave上必须先从master处恢复purge掉的那部分日志对应的数据。上图中备份结束时的GTID为A2。然后slave开启复制，唯一需要考虑的是"是否需要设置 _gtid\_purged_ 跳过一部分gtid以避免重复执行"。
+如果`A1 != 0`，表示master上的binlog中删除了一部分gtid。此时slave上必须先从master处恢复purge掉的那部分日志对应的数据。上图中备份结束时的GTID为A2。然后slave开启复制，唯一需要考虑的是"是否需要设置 _gtid_purged_ 跳过一部分gtid以避免重复执行"。
 
 备份数据到slave上，方式可以是mysqldump、冷备份、xtrabackup备份都行。由于gtid复制的特性，所需要的操作都很少，也很简单，前提是理解了"gtid的生命周期"。
 ```

@@ -640,9 +640,9 @@ Redis Cluster 实现了一种混合形式的查询路由，但并不是直接将
 需要知道 Redis 的复制方式前，需要知道主从复制（Master-Slave Replication）的工作原理，具体为：
 
 1. Slave 从节点服务启动并连接到 Master 之后，它将主动发送一个 SYNC 命令；
-1. Master 服务主节点收到同步命令后将启动后台存盘进程，同时收集所有接收到的用于修改数据集的命令，在后台进程执行完毕后，Master 将传送整个数据库文件到 Slave，以完成一次完全同步；
-1. Slave 从节点服务在接收到数据库文件数据之后将其存盘并加载到内存中；
-1. 此后，Master 主节点继续将所有已经收集到的修改命令，和新的修改命令依次传送给 Slaves，Slave 将在本次执行这些数据修改命令，从而达到最终的数据同步。
+2. Master 服务主节点收到同步命令后将启动后台存盘进程，同时收集所有接收到的用于修改数据集的命令，在后台进程执行完毕后，Master 将传送整个数据库文件到 Slave，以完成一次完全同步；
+3. Slave 从节点服务在接收到数据库文件数据之后将其存盘并加载到内存中；
+4. 此后，Master 主节点继续将所有已经收集到的修改命令，和新的修改命令依次传送给 Slaves，Slave 将在本次执行这些数据修改命令，从而达到最终的数据同步。
 
 整个执行的过程都是使用异步复制的方式进行复制。
 
@@ -1089,36 +1089,36 @@ Jedis 的基本使用方法：使用 Jedis 存储数据，Jedis 读取数据的�
 字符串类型：
 
 1. 存储数据：`jedis.set(String key,String value);`
-1. 读取数据：`String value = jedis.gett(String key);`
-1. 存储数据并在指定时间后删除：`jedis.setex(String key，int seconds，String value);`
-1. 删除数据：`jedis.dle(String key);`
+2. 读取数据：`String value = jedis.gett(String key);`
+3. 存储数据并在指定时间后删除：`jedis.setex(String key，int seconds，String value);`
+4. 删除数据：`jedis.dle(String key);`
 
 hash 类型：map
 
 1. 存储数据：`jedis.hset(String key,String field,String value);`
-1. 读取某个数据：`String value = jedis.hget(String key,String field);`
-1. 读取所有数据：`Map<String,String> map = jedis.hgetall(String key);`
-1. 删除数据：`jedis.hdel(String key,String field);`
+2. 读取某个数据：`String value = jedis.hget(String key,String field);`
+3. 读取所有数据：`Map<String,String> map = jedis.hgetall(String key);`
+4. 删除数据：`jedis.hdel(String key,String field);`
 
 list类型，可以重复：
 
 1. 向列表最左边添加数据：`jedis.lpush(String key,String...strings);`可以存储多个数据，逗号隔开。
-1. 向列表最右边添加数据：`jedis.rpush(String key,String...strings);`
-1. 按照范围查询数据：`jedis.lrange(String key,long start,long end);`
-1. 删除列表最左边的数据：`jedis.lpop(String key);`
-1. 删除列表最右边的数据：`jedis.rpop(String key);`
+2. 向列表最右边添加数据：`jedis.rpush(String key,String...strings);`
+3. 按照范围查询数据：`jedis.lrange(String key,long start,long end);`
+4. 删除列表最左边的数据：`jedis.lpop(String key);`
+5. 删除列表最右边的数据：`jedis.rpop(String key);`
 
 set类型，不可重复：
 
 1. 存储数据：`jedis.sadd(String key,String...strings);` 可以存储多个数据，逗号隔开。
-1. 获取数据：`jedis.smembers(String key);`
-1. 删除数据：`jedis.srem(String key,String strings);` 可以删除多个数据，逗号隔开。
+2. 获取数据：`jedis.smembers(String key);`
+3. 删除数据：`jedis.srem(String key,String strings);` 可以删除多个数据，逗号隔开。
 
 sorted类型，不可重复，有序：
 
 1. 存储数据：`jedis.zadd(String key,double score,String value);`
-1. 获取数据：`jedis.zrange(String key,long start,long end);`
-1. 删除数据：`jedis.zrem(String key,String value);`
+2. 获取数据：`jedis.zrange(String key,long start,long end);`
+3. 删除数据：`jedis.zrem(String key,String value);`
 
 原文链接：
 

@@ -20,9 +20,9 @@
 ### 事务的特性
 
 1. 原子性（Atomicity）：事务包含的所有操作要么全部成功（提交），要么全部失败（回滚）。
-1. 一致性（Consistency）：事务的执行的前后数据的完整性保持一致。
-1. 隔离性（Isolation）：一个事务执行的过程中，不应该受到其他事务的干扰。
-1. 持久性（Durability）：事务一旦结束，数据就持久到数据库，即使提交后，数据库发生崩溃，也不会丢失提交的数据。
+2. 一致性（Consistency）：事务的执行的前后数据的完整性保持一致。
+3. 隔离性（Isolation）：一个事务执行的过程中，不应该受到其他事务的干扰。
+4. 持久性（Durability）：事务一旦结束，数据就持久到数据库，即使提交后，数据库发生崩溃，也不会丢失提交的数据。
 
 四种特性，简称ACID，其中最不好理解的就是一致性，有不少人认为原子性、隔离性、持久性就是为了保证一致性，我们也不搞学术研究，一致性到底该怎么解释，到底怎么定义一致性，就看各位看官的了。
 
@@ -51,10 +51,10 @@ CREATE TABLE `student` (
 ![image.png](../assets/15100432-64db941b7108e9b8.png) 如图所示：
 
 1. sessionA和sessionB开启了一个事务；
-1. sessionB把id=2的name修改成了“地底王”；
-1. sessionA把id=2的name修改成了“梦境地底王”；
-1. sessionB回滚了事务；
-1. sessionA提交了事务。
+2. sessionB把id=2的name修改成了“地底王”；
+3. sessionA把id=2的name修改成了“梦境地底王”；
+4. sessionB回滚了事务；
+5. sessionA提交了事务。
 
 如果sessionB在回滚事务的时候把sessionA的修改也给回滚了，导致sessionA的提交丢失了，这种现象就被称为“脏写”。sessionA会一脸懵逼，我明明修改了数据，也提交了数据，为什么数据没有变化呢。
 
@@ -63,26 +63,26 @@ CREATE TABLE `student` (
 ![image.png](../assets/15100432-bb45dfb5d2cdaaae.png) 如图所示：
 
 1. sessionA和sessionB开启了一个事务；
-1. sessionB把id=2的name修改成了“地底王”，此时还未提交；
-1. sessionA查询了id=2的数据，如果读出来的数据的name是“地底王”，也就是读到了sessionB还没有提交的数据，就被称为“脏读”。
+2. sessionB把id=2的name修改成了“地底王”，此时还未提交；
+3. sessionA查询了id=2的数据，如果读出来的数据的name是“地底王”，也就是读到了sessionB还没有提交的数据，就被称为“脏读”。
 
 #### 不可重复读
 
 ![image.png](../assets/15100432-3e016ee5dd623ca4.png) 如图所示：
 
 1. sessionA和sessionB开启了一个事务；
-1. sessionA查询id=2的数据，假如name是“地底王”，
-1. sessionB把id=2的name修改成了“梦境地底王”，随后提交了事务；
-1. sessionA再一次查询了id=2的数据，如果name是“梦境地底王”，说明在同一个事务中，sessionA前后读到的数据不一致，就被称为“不可重复读”。
+2. sessionA查询id=2的数据，假如name是“地底王”，
+3. sessionB把id=2的name修改成了“梦境地底王”，随后提交了事务；
+4. sessionA再一次查询了id=2的数据，如果name是“梦境地底王”，说明在同一个事务中，sessionA前后读到的数据不一致，就被称为“不可重复读”。
 
 #### 幻读
 
 ![image.png](../assets/15100432-bb07c982c8449ec0.png) 如图所示：
 
 1. sessionA和sessionB开启了一个事务；
-1. sessionA查询name=“地底王”的数据，假设此时读到了一条记录；
-1. sessionB又插入一条name=“地底王”的数据，随后提交；
-1. seesionA再一次查询name=“地底王”的数据，如果此时读到了两条记录，第二次查询读到了第一次查询未查询出来的数据，就被称为“幻读”。
+2. sessionA查询name=“地底王”的数据，假设此时读到了一条记录；
+3. sessionB又插入一条name=“地底王”的数据，随后提交；
+4. seesionA再一次查询name=“地底王”的数据，如果此时读到了两条记录，第二次查询读到了第一次查询未查询出来的数据，就被称为“幻读”。
 
 #### 四种隔离级别
 
@@ -172,7 +172,7 @@ _为什么m_ids只有一个，为什么creator_trx_id是0？这里再次强调�
 那么A事务执行的select语句会读到什么数据呢？
 
 1. 判断最新的数据版本，name是“梦境地底王”，对应的trx_id是100，trx_id在m_ids里面，说明当前事务是活跃事务，这个数据版本是由还没有提交的事务创建的，所以这个版本不可见。
-1. 顺着roll_pointer找到这个数据的上一个版本，name是“地底王”，对应的trx_id是99，而ReadView中的min_trx_id是100，trx_id\<min_trx_id，代表当前数据版本是由已经提交的事务创建的，该版本可见。
+2. 顺着roll_pointer找到这个数据的上一个版本，name是“地底王”，对应的trx_id是99，而ReadView中的min_trx_id是100，trx_id\<min_trx_id，代表当前数据版本是由已经提交的事务创建的，该版本可见。
 
 所以读到的数据的name是“地底王”。
 
@@ -188,14 +188,16 @@ _因为事务T已经提交了，所以没有活跃的事务。_
 
 #### REPEATABLE READ ——首次读取数据会创建ReadView
 
-假设，现在系统只有一个活跃的事务T，事务id是100，事务中修改了数据，但是还没有提交，形成的版本链是这样的： ![image.png](https://upload-images.jianshu.io/upload_images/15100432-cae882ecd4fc0a0a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+假设，现在系统只有一个活跃的事务T，事务id是100，事务中修改了数据，但是还没有提交，形成的版本链是这样的： 
+
+![image.png](https://upload-images.jianshu.io/upload_images/15100432-cae882ecd4fc0a0a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 现在A事务启动，并且执行了select语句，此时会创建出一个ReadView，m_ids是【100】，min_trx_id是100， max_trx_id是101，creator_trx_id是0。
 
 那么A事务执行的select语句会读到什么数据呢？
 
 1. 判断最新的数据版本，name是“梦境地底王”，对应的trx_id是100，trx_id在m_ids里面，说明当前事务是活跃事务，这个数据版本是由还没有提交的事务创建的，所以这个版本不可见。
-1. 顺着roll_ponit找到这个数据的上一个版本，name是“地底王”，对应的trx_id是99，而ReadView中的min_trx_id是100，trx_id\<min_trx_id，代表当前数据版本是由已经提交的事务创建的，该版本可见。
+2. 顺着roll_ponit找到这个数据的上一个版本，name是“地底王”，对应的trx_id是99，而ReadView中的min_trx_id是100，trx_id\<min_trx_id，代表当前数据版本是由已经提交的事务创建的，该版本可见。
 
 所以读到的数据的name是“地底王”。
 

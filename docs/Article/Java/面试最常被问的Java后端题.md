@@ -24,9 +24,9 @@ java.lang.Object
 调用该方法后当前线程进入睡眠状态，直到以下事件发生。
 
 1. 其他线程调用了该对象的 notify 方法；
-1. 其他线程调用了该对象的 notifyAll 方法；
-1. 其他线程调用了 interrupt 中断该线程；
-1. 时间间隔到了。
+2. 其他线程调用了该对象的 notifyAll 方法；
+3. 其他线程调用了 interrupt 中断该线程；
+4. 时间间隔到了。
 
 此时该线程就可以被调度了，如果是被中断的话就抛出一个 InterruptedException 异常。**notify 方法** 配合 synchronized 使用，该方法唤醒在该对象上 **等待队列** 中的某个线程（同步队列中的线程是给抢占 CPU 的线程，等待队列中的线程指的是等待唤醒的线程）。**notifyAll 方法** 配合 synchronized 使用，该方法唤醒在该对象上等待队列中的所有线程。**总结** 只要把上面几个方法熟悉就可以了，toString 和 getClass 方法可以不用去讨论它们。该题目考察的是对 Object 的熟悉程度，平时用的很多方法并没看其定义但是也在用，比如说：wait () 方法，equals () 方法等。
 
@@ -40,22 +40,22 @@ Class Object is the root of the class hierarchy.Every class has Object as a supe
 
 这题目看似简单，要好好回答起来还是有点小复杂的，我们来看看，到底有哪些方式可以创建对象？
 
-- 1. 使用 new 关键字，这也是我们平时使用的最多的创建对象的方式，示例：
+1. 使用 new 关键字，这也是我们平时使用的最多的创建对象的方式，示例：
 
-```java
-User user=new User();
-```
+    ```java
+    User user=new User();
+    ```
 
-- 2. 反射方式创建对象，使用 newInstance ()，但是得处理两个异常 InstantiationException、IllegalAccessException：
+2. 反射方式创建对象，使用 newInstance ()，但是得处理两个异常 InstantiationException、IllegalAccessException：
 
-```java
-User user=User.class.newInstance();
-Object object=(Object)Class.forName("java.lang.Object").newInstance()
-```
+    ```java
+    User user=User.class.newInstance();
+    Object object=(Object)Class.forName("java.lang.Object").newInstance()
+    ```
 
-- 3. 使用 clone 方法，前面题目中 clone 是 Object 的方法，所以所有对象都有这个方法。
+3. 使用 clone 方法，前面题目中 clone 是 Object 的方法，所以所有对象都有这个方法。
 
-- 4. 使用反序列化创建对象，调用 ObjectInputStream 类的 readObject () 方法。
+4. 使用反序列化创建对象，调用 ObjectInputStream 类的 readObject () 方法。
 
 我们反序列化一个对象，JVM 会给我们创建一个单独的对象。JVM 创建对象并不会调用任何构造函数。一个对象实现了 Serializable 接口，就可以把对象写入到文件中，并通过读取文件来创建对象。**总结** 创建对象的方式关键字：new、反射、clone 拷贝、反序列化。
 
@@ -272,10 +272,10 @@ javap -verbose FinallyDemo.class >>test.txt
 new 创建一个普通对象的过程如下：
 
 1. 检测类是否被加载过
-1. 为对象分配内存
-1. 为分配的内存空间初始化为 0
-1. 对对象进行其他相关设置
-1. 执行 init 方法
+2. 为对象分配内存
+3. 为分配的内存空间初始化为 0
+4. 对对象进行其他相关设置
+5. 执行 init 方法
 
 下面用一张图来描述：
 
@@ -602,59 +602,56 @@ HTTP 协议的长连接和短连接，实质上是 TCP 协议的长连接和短�
 
 ### 2. JDBC 编程有哪些步骤？
 
-- 1. 装载相应的数据库的 JDBC 驱动并进行初始化：
+1. 装载相应的数据库的 JDBC 驱动并进行初始化：
 
-```java
-Class.forName("com.mysql.jdbc.Driver"); 
+    ```java
+    Class.forName("com.mysql.jdbc.Driver"); 
+    ```
 
-```
+2. 建立 JDBC 和数据库之间的 Connection 连接：
 
-- 2. 建立 JDBC 和数据库之间的 Connection 连接：
+    ```java
+    Connection c = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/test?characterEncoding=UTF-8", "root", "123456");
+    ```
 
-```java
-Connection c = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/test?characterEncoding=UTF-8", "root", "123456");
+3. 创建 Statement 或者 PreparedStatement 接口，执行 SQL 语句：
 
-```
-
-- 3. 创建 Statement 或者 PreparedStatement 接口，执行 SQL 语句：
-
-```java
-    // 查询用户信息
-    public List<User> findUserList(){
-        String sql = "select * from t_user order by user_id";
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        // 创建一个 List 用于存放查询到的 User 对象
-        List<User> userList = new ArrayList<>();
-        try {
-            conn = DbUtil.getConnection();
-            pstmt =(PreparedStatement) conn.prepareStatement(sql);
-            rs =(ResultSet) pstmt.executeQuery();
-            while(rs.next()){
-                int courseId = rs.getInt("user_id");
-                String courseName = rs.getString("user_name");
-                // 每个记录对应一个 User 对象
-                User user = new User();
-                user.setUserId(courseId);
-                user.setUserName(courseName);
-                // 将对象放到集合中
-                userList.add(course);
+    ```java
+        // 查询用户信息
+        public List<User> findUserList(){
+            String sql = "select * from t_user order by user_id";
+            Connection conn = null;
+            PreparedStatement pstmt = null;
+            ResultSet rs = null;
+            // 创建一个 List 用于存放查询到的 User 对象
+            List<User> userList = new ArrayList<>();
+            try {
+                conn = DbUtil.getConnection();
+                pstmt =(PreparedStatement) conn.prepareStatement(sql);
+                rs =(ResultSet) pstmt.executeQuery();
+                while(rs.next()){
+                    int courseId = rs.getInt("user_id");
+                    String courseName = rs.getString("user_name");
+                    // 每个记录对应一个 User 对象
+                    User user = new User();
+                    user.setUserId(courseId);
+                    user.setUserName(courseName);
+                    // 将对象放到集合中
+                    userList.add(course);
+                }
+            } catch(SQLException e) {
+                e.printStackTrace();
+            }finally{
+                // 资源关闭
+                DbUtil.close(pstmt);
+                DbUtil.close(conn);
             }
-        } catch(SQLException e) {
-            e.printStackTrace();
-        }finally{
-            // 资源关闭
-            DbUtil.close(pstmt);
-            DbUtil.close(conn);
+             return userList;
         }
-         return userList;
-    }
+    ```
 
-```
-
-- 4. 处理和显示结果。
-- 5. 释放资源。
+4. 处理和显示结果。
+5. 释放资源。
 
 ### 3. 说一下 MyBatis 中使用的 ## 和 $ 有什么区别
 
@@ -990,10 +987,10 @@ DLX=Dead-Letter-Exchange。利用 DLX，当消息在一个队列中变成死信�
 ### 3. 为什么 Redis 单线程模型效率也能那么高？
 
 1. C 语言实现，效率高
-1. 纯内存操作
-1. 基于非阻塞的 IO 复用模型机制
-1. 单线程的话就能避免多线程的频繁上下文切换问题
-1. 丰富的数据结构（全称采用 hash 结构，读取速度非常快。对数据存储进行了一些优化，比如亚索表、跳表等）
+2. 纯内存操作
+3. 基于非阻塞的 IO 复用模型机制
+4. 单线程的话就能避免多线程的频繁上下文切换问题
+5. 丰富的数据结构（全称采用 hash 结构，读取速度非常快。对数据存储进行了一些优化，比如亚索表、跳表等）
 
 ### 4. 说说 Redis 的线程模型
 
@@ -1183,25 +1180,38 @@ public @interface SpringBootApplication {
 
 ### 1. Spring 中 ApplicationContext 和 BeanFactory 的区别
 
-- **类图**![img](../assets/720bf4e0-61e6-11ea-861e-fb2bdb9ba1ba.jpg)
+- **类图**
 
-- **包目录不同** - spring-beans.jar 中 org.springframework.beans.factory.BeanFactory
+![img](../assets/720bf4e0-61e6-11ea-861e-fb2bdb9ba1ba.jpg)
+
+- **包目录不同** 
+  - spring-beans.jar 中 org.springframework.beans.factory.BeanFactory
   - spring-context.jar 中 org.springframework.context.ApplicationContext
 
-- **国际化** BeanFactory 是不支持国际化功能的，因为 BeanFactory 没有扩展 Spring 中 MessageResource 接口。相反，由于 ApplicationContext 扩展了 MessageResource 接口，因而具有消息处理的能力（i18N）。
-- **强大的事件机制（Event）** 基本上牵涉到事件（Event）方面的设计，就离不开观察者模式，ApplicationContext 的事件机制主要通过 ApplicationEvent 和 ApplicationListener 这两个接口来提供的，和 Java swing 中的事件机制一样。即当 ApplicationContext 中发布一个事件时，所有扩展了 ApplicationListener 的 Bean 都将接受到这个事件，并进行相应的处理。
-- **底层资源的访问** ApplicationContext 扩展了 ResourceLoader（资源加载器）接口，从而可以用来加载多个 Resource，而 BeanFactory 是没有扩展 ResourceLoader。
-- **对 Web 应用的支持** 与 BeanFactory 通常以编程的方式被创建，ApplicationContext 能以声明的方式创建，如使用 ContextLoader。
-  当然你也可以使用 ApplicationContext 的实现方式之一，以编程的方式创建 ApplicationContext 实例。
-- **延迟加载** 1. BeanFactroy 采用的是延迟加载形式来注入 Bean 的，即只有在使用到某个 Bean 时 (调用 getBean ())，才对该 Bean 进行加载实例化。这样，我们就不能发现一些存在的 spring 的配置问题。而 ApplicationContext 则相反，它是在容器启动时，一次性创建了所有的 Bean。这样，在容器启动时，我们就可以发现 Spring 中存在的配置错误。
-   2. BeanFactory 和 ApplicationContext 都支持 BeanPostProcessor、BeanFactoryPostProcessor 的使用。两者之间的区别是：BeanFactory 需要手动注册，而 ApplicationContext 则是自动注册。
-   可以看到，ApplicationContext 继承了 BeanFactory，BeanFactory 是 Spring 中比较原始的 Factory，它不支持 AOP、Web 等 Spring 插件。而 ApplicationContext 不仅包含了 BeanFactory 的所有功能，还支持 Spring 的各种插件，还以一种面向框架的方式工作以及对上下文进行分层和实现继承。
-   BeanFactory 是 Spring 框架的基础设施，面向 Spring 本身；而 ApplicationContext 面向使用 Spring 的开发者，相比 BeanFactory 提供了更多面向实际应用的功能，几乎所有场合都可以直接使用 ApplicationContext，而不是底层的 BeanFactory。
-- **常用容器** BeanFactory 类型的有 XmlBeanFactory，它可以根据 XML 文件中定义的内容，创建相应的 Bean。
+- **国际化** 
+  - BeanFactory 是不支持国际化功能的，因为 BeanFactory 没有扩展 Spring 中 MessageResource 接口。相反，由于 ApplicationContext 扩展了 MessageResource 接口，因而具有消息处理的能力（i18N）。
+
+- **强大的事件机制（Event）** 
+  - 基本上牵涉到事件（Event）方面的设计，就离不开观察者模式，ApplicationContext 的事件机制主要通过 ApplicationEvent 和 ApplicationListener 这两个接口来提供的，和 Java swing 中的事件机制一样。即当 ApplicationContext 中发布一个事件时，所有扩展了 ApplicationListener 的 Bean 都将接受到这个事件，并进行相应的处理。
+
+- **底层资源的访问** 
+  - ApplicationContext 扩展了 ResourceLoader（资源加载器）接口，从而可以用来加载多个 Resource，而 BeanFactory 是没有扩展 ResourceLoader。
+
+- **对 Web 应用的支持** 
+  - 与 BeanFactory 通常以编程的方式被创建，ApplicationContext 能以声明的方式创建，如使用 ContextLoader。 当然你也可以使用 ApplicationContext 的实现方式之一，以编程的方式创建 ApplicationContext 实例。
+
+- **延迟加载**
+  1. BeanFactory 采用的是延迟加载形式来注入 Bean 的，即只有在使用到某个 Bean 时 (调用 getBean ())，才对该 Bean 进行加载实例化。这样，我们就不能发现一些存在的 spring 的配置问题。而 ApplicationContext 则相反，它是在容器启动时，一次性创建了所有的 Bean。这样，在容器启动时，我们就可以发现 Spring 中存在的配置错误。
+  2. BeanFactory 和 ApplicationContext 都支持 BeanPostProcessor、BeanFactoryPostProcessor 的使用。两者之间的区别是：BeanFactory 需要手动注册，而 ApplicationContext 则是自动注册。
+  可以看到，ApplicationContext 继承了 BeanFactory，BeanFactory 是 Spring 中比较原始的 Factory，它不支持 AOP、Web 等 Spring 插件。而 ApplicationContext 不仅包含了 BeanFactory 的所有功能，还支持 Spring 的各种插件，还以一种面向框架的方式工作以及对上下文进行分层和实现继承。
+  BeanFactory 是 Spring 框架的基础设施，面向 Spring 本身；而 ApplicationContext 面向使用 Spring 的开发者，相比 BeanFactory 提供了更多面向实际应用的功能，几乎所有场合都可以直接使用 ApplicationContext，而不是底层的 BeanFactory。
+
+- **常用容器** 
+  BeanFactory 类型的有 XmlBeanFactory，它可以根据 XML 文件中定义的内容，创建相应的 Bean。 
   ApplicationContext 类型的常用容器有：
-   1. ClassPathXmlApplicationContext：从 ClassPath 的 XML 配置文件中读取上下文，并生成上下文定义。应用程序上下文从程序环境变量中取得。
-   2. FileSystemXmlApplicationContext：由文件系统中的 XML 配置文件读取上下文。
-   3. XmlWebApplicationContext：由 Web 应用的 XML 文件读取上下文。例如我们在 Spring MVC 使用的情况。
+  1. ClassPathXmlApplicationContext：从 ClassPath 的 XML 配置文件中读取上下文，并生成上下文定义。应用程序上下文从程序环境变量中取得。
+  2. FileSystemXmlApplicationContext：由文件系统中的 XML 配置文件读取上下文。
+  3. XmlWebApplicationContext：由 Web 应用的 XML 文件读取上下文。例如我们在 Spring MVC 使用的情况。
 
 ### 2. 说一下你对 Spring IOC 的理解
 
@@ -1310,20 +1320,22 @@ ZooKeeper 是一个开放源码的分布式协调服务，它是集群的管理�
 
 ZooKeeper 允许客户端向服务端的某个 znode 注册一个 Watcher 监听，当服务端的一些指定事件触发了这个 Watcher，服务端会向指定客户端发送一个事件通知来实现分布式的通知功能，然后客户端根据 Watcher 通知状态和事件类型做出业务上的改变。
 大致分为三个步骤：
-客户端注册 Watcher
 
+客户端注册 Watcher
 1. 调用 getData、getChildren、exist 三个 API，传入 Watcher 对象；
-2. . 标记请求 request，封装 Watcher 到 WatchRegistration；
+2. 标记请求 request，封装 Watcher 到 WatchRegistration；
 3. 封装成 Packet 对象，发服务端发送 request；
 4. 收到服务端响应后，将 Watcher 注册到 ZKWatcherManager 中进行管理；
 5. 请求返回，完成注册。
-   服务端处理 Watcher
-6. 务端接收 Watcher 并存储；
-7. Watcher 触发；
-8. 调用 process 方法来触发 Watcher。
-   客户端回调 Watcher
-9. 客户端 SendThread 线程接收事件通知，交由 EventThread 线程回调 Watcher。
-10. 客户端的 Watcher 机制同样是一次性的，一旦被触发后，该 Watcher 就失效了。
+   
+服务端处理 Watcher
+1. 务端接收 Watcher 并存储；
+2. Watcher 触发；
+3. 调用 process 方法来触发 Watcher。
+   
+客户端回调 Watcher
+1. 客户端 SendThread 线程接收事件通知，交由 EventThread 线程回调 Watcher。
+2. 客户端的 Watcher 机制同样是一次性的，一旦被触发后，该 Watcher 就失效了。
 
 ### 5. ZooKeeper 对节点的 watch 监听通知是永久的吗？
 

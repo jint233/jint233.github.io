@@ -11,15 +11,15 @@ PolarFS的数据IO操作
 一般情况下，写操作不会涉及到卷上文件系统的元数据更新，因为在写之前就已经通过libpfs的pfs_posix_fallocate()这个API将Block预分配给文件，这就避免在读写IO路径上出现代价较高的文件系统元数据同步过程。上图是PolarFS的写操作流程图，每步操作解释如下：
 
 1. POLARDB通过libpfs发送一个写请求Request1，经由ring buffer发送到PolarSwitch；
-1. PolarSwitch根据本地缓存的元数据，将Request1发送至对应Chunk的Leader节点（ChunkServer1）；
-1. Request1到达ChunkServer1后，节点上的RDMA NIC将Request1放到一个预分配好的内存buffer中，基于Request1构造一个请求对象，并将该对象加到请求队列中。一个IO轮询线程不断轮询这个请求队列，一旦发现有新请求则立即开始处理；
-1. IO处理线程通过异步调用将Request1通过SPDK写到Chunk对应的WAL日志块上，同时将请求通过RDMA异步发向给Chunk的Follower节点（ChunkServer2、ChunkServer3）。由于都是异步调用，所以数据传输是并发进行的；
-1. 当Request1请求到达ChunkServer2、ChunkServer3后，同样通过RDMA NIC将其放到预分配好的内存buffer并加入到复制队列中；
-1. Follower节点上的IO轮询线程被触发，Request1通过SPDK异步地写入该节点的Chunk副本对应的WAL日志块上；
-1. 当Follower节点的写请求成功后，会在回调函数中通过RDMA向Leader节点发送一个应答响应；
-1. Leader节点收到ChunkServer2、ChunkServer3任一节点成功的应答后，即形成Raft组的majority。主节点通过SPDK将Request1写到请求中指定的数据块上；
-1. 随后，Leader节点通过RDMA NIC向PolarSwitch返回请求处理结果；
-1. PolarSwitch标记请求成功并通知上层的POLARDB。
+2. PolarSwitch根据本地缓存的元数据，将Request1发送至对应Chunk的Leader节点（ChunkServer1）；
+3. Request1到达ChunkServer1后，节点上的RDMA NIC将Request1放到一个预分配好的内存buffer中，基于Request1构造一个请求对象，并将该对象加到请求队列中。一个IO轮询线程不断轮询这个请求队列，一旦发现有新请求则立即开始处理；
+4. IO处理线程通过异步调用将Request1通过SPDK写到Chunk对应的WAL日志块上，同时将请求通过RDMA异步发向给Chunk的Follower节点（ChunkServer2、ChunkServer3）。由于都是异步调用，所以数据传输是并发进行的；
+5. 当Request1请求到达ChunkServer2、ChunkServer3后，同样通过RDMA NIC将其放到预分配好的内存buffer并加入到复制队列中；
+6. Follower节点上的IO轮询线程被触发，Request1通过SPDK异步地写入该节点的Chunk副本对应的WAL日志块上；
+7. 当Follower节点的写请求成功后，会在回调函数中通过RDMA向Leader节点发送一个应答响应；
+8. Leader节点收到ChunkServer2、ChunkServer3任一节点成功的应答后，即形成Raft组的majority。主节点通过SPDK将Request1写到请求中指定的数据块上；
+9. 随后，Leader节点通过RDMA NIC向PolarSwitch返回请求处理结果；
+10. PolarSwitch标记请求成功并通知上层的POLARDB。
 
 读请求无需这么复杂的步骤，lipfs发起的读请求直接通过PolarSwitch路由到数据对应Chunk的Leader节点（ChunkServer1），从其中读取对应的数据返回即可。需要说明的是，在ChunkServer上有个子模块叫IoScheduler，用于保证发生并发读写访问时，读操作能够读到最新的已提交数据。
 
@@ -72,11 +72,11 @@ PolarFS的每个卷/文件系统实例都有相应的Journal文件和与之对�
 ![img](../assets/2018101218075681f91273-0f69-4647-9e9e-2c07628a85eb.png)
 
 1. Node 1是读写挂载点，其在pfs_fallocate()调用中将卷的第201个block分配给FileID为316的文件后，通过Paxos文件请求互斥锁，并顺利获得锁。
-1. Node 1开始记录事务至journal中。最后写入项标记为pending tail。当所有的项记录之后，pending tail变成journal的有效tail。
-1. Node1更新superblock，记录修改的元数据。与此同时，node2尝试获取访问互斥锁，由于此时node1拥有的互斥锁，Node2会失败重试。
-1. Node2在Node1释放lock后（可能是锁的租约到期所致）拿到锁，但journal中node1追加的新项决定了node2的本地元数据是过时的。
-1. Node2扫描新项后释放lock。然后node2回滚未记录的事务并更新本地metadata。最后Node2进行事务重试。
-1. Node3开始自动同步元数据，它只需要load增量项并在它本地重放即可。
+2. Node 1开始记录事务至journal中。最后写入项标记为pending tail。当所有的项记录之后，pending tail变成journal的有效tail。
+3. Node1更新superblock，记录修改的元数据。与此同时，node2尝试获取访问互斥锁，由于此时node1拥有的互斥锁，Node2会失败重试。
+4. Node2在Node1释放lock后（可能是锁的租约到期所致）拿到锁，但journal中node1追加的新项决定了node2的本地元数据是过时的。
+5. Node2扫描新项后释放lock。然后node2回滚未记录的事务并更新本地metadata。最后Node2进行事务重试。
+6. Node3开始自动同步元数据，它只需要load增量项并在它本地重放即可。
 
 PolarFS的元速度更新机制非常适合PolarDB一写多读的典型应用扩展模式。正常情况下一写多读模式没有锁争用开销，只读实例可以通过原子IO无锁获取Journal信息，从而使得PolarDB可以提供近线性的QPS性能扩展。
 
@@ -91,7 +91,7 @@ PolarFS的元速度更新机制非常适合PolarDB一写多读的典型应用扩
 数据库缓存主要是InnoDB的Buffer Pool（BP），存在2个问题：
 
 1. 读写节点的数据更改会缓存在bp上，只有完成刷脏页操作后polarfs才能感知，所以如果在刷脏之前只读节点发起读数据操作，读到的数据是旧的；
-1. 就算PolarFS感知到了，只读节点的已经在BP中的数据还是旧的。所以需要解决不同节点间的缓存一致性问题。
+2. 就算PolarFS感知到了，只读节点的已经在BP中的数据还是旧的。所以需要解决不同节点间的缓存一致性问题。
 
 PolarDB采用的方法是基于redolog复制的节点间数据同步。可能我们会想到Primary节点通过网络将redo日志发送给ReadOnly/Replica节点，但其实并不是，现在采用的方案是redo采用非ring buffer模式，每个文件固定大小，大小达到后Rotate到新的文件，在写模式上走Direct IO模式，确保磁盘上的redo数据是最新的，在此基础上，Primary节点通过网络通知其他节点可以读取的redo文件及偏移位置，让这些节点自主到共享存储上读取所需的redo信息，并进行回放。流程如下图所示：
 
@@ -117,7 +117,7 @@ PolarDB通过元数据同步来解决该问题，它是个用户态文件系统�
 针对该问题，PolarDB解决方法是：
 
 1. 限制读写节点刷脏页机制，如果脏页的redo还没有被只读节点回放，那么该页不能被刷回到存储上。这就确保只读节点读取到的数据，它之前的数据链是完整的，或者说只读节点已经知道其之前的所有redo日志。这样即使该数据的记录版本当前的事务不可见，也可以通过undo构造出来。即使undo对应的page是旧的，可以通过redo构造出所需的undo page。
-1. replica需要缓存所有未刷盘的数据变更(即RedoLog)，只有primary节点把脏页刷入盘后，replica缓存的日志才能被释放。这是因为，如果数据未刷盘，那么只读读到的数据就可能是旧的，需要通过redo来重建出来，参考第一点。另外，虽然buffer pool中可能已经缓存了未刷盘的page的数据，但该page可能会被LRU替换出去，当其再次载入所以只读节点必须缓存这些redo。
+2. replica需要缓存所有未刷盘的数据变更(即RedoLog)，只有primary节点把脏页刷入盘后，replica缓存的日志才能被释放。这是因为，如果数据未刷盘，那么只读读到的数据就可能是旧的，需要通过redo来重建出来，参考第一点。另外，虽然buffer pool中可能已经缓存了未刷盘的page的数据，但该page可能会被LRU替换出去，当其再次载入所以只读节点必须缓存这些redo。
 
 DDL问题
 

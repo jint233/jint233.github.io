@@ -512,7 +512,7 @@ TCP 客户端执行结果：
 
 2. 浏览器得到网址对应的服务器的 IP 地址后，通过与服务器三次握手建立 TCP 连接。
 
-![img](../assets/140b6fd0-62e8-11ea-9b06-5f146ad63a8a.jpg)
+   ![img](../assets/140b6fd0-62e8-11ea-9b06-5f146ad63a8a.jpg)
 
 3. 浏览器与服务器建立好 TCP 连接后，就会发送 HTTP 请求。
 
@@ -521,23 +521,23 @@ TCP 客户端执行结果：
    - 然后在网络层将 TCP 数据包嵌入到 IP 报文段中；
    - 最后将 IP 数据包嵌入到以太网数据包中在网络中传输。
 
-![img](../assets/87baf4e0-62e9-11ea-94d9-09523e73926b.jpg)
+   ![img](../assets/87baf4e0-62e9-11ea-94d9-09523e73926b.jpg)
 
 4. 服务器处理浏览器发送的 HTTP 请求。
 
     浏览器向 Web 服务器如 Nginx 发送 HTTP 请求，Nginx 将请求转发给 Tomcat 服务器，Tomcat 服务器请求 MySQL、Redis 等 DB 服务器，得到结果后将 Velocity 模板引擎和数据整合，将生成的静态页面文件通过 Nginx 返回给浏览器。
 
-![img](../assets/87580d00-62ec-11ea-af20-4f6854ce034d.jpg)
+   ![img](../assets/87580d00-62ec-11ea-af20-4f6854ce034d.jpg)
 
 5. 服务器返回响应结果。
 
     在响应头中返回了 HTTP 状态码、HTTP 协议版本、是否为长连接、文本编码类型、日期等等。
 
-![img](../assets/c8b83cb0-62ed-11ea-b0ad-ffc9490087fa.jpg)
+   ![img](../assets/c8b83cb0-62ed-11ea-b0ad-ffc9490087fa.jpg)
 
 6. 浏览器和者服务器通过四次挥手关闭 TCP。
 
-![img](../assets/42851d60-62ee-11ea-94d9-09523e73926b.jpg)
+   ![img](../assets/42851d60-62ee-11ea-94d9-09523e73926b.jpg)
 
 7. 浏览器解析 HTML、CSS、JS 等进行页面渲染。
 
