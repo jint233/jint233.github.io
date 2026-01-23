@@ -77,7 +77,7 @@ git push origin master
 
 但是这次可没有这么顺利就修改成功了，Git 报错信息
 
-> To <https://gitee.com/chandler2code/git-conflict-demo.git> ! \[rejected\] master -> master (fetch first) error: failed to push some refs to '<https://gitee.com/chandler2code/git-conflict-demo.git>' hint: Updates were rejected because the remote contains work that you do hint: not have locally. This is usually caused by another repository pushing hint: to the same ref. You may want to first integrate the remote changes hint: (e.g., 'git pull …') before pushing again. hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+> To <https://gitee.com/chandler2code/git-conflict-demo.git> ! [rejected] master -> master (fetch first) error: failed to push some refs to '<https://gitee.com/chandler2code/git-conflict-demo.git>' hint: Updates were rejected because the remote contains work that you do hint: not have locally. This is usually caused by another repository pushing hint: to the same ref. You may want to first integrate the remote changes hint: (e.g., 'git pull …') before pushing again. hint: See the 'Note about fast-forwards' in 'git push --help' for details.
 
 意思就是当前分支与远端的分支相比，远端已经发生了修改，如果要继续操作，则要先执行命令`git pull`合并远端的代码。
 

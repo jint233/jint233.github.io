@@ -79,7 +79,7 @@ Spring Batch 的文档很全面，但对于初学者来说，整个文档读完�
 @SpringBootApplication
 @EnableBatchProcessing
 public class BatchsrvApplication {
-public static void main(String\[\] args) {
+public static void main(String[] args) {
 SpringApplication.run(BatchsrvApplication.class, args);
 }
 }
@@ -180,7 +180,7 @@ protected JobRepository createJobRepository() throws Exception {
   */
   @Bean
   @StepScope
-  public JdbcPagingItemReader<PayRecord> payRecordReader(@Value("#{jobParameters\[minId\]}") Long minId, @Value("#{jobParameters\[maxId\]}") Long maxId) throws Exception {
+  public JdbcPagingItemReader<PayRecord> payRecordReader(@Value("#{jobParameters[minId]}") Long minId, @Value("#{jobParameters[maxId]}") Long maxId) throws Exception {
   JdbcPagingItemReader<PayRecord> reader = new JdbcPagingItemReader();
   final SqlPagingQueryProviderFactoryBean sqlPagingQueryProviderFactoryBean = new SqlPagingQueryProviderFactoryBean();
   sqlPagingQueryProviderFactoryBean.setDataSource(primaryDatasource);

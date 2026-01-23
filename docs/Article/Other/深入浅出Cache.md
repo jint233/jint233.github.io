@@ -123,8 +123,8 @@ cache.setex(String.valueOf(user.getId()), 300, user.toString()); // TTL, 可以�
 
 1. Hashing
 2. Consistent Hashing (using virtual nodes)
-   - servers = \[‘cache-server1.yuozan.com:6379’, ‘cache-server2.youzan.com:6379’\];
-   - server_index = hash(key) % servers.length; server = servers\[server_index;
+   - servers = [‘cache-server1.yuozan.com:6379’, ‘cache-server2.youzan.com:6379’];
+   - server_index = hash(key) % servers.length; server = servers[server_index;
 
 ### 算法描述
 

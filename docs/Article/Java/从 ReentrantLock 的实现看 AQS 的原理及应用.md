@@ -962,6 +962,6 @@ public class LeeMain {
 
 ## 参考资料
 
-- Lea D. The java. util. concurrent synchronizer framework\[J\]. Science of Computer Programming, 2005, 58(3): 293-309.
+- Lea D. The java. util. concurrent synchronizer framework[J]. Science of Computer Programming, 2005, 58(3): 293-309.
 - 《Java 并发编程实战》
 - [不可不说的 Java “锁” 事](https://tech.meituan.com/2018/11/15/java-lock.html)

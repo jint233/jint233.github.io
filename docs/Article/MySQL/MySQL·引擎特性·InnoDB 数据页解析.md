@@ -2,7 +2,7 @@
 
 ## 前言
 
-之前介绍的\[MySQL · 引擎特性 · InnoDB Buffer Pool\](MySQL · 引擎特性 · InnoDB Buffer Pool.md)中，详细介绍了 InnoDB Buffer Pool 的实现细节，Buffer Pool 主要就是用来存储数据页的，是数据页在内存中的动态存储方式，而本文介绍一下数据页在磁盘上的静态存储方式以及相关的操作。由于数据页的结构涉及 InnoDB 非常底层的代码，因此各个版本的 MySQL 都可以参考。相关代码主要集中在 page 目录下。
+之前介绍的[MySQL · 引擎特性 · InnoDB Buffer Pool](./MySQL·引擎特性·InnoDB%20Buffer%20Pool.md)中，详细介绍了 InnoDB Buffer Pool 的实现细节，Buffer Pool 主要就是用来存储数据页的，是数据页在内存中的动态存储方式，而本文介绍一下数据页在磁盘上的静态存储方式以及相关的操作。由于数据页的结构涉及 InnoDB 非常底层的代码，因此各个版本的 MySQL 都可以参考。相关代码主要集中在 page 目录下。
 
 ## 基础知识
 

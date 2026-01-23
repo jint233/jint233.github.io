@@ -267,21 +267,21 @@ Cluster-254 gfsh>
 
 **2. 连接任意一个 locator**
 
-指定 locator 的 ip \[端口\] 就可以了。
+指定 locator 的 ip [端口] 就可以了。
 
 注意看 shell 中的第三行
 
 ```plaintext
-Connecting to Manager at \[host=192.168.33.15, port=1099\] ..
+Connecting to Manager at [host=192.168.33.15, port=1099] ..
 ```
 
 实际上 locator 也是会返回 leader 的 JMX 让本地进行连接。
 
 ```plaintext
-gfsh>connect --locator=192.168.33.23\[10334\]
-Connecting to Locator at \[host=192.168.33.23, port=10334\] ..
-Connecting to Manager at \[host=192.168.33.15, port=1099\] ..
-Successfully connected to: \[host=192.168.33.15, port=1099\]
+gfsh>connect --locator=192.168.33.23[10334]
+Connecting to Locator at [host=192.168.33.23, port=10334] ..
+Connecting to Manager at [host=192.168.33.15, port=1099] ..
+Successfully connected to: [host=192.168.33.15, port=1099]
 Cluster-254 gfsh>
 ```
 
@@ -418,7 +418,7 @@ Used Heap   : 752M
 Max Heap    : 1945M
 Working Dir : /opt/geode_work18/server_33_15
 Log file    : /opt/geode_work18/server_33_15/server_33_15.log
-Locators    : 192.168.33.15\[10334\],192.168.33.20\[10334\]
+Locators    : 192.168.33.15[10334],192.168.33.20[10334]
 Cache Server Information
 Server Bind              :
 Server Port              : 40401
@@ -438,13 +438,13 @@ status cluster-config-service   status gateway-receiver         status gateway-s
 
 ```java
 gfsh>status locator --name=locator_33_15
-Locator in /opt/geode_work18/locator_33_15 on 192.168.33.15\[10334\] as locator_33_15 is currently online.
+Locator in /opt/geode_work18/locator_33_15 on 192.168.33.15[10334] as locator_33_15 is currently online.
 Process ID: 1184
 Uptime: 2 days 2 hours 25 minutes 33 seconds
 Geode Version: 1.9.2
 Java Version: 1.8.0_102
 Log File: /opt/geode_work18/locator_33_15/locator_33_15.log
-JVM Arguments: -Dgemfire.locators=192.168.33.15\[10334\],192.168.33.20\[10334\],192.168.33.23\[10334\] -Dgemfire.enable-cluster-configuration=true -Dgemfire.load-cluster-configuration-from-dir=false -Dgemfire.max-num-reconnect-tries=100 -Dgemfire.member-timeout=120000 -Dgemfire.distributed-system-id=254 -Xms512M -Xmx1G -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -Dgemfire.launcher.registerSignalHandlers=true -Djava.awt.headless=true -Dsun.rmi.dgc.server.gcInterval=9223372036854775806
+JVM Arguments: -Dgemfire.locators=192.168.33.15[10334],192.168.33.20[10334],192.168.33.23[10334] -Dgemfire.enable-cluster-configuration=true -Dgemfire.load-cluster-configuration-from-dir=false -Dgemfire.max-num-reconnect-tries=100 -Dgemfire.member-timeout=120000 -Dgemfire.distributed-system-id=254 -Xms512M -Xmx1G -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -Dgemfire.launcher.registerSignalHandlers=true -Djava.awt.headless=true -Dsun.rmi.dgc.server.gcInterval=9223372036854775806
 Class-Path: /opt/apache-geode-1.9.2/lib/geode-core-1.9.2.jar:/opt/apache-geode-1.9.2/lib/geode-dependencies.jar
 Cluster configuration service is up and running.
 ```
@@ -705,9 +705,9 @@ log.info("error {}" , aCqEvent);
 ```sql
 Intial result includes: User(id=1574821109586, name=xy99, age=99, createTime=Wed Nov 27 10:18:29 CST 2019)
 id=1574827945765
-2019-11-27 12:12:25.830 INFO  \[Cache Client Updater Thread  on 192.168.33.20(server_33_20:32746)<v6>:41001 port 40401\] |UserCqListener|cq create test.user.1574827945765, User(id=1574827945765, name=xy100, age=100, createTime=Wed Nov 27 12:12:25 CST 2019)
-2019-11-27 12:12:26.857 INFO  \[Cache Client Updater Thread  on 192.168.33.20(server_33_20:32746)<v6>:41001 port 40401\] |UserCqListener|cq update test.user.1574827945765, User(id=1574827945765, name=xy100-1, age=100, createTime=Wed Nov 27 12:12:25 CST 2019)
-2019-11-27 12:12:27.875 INFO  \[Cache Client Updater Thread  on 192.168.33.20(server_33_20:32746)<v6>:41001 port 40401\] |UserCqListener|cq destroy test.user.1574827945765, null
+2019-11-27 12:12:25.830 INFO  [Cache Client Updater Thread  on 192.168.33.20(server_33_20:32746)<v6>:41001 port 40401] |UserCqListener|cq create test.user.1574827945765, User(id=1574827945765, name=xy100, age=100, createTime=Wed Nov 27 12:12:25 CST 2019)
+2019-11-27 12:12:26.857 INFO  [Cache Client Updater Thread  on 192.168.33.20(server_33_20:32746)<v6>:41001 port 40401] |UserCqListener|cq update test.user.1574827945765, User(id=1574827945765, name=xy100-1, age=100, createTime=Wed Nov 27 12:12:25 CST 2019)
+2019-11-27 12:12:27.875 INFO  [Cache Client Updater Thread  on 192.168.33.20(server_33_20:32746)<v6>:41001 port 40401] |UserCqListener|cq destroy test.user.1574827945765, null
 ```
 
 那么我们思考一下这个连续查询能为我们做什么呢？

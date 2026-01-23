@@ -173,7 +173,7 @@
 
 > Martin Flower 的定义：
 >
-> In short, the microservice architectural style \[1\] is an approach to developing a single application as a suite of small services, each running in its own process and communicating with lightweight mechanisms, often an HTTP resource API. These services are built around business capabilities and independently deployable by fully automated deployment machinery. There is a bare minimum of centralized management of these services, which may be written in different programming languages and use different data storage technologies
+> In short, the microservice architectural style [1] is an approach to developing a single application as a suite of small services, each running in its own process and communicating with lightweight mechanisms, often an HTTP resource API. These services are built around business capabilities and independently deployable by fully automated deployment machinery. There is a bare minimum of centralized management of these services, which may be written in different programming languages and use different data storage technologies
 
 简单的说，微服务是软件系统架构上的一个设计风格，它倡导将一个原本独立的系统分成多个小型服务，这些小型服务都在各自独立的进程中运行，服务之间通过基于 HTTP 的 RESTful 轻量级 API 进行通信协作。被拆分的每个微服务围绕系统中的某项或一些耦合度较高的业务进行构建，并且每个服务都维护着自身的数据存储、业务开发、自动化测试案例以及独立部署机制。由于有了轻量级通信机制，这些微服务间可以使用不通的语言来编写。
 

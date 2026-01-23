@@ -350,11 +350,11 @@ gtid_mode=on                      # 必须项
 在 slave2 上执行：
 
 ```plaintext
-\[\[email protected\] ~\]# systemctl stop mysqld
-\[\[email protected\] ~\]# rm -rf /data/\*    # 恢复前必须先清空数据目录
-\[\[email protected\] ~\]# innobackupex --copy-back /tmp/2018-06-09_20-02-24/  # 恢复备份数据
-\[\[email protected\] ~\]# chown -R mysql.mysql /data
-\[\[email protected\] ~\]# systemctl start mysqld
+[[emailprotected] ~]# systemctl stop mysqld
+[[emailprotected] ~]# rm -rf /data/\*    # 恢复前必须先清空数据目录
+[[emailprotected] ~]# innobackupex --copy-back /tmp/2018-06-09_20-02-24/  # 恢复备份数据
+[[emailprotected] ~]# chown -R mysql.mysql /data
+[[emailprotected] ~]# systemctl start mysqld
 ```
 
 **3.设置 gtid_purged，连接 master，开启复制功能。**
@@ -364,11 +364,11 @@ gtid_mode=on                      # 必须项
 可以从 slave2 数据目录中的`xtrabackup_info`文件中获取。如果不是 xtrabackup 备份的，那么可以直接从 master 的`show global variables like "gtid_executed";`中获取，它表示 master 中已执行过的事务。
 
 ```plaintext
-\[\[email protected\] ~\]# cat /data/xtrabackup_info
+[[emailprotected] ~]# cat /data/xtrabackup_info
 uuid = fc3de8c1-6bdc-11e8-832d-000c29ed4cf4
 name =
 tool_name = innobackupex
-tool_command = -uroot \[email protected\]! -S /data/mysql.sock /backdir/
+tool_command = -uroot [emailprotected]! -S /data/mysql.sock /backdir/
 tool_version = 2.4.11
 ibbackup_version = 2.4.11
 server_version = 5.7.22-log
@@ -422,7 +422,7 @@ mysql> change master to
 master_host='192.168.100.21',
 master_port=3306,
 master_auto_position=1;
-mysql> start slave user='repl' password='\[email protected\]!';
+mysql> start slave user='repl' password='[emailprotected]!';
 ```
 
 查看 slave 的状态，看是否正确启动了复制功能。如果没错，再在 master 上修改一部分数据，检查是否同步到 slave1 和 slave2。
@@ -465,9 +465,9 @@ Auto_Position: 1
 例如：
 
 ```sql
-\[\[email protected\] ~\]# mysqlbinlog /data/master-bin.000007
+[[email protected] ~]# mysqlbinlog /data/master-bin.000007
 /_!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=1_/;
-/_!50003 SET @\[email protected\]@COMPLETION_TYPE,COMPLETION_TYPE=0_/;
+/_!50003 SET @[email protected]@COMPLETION_TYPE,COMPLETION_TYPE=0_/;
 DELIMITER /_!_/;
 
 # at 4
@@ -529,7 +529,7 @@ DELIMITER ;
 
 # End of log file
 
-/_!50003 SET \[email protected\]_COMPLETION_TYPE_/;
+/_!50003 SET [email protected]_COMPLETION_TYPE_/;
 /_!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=0_/;
 ```
 

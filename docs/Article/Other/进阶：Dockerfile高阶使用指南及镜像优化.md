@@ -285,18 +285,18 @@ Agent pid 28184
 Enter passphrase for /home/tao/.ssh/id_rsa:
 Identity added: /home/tao/.ssh/id_rsa (/home/tao/.ssh/id_rsa)
 (MoeLove) ➜  d docker build --ssh=default -t local/ssh .
-\[+\] Building 0.5s (10/10) FINISHED
-=> \[internal\] load build definition from Dockerfile                                                 0.1s
+[+] Building 0.5s (10/10) FINISHED
+=> [internal] load build definition from Dockerfile                                                 0.1s
 => => transferring dockerfile: 96B                                                                  0.0s
-=> \[internal\] load .dockerignore                                                                    0.1s
+=> [internal] load .dockerignore                                                                    0.1s
 => => transferring context: 2B                                                                      0.0s
 => resolve image config for docker.io/docker/dockerfile:experimental                                0.0s
 => CACHED docker-image://docker.io/docker/dockerfile:experimental                                   0.0s
-=> \[internal\] load metadata for docker.io/library/alpine:latest                                     0.0s
-=> \[1/4\] FROM docker.io/library/alpine                                                              0.0s
-=> CACHED \[2/4\] RUN apk add --no-cache git openssh-client                                           0.0s
-=> CACHED \[3/4\] RUN mkdir -p -m 0700 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts         0.0s
-=> CACHED \[4/4\] RUN --mount=type=ssh,required git clone \[email protected\]:tao12345666333/moe.git       0.0s
+=> [internal] load metadata for docker.io/library/alpine:latest                                     0.0s
+=> [1/4] FROM docker.io/library/alpine                                                              0.0s
+=> CACHED [2/4] RUN apk add --no-cache git openssh-client                                           0.0s
+=> CACHED [3/4] RUN mkdir -p -m 0700 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts         0.0s
+=> CACHED [4/4] RUN --mount=type=ssh,required git clone [email protected]:tao12345666333/moe.git       0.0s
 => exporting to image                                                                               0.0s
 => => exporting layers                                                                              0.0s
 => => writing image sha256:35d3ded5595a48de50054121feed13ebadf9b5e73b6cefeeba4215e1a20a20fd         0.0s
@@ -318,10 +318,10 @@ Identity added: /home/tao/.ssh/id_rsa (/home/tao/.ssh/id_rsa)
 ```bash
 (MoeLove) ➜  d docker history local/ssh
 IMAGE               CREATED             CREATED BY                                      SIZE                COMMENT
-35d3ded5595a        35 minutes ago      RUN /bin/sh -c git clone \[email protected\]:tao1…   16.9kB              buildkit.dockerfile.v0
+35d3ded5595a        35 minutes ago      RUN /bin/sh -c git clone [email protected]:tao1…   16.9kB              buildkit.dockerfile.v0
 <missing>           35 minutes ago      RUN /bin/sh -c mkdir -p -m 0700 ~/.ssh && ss…   392B                buildkit.dockerfile.v0
 <missing>           36 minutes ago      RUN /bin/sh -c apk add --no-cache git openss…   20.8MB              buildkit.dockerfile.v0
-<missing>           2 weeks ago         /bin/sh -c #(nop)  CMD \["/bin/sh"\]              0B
+<missing>           2 weeks ago         /bin/sh -c #(nop)  CMD ["/bin/sh"]              0B
 <missing>           2 weeks ago         /bin/sh -c #(nop) ADD file:a86aea1f3a7d68f6a…   5.53MB
 ```
 
@@ -330,15 +330,15 @@ IMAGE               CREATED             CREATED BY                              
 如果没有运行 `ssh-agent` 或者是密钥没有 ssh-add 添加进去， 你就会看到类似下面的问题：
 
 ```bash
-## (MoeLove) ➜  d docker build --no-cache --ssh=default -t local/ssh . \[+\] Building 11.9s (9/9) FINISHED => \[internal\] load .dockerignore                                                                    0.1s => => transferring context: 2B                                                                      0.0s => \[internal\] load build definition from Dockerfile                                                 0.1s => => transferring dockerfile: 96B                                                                  0.0s => resolve image config for docker.io/docker/dockerfile:experimental                                0.0s => CACHED docker-image://docker.io/docker/dockerfile:experimental                                   0.0s => \[internal\] load metadata for docker.io/library/alpine:latest                                     0.0s => CACHED \[1/4\] FROM docker.io/library/alpine                                                       0.0s => \[2/4\] RUN apk add --no-cache git openssh-client                                                  5.5s => \[3/4\] RUN mkdir -p -m 0700 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts                3.0s => ERROR \[4/4\] RUN --mount=type=ssh,required git clone \[email protected\]:tao12345666333/moe.git        2.9s
+## (MoeLove) ➜  d docker build --no-cache --ssh=default -t local/ssh . [+] Building 11.9s (9/9) FINISHED => [internal] load .dockerignore                                                                    0.1s => => transferring context: 2B                                                                      0.0s => [internal] load build definition from Dockerfile                                                 0.1s => => transferring dockerfile: 96B                                                                  0.0s => resolve image config for docker.io/docker/dockerfile:experimental                                0.0s => CACHED docker-image://docker.io/docker/dockerfile:experimental                                   0.0s => [internal] load metadata for docker.io/library/alpine:latest                                     0.0s => CACHED [1/4] FROM docker.io/library/alpine                                                       0.0s => [2/4] RUN apk add --no-cache git openssh-client                                                  5.5s => [3/4] RUN mkdir -p -m 0700 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts                3.0s => ERROR [4/4] RUN --mount=type=ssh,required git clone [email protected]:tao12345666333/moe.git        2.9s
 
-> \[4/4\] RUN --mount=type=ssh,required git clone \[email protected\]:tao12345666333/moe.git         && cd moe         && git checkout -b release:
+> [4/4] RUN --mount=type=ssh,required git clone [email protected]:tao12345666333/moe.git         && cd moe         && git checkout -b release:
 
 # 9 0.691 Cloning into 'moe'
 
 # 9 1.923 Warning: Permanently added the RSA host key for IP address '192.30.253.112' to the list of known hosts
 
-# 9 2.842 \[email protected\]: Permission denied (publickey)
+# 9 2.842 [email protected]: Permission denied (publickey)
 
 # 9 2.843 fatal: Could not read from remote repository
 
@@ -350,7 +350,7 @@ IMAGE               CREATED             CREATED BY                              
 
 ______________________________________________________________________
 
-rpc error: code = Unknown desc = executor failed running \[/bin/sh -c git clone \[email protected\]:tao12345666333/moe.git         && cd moe         && git checkout -b release\]: exit code: 128
+rpc error: code = Unknown desc = executor failed running [/bin/sh -c git clone [email protected]:tao12345666333/moe.git         && cd moe         && git checkout -b release]: exit code: 128
 ```
 
 ### 小结
@@ -471,18 +471,18 @@ default default               running  linux/amd64
 
 ```bash
 (MoeLove) ➜  spring-boot-hello-world git:(master) docker buildx build --load -t remote/spring-boot:1 .
-\[+\] Building 31.1s (6/14)
-\[+\] Building 686.6s (16/16) FINISHED
-=> \[internal\] booting buildkit                                                                            21.2s
+[+] Building 31.1s (6/14)
+[+] Building 686.6s (16/16) FINISHED
+=> [internal] booting buildkit                                                                            21.2s
 => => pulling image moby/buildkit:master                                                                  20.7s
 => => creating container buildx_buildkit_d18090                                                            0.5s
-=> => unpacking docker.io/library/openjdk:\[email protected\]:f362b165b870ef129cbe730f29065ff37399c0aa8bc  2.2s
-=> \[builder 2/6\] WORKDIR /app                                                                              0.0s
-=> \[builder 3/6\] COPY pom.xml /app/                                                                        0.1s
-=> \[builder 4/6\] RUN mvn dependency:go-offline                                                           596.4s
-=> \[builder 5/6\] COPY src /app/src                                                                         0.2s
-=> \[builder 6/6\] RUN mvn -e -B package                                                                    25.3s
-=> \[stage-2 2/2\] COPY --from=builder /app/target/gs-spring-boot-0.1.0.jar /                                0.2s
+=> => unpacking docker.io/library/openjdk:[email protected]:f362b165b870ef129cbe730f29065ff37399c0aa8bc  2.2s
+=> [builder 2/6] WORKDIR /app                                                                              0.0s
+=> [builder 3/6] COPY pom.xml /app/                                                                        0.1s
+=> [builder 4/6] RUN mvn dependency:go-offline                                                           596.4s
+=> [builder 5/6] COPY src /app/src                                                                         0.2s
+=> [builder 6/6] RUN mvn -e -B package                                                                    25.3s
+=> [stage-2 2/2] COPY --from=builder /app/target/gs-spring-boot-0.1.0.jar /                                0.2s
 => exporting to oci image format                                                                           2.3s
 => => exporting layers                                                                                     1.3s
 => => exporting manifest sha256:f5af6ad923434c4d7d2d6f94f095ccacfe6983cec592de6b8a0a3af37206686a           0.0s
@@ -563,7 +563,7 @@ COPY --from=builder /app/target/gs-spring-boot-0.1.0.jar /
 
 COPY --from=builder /app/target/gs-spring-boot-0.1.0.jar /tmp/
 RUN rm /tmp/gs-spring-boot-0.1.0.jar
-CMD \[ "java", "-jar", "/gs-spring-boot-0.1.0.jar" \]
+CMD [ "java", "-jar", "/gs-spring-boot-0.1.0.jar" ]
 ```
 
 给它增加了两句完全没有必要的操作，现在构建该镜像。
@@ -581,7 +581,7 @@ remote/spring-boot   1                   644867602b8a        About an hour ago  
 
 ```bash
 (MoeLove) ➜  spring-boot-hello-world git:(master) ✗ docker build --squash -t remote/spring-boot:3 .
-\[+\] Building 2.5s (16/16) FINISHED
+[+] Building 2.5s (16/16) FINISHED
 ...
 => exporting to image                                                                                      0.0s
 => => exporting layers                                                                                     0.0s
@@ -605,7 +605,7 @@ remote/spring-boot   1                   644867602b8a        About an hour ago  
 (MoeLove) ➜  spring-boot-hello-world git:(master) ✗ docker image history remote/spring-boot:3
 IMAGE               CREATED              CREATED BY                                      SIZE                COMMENT
 a2c1e139697b        About a minute ago                                                   103MB               create new from sha256:2d5ba7eb86d2ad5594f82a896637c91137d150dab61fe8dc3acbdfcd164f6686
-<missing>           292 years ago        CMD \["java" "-jar" "/gs-spring-boot-0.1.0.ja…   0B                  buildkit.dockerfile.v0
+<missing>           292 years ago        CMD ["java" "-jar" "/gs-spring-boot-0.1.0.ja…   0B                  buildkit.dockerfile.v0
 <missing>           About a minute ago   RUN /bin/sh -c rm /tmp/gs-spring-boot-0.1.0.…   0B                  buildkit.dockerfile.v0
 <missing>           About a minute ago   COPY /app/target/gs-spring-boot-0.1.0.jar /t…   0B                  buildkit.dockerfile.v0
 <missing>           3 days ago           COPY /app/target/gs-spring-boot-0.1.0.jar / …   0B                  buildkit.dockerfile.v0
@@ -616,7 +616,7 @@ a2c1e139697b        About a minute ago                                          
 <missing>           2 weeks ago          /bin/sh -c #(nop)  ENV JAVA_HOME=/usr/lib/jv…   0B
 <missing>           2 weeks ago          /bin/sh -c {   echo '#!/bin/sh';   echo 'set…   0B
 <missing>           2 weeks ago          /bin/sh -c #(nop)  ENV LANG=C.UTF-8             0B
-<missing>           2 weeks ago          /bin/sh -c #(nop)  CMD \["/bin/sh"\]              0B
+<missing>           2 weeks ago          /bin/sh -c #(nop)  CMD ["/bin/sh"]              0B
 <missing>           2 weeks ago          /bin/sh -c #(nop) ADD file:a86aea1f3a7d68f6a…   0B
 ```
 

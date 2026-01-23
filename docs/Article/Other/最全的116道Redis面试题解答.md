@@ -331,7 +331,7 @@ DISCARD
 
 Discard
 
-WATCH key \[key …\]
+WATCH key [key …]
 
 监视一个 (或多个) key，如果在事务执行之前这个 (或这些) key 被其他命令所改动，那么事务将被打断
 
@@ -869,11 +869,11 @@ Redis 采用的删除策略是将惰性删除策略和定期删除策略组合�
 
 Redis 提供了 6 种淘汰策略：
 
-- volatile-lru：该淘汰策略是被使用最多的一种，从已设置过期时间的数据集（server.db \[i\].expires）中挑选最近最少使用的数据淘汰；而没有设置过期时间的 key 不会被淘汰，这样可以保证需要持久化的数据不会突然丢失；
-- volatile-ttl：从已设置过期时间的数据集（server.db \[i\].expires）中挑选将要过期的数据淘汰，它和 volatile-lru 的区别在于 key 的剩余生存时间 ttl 的值越小越优先被淘汰，而 volatile-lru 是根据使用程度越小越被淘汰；
-- volatile-random：从已设置过期时间的数据集（server.db \[i\].expires）中随机选择数据淘汰；
-- allkeys-lru：从数据集（server.db \[i\].dict）中挑选最近最少使用的数据淘汰；它和 volatile-lru 淘汰机制的区别在于 allkeys-lru 针对的是全体 key 对象，淘汰的 key 不只是包括设置了过期时间的 key，也包括了没有设置过期时间的 key。而 volatile-lru 主要是针对设置了过期时间的 key 进行淘汰；
-- allkeys-random：从数据集（server.db \[i\].dict）中随机选择数据淘汰；
+- volatile-lru：该淘汰策略是被使用最多的一种，从已设置过期时间的数据集（server.db [i].expires）中挑选最近最少使用的数据淘汰；而没有设置过期时间的 key 不会被淘汰，这样可以保证需要持久化的数据不会突然丢失；
+- volatile-ttl：从已设置过期时间的数据集（server.db [i].expires）中挑选将要过期的数据淘汰，它和 volatile-lru 的区别在于 key 的剩余生存时间 ttl 的值越小越优先被淘汰，而 volatile-lru 是根据使用程度越小越被淘汰；
+- volatile-random：从已设置过期时间的数据集（server.db [i].expires）中随机选择数据淘汰；
+- allkeys-lru：从数据集（server.db [i].dict）中挑选最近最少使用的数据淘汰；它和 volatile-lru 淘汰机制的区别在于 allkeys-lru 针对的是全体 key 对象，淘汰的 key 不只是包括设置了过期时间的 key，也包括了没有设置过期时间的 key。而 volatile-lru 主要是针对设置了过期时间的 key 进行淘汰；
+- allkeys-random：从数据集（server.db [i].dict）中随机选择数据淘汰；
 - no-enviction：Redis 默认使用这种淘汰策略，当内存达到限制的时候，不淘汰任何数据，不可写入任何数据集，所有引起申请内存的命令会报错。它的优点在于可以保证数据不被丢失，但是它的缺点是会导致线上的业务不能持续进行的问题。这个淘汰策略下除了 DEL 请求和读请求服务可以继续被执行外，不能继续执行写请求。
 
 #### 4. 如何优化 Redis 服务的性能？

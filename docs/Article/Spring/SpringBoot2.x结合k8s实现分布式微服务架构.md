@@ -146,7 +146,7 @@ ports:
 可以看到执行 `kubectl apply -f service.yaml` 后：
 ```
 
-\[email protected\]:~$ kubectl get svc
+[email protected]:~$ kubectl get svc
 
 NAME                          TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)              AGE
 
@@ -330,7 +330,7 @@ kubernetes:
 
 
 ```plaintext
-开启后，我们在《\[微服务 Spring Cloud 架构设计\]》一文中讲过，其实最终是向 K8s 的 API Server 发起 http 请求，获取 Service 资源的数据列表。然后根据底层的负载均衡策略来实现服务的发现，最终解析到某个 pod 上。那么为了同一服务的多个 pod 存在，我们需要执行：
+开启后，我们在《[微服务 Spring Cloud 架构设计]》一文中讲过，其实最终是向 K8s 的 API Server 发起 http 请求，获取 Service 资源的数据列表。然后根据底层的负载均衡策略来实现服务的发现，最终解析到某个 pod 上。那么为了同一服务的多个 pod 存在，我们需要执行：
 ```
 
 kubectl scale --replicas=2 deployment admin-web-deployment
@@ -1247,7 +1247,7 @@ coreSize: 5
 @EnableConfigurationProperties(EnvConfig.class)
 @EnableDiscoveryClient
 public class AdminApp {
-public static void main(String\[\] args) {
+public static void main(String[] args) {
 
 ```bash
 ```

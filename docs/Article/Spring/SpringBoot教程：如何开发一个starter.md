@@ -281,7 +281,7 @@ public static final String FACTORIES_RESOURCE_LOCATION = "META-INF/spring.factor
             return list.toArray(new String[list.size()]);
         }
         private boolean checkEmail(String email) {
-            return ReUtil.isMatch("\\[email protected]\\w+\\.[a-z]+(\\.[a-z]+)?", email);
+            return ReUtil.isMatch("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", email);
         }
     }
     ```

@@ -204,7 +204,7 @@ GET index_name/_stats?filter_path=indices.**.request_cache
 如果某些单词在索引中经常使用，但不在默认停用词列表中，则可以使用[截止频率](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html#query-dsl-match-query-cutoff)来动态处理它们。
 
 - **如果不关心文档返回的顺序，则按 _doc 排序。** Elasticsearch 默认使用“_score”字段按评分排序。如果不关心顺序，可以使用"sort":"_doc"让 Elasticsearch 按索引顺序返回命中文档，可以节省排序开销。
-- **避免使用脚本查询（script query）计算动态字段，建议在索引时计算并在文档中添加该字段。** 例如，我们有一个包含大量用户信息的索引，我们需要查询以"1234"开头的所有用户。你可能运行一个脚本查询，如"source":“doc\[‘num’\].value.startsWith（‘1234’）”。这个查询非常耗费资源，并且减慢整个系统。索引时考虑添加一个名为“num_prefix”的字段。然后我们可以查询"name_prefix":“1234”。
+- **避免使用脚本查询（script query）计算动态字段，建议在索引时计算并在文档中添加该字段。** 例如，我们有一个包含大量用户信息的索引，我们需要查询以"1234"开头的所有用户。你可能运行一个脚本查询，如"source":“doc[‘num’].value.startsWith（‘1234’）”。这个查询非常耗费资源，并且减慢整个系统。索引时考虑添加一个名为“num_prefix”的字段。然后我们可以查询"name_prefix":“1234”。
 - **避免使用通配符查询。** 运行性能测试
 
 ______________________________________________________________________

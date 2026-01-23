@@ -42,8 +42,8 @@
 </servlet-mapping>
 
 ```java
-\[1\] 处，配置了 org.springframework.web.context.ContextLoaderListener 对象。这是一个 javax.servlet.ServletContextListener 对象，会初始化一个 Root Spring WebApplicationContext 容器。
-\[2\] 处，配置了 org.springframework.web.servlet.DispatcherServlet 对象。这是一个 javax.servlet.http.HttpServlet 对象，它除了拦截我们制定的 \*.do 请求外，也会初始化一个属于它的 Spring WebApplicationContext 容器。并且，这个容器是以 \[1\] 处的 Root 容器作为父容器。
+[1] 处，配置了 org.springframework.web.context.ContextLoaderListener 对象。这是一个 javax.servlet.ServletContextListener 对象，会初始化一个 Root Spring WebApplicationContext 容器。
+[2] 处，配置了 org.springframework.web.servlet.DispatcherServlet 对象。这是一个 javax.servlet.http.HttpServlet 对象，它除了拦截我们制定的 \*.do 请求外，也会初始化一个属于它的 Spring WebApplicationContext 容器。并且，这个容器是以 [1] 处的 Root 容器作为父容器。
 在 Servlet 容器启动时，例如 Tomcat、Jetty 启动，则会被 ContextLoaderListener 监听到，从而调用 ContextLoaderListener #contextInitialized(ServletContextEvent event) 方法，初始化 Root WebApplicationContext 容器。
 ```
 

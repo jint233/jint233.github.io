@@ -20,7 +20,7 @@ shell> mysqladmin refresh
 
 错误日志是最重要的日志之一，它记录了 MariaDB/MySQL 服务启动和停止正确和错误的信息，还记录了 mysqld 实例运行过程中发生的错误事件信息。
 
-可以使用" --log-error=\[file_name\] "来指定 mysqld 记录的错误日志文件，如果没有指定 file_name，则默认的错误日志文件为 datadir 目录下的 `hostname`.err ，hostname 表示当前的主机名。
+可以使用" --log-error=[file_name] "来指定 mysqld 记录的错误日志文件，如果没有指定 file_name，则默认的错误日志文件为 datadir 目录下的 `hostname`.err ，hostname 表示当前的主机名。
 
 也可以在 MariaDB/MySQL 配置文件中的 mysqld 配置部分，使用 log-error 指定错误日志的路径。
 
@@ -245,17 +245,17 @@ Count: 1  Time=10.00s (10s)  Lock=0.00s (0s)  Rows=1.0 (1), root[root]@localhost
 
 所以，对于事务表来说，一个事务中可能包含多条二进制日志事件，它们会在提交时一次性写入。而对于非事务表的操作，每次执行完语句就直接写入。
 
-MariaDB/MySQL 默认没有启动二进制日志，要启用二进制日志使用 --log-bin=\[on|off|file_name\] 选项指定，如果没有给定 file_name，则默认为 datadir 下的主机名加"-bin"，并在后面跟上一串数字表示日志序列号，如果给定的日志文件中包含了后缀(logname.suffix)将忽略后缀部分。
+MariaDB/MySQL 默认没有启动二进制日志，要启用二进制日志使用 --log-bin=[on|off|file_name] 选项指定，如果没有给定 file_name，则默认为 datadir 下的主机名加"-bin"，并在后面跟上一串数字表示日志序列号，如果给定的日志文件中包含了后缀(logname.suffix)将忽略后缀部分。
 
 ![img](../assets/733013-20180507084125816-1681048114.png)
 
-或者在配置文件中的\[mysqld\]部分设置 log-bin 也可以。注意：对于 mysql 5.7，直接启动 binlog 可能会导致 mysql 服务启动失败，这时需要在配置文件中的 mysqld 为 mysql 实例分配 server_id。
+或者在配置文件中的[mysqld]部分设置 log-bin 也可以。注意：对于 mysql 5.7，直接启动 binlog 可能会导致 mysql 服务启动失败，这时需要在配置文件中的 mysqld 为 mysql 实例分配 server_id。
 
 ```shell
 [mysqld]# server_id=1234``log-bin=[on|filename]`
 ```
 
-mysqld 还 **创建一个二进制日志索引文件**，当二进制日志文件滚动的时候会向该文件中写入对应的信息。所以该文件包含所有使用的二进制日志文件的文件名。默认情况下该文件与二进制日志文件的文件名相同，扩展名为'.index'。要指定该文件的文件名使用 --log-bin-index\[=file_name\] 选项。当 mysqld 在运行时不应手动编辑该文件，免得 mysqld 变得混乱。
+mysqld 还 **创建一个二进制日志索引文件**，当二进制日志文件滚动的时候会向该文件中写入对应的信息。所以该文件包含所有使用的二进制日志文件的文件名。默认情况下该文件与二进制日志文件的文件名相同，扩展名为'.index'。要指定该文件的文件名使用 --log-bin-index[=file_name] 选项。当 mysqld 在运行时不应手动编辑该文件，免得 mysqld 变得混乱。
 
 当重启 mysql 服务或刷新日志或者达到日志最大值时，将滚动二进制日志文件，滚动日志时只修改日志文件名的数字序列部分。
 
@@ -661,7 +661,7 @@ mysql> insert into student values(7,'xiaowoniu','female',now());
 查看产生的日志。
 
 ```plaintext
-\[\[email protected\] data\]# mysqlbinlog mysql-bin.000005
+[[email protected] data]# mysqlbinlog mysql-bin.000005
 ...前面固定部分省略...
 '/*!*/;
 
@@ -708,7 +708,7 @@ DELIMITER ;
 发现是一堆看不懂的东西，使用-vv 可将这些显示出来。可以看出，结果中记录的非常详细，这也是为什么基于 row 记录日志会导致日志文件极速变大。
 
 ```sql
-\[\[email protected\] data\]# mysqlbinlog mysql-bin.000005 -vv
+[[email protected] data]# mysqlbinlog mysql-bin.000005 -vv
 ...前面省略...
 BINLOG '
 gPraWBMBAAAAOgAAAAIBAAAAAF4AAAAAAAEABHRlc3QAB3N0dWRlbnQABAMP/hIFHgD3AQAMCf3N
@@ -769,7 +769,7 @@ mysqlbinlog --stop-datetime="2014-7-2 15:27:48" /tmp/mysql-bin.000008 | mysql -u
 恢复多个二进制日志文件时：
 
 ```plaintext
-mysqlbinlog mysql-bin.\[\*\] | mysql -uroot -p password
+mysqlbinlog mysql-bin.[\*] | mysql -uroot -p password
 ```
 
 或者将它们导入到一个文件中后恢复。
