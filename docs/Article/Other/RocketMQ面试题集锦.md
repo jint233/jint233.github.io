@@ -70,7 +70,7 @@ Producer 在发送消息的时候指定什么时刻发送，然后消息被发�
 
 顺序消息在日常的功能场景中很常见，比如点外卖生成外卖订单、付款、送餐的消息需要保证严格的顺序。
 
-**全局顺序消息：** RocketMQ 的一个 Topic 下默认有八个读队列和八个写队列，如果要保证全局顺序消息的话需要在生产端只保留一个读写队列，然后消费端只有一个消费线程，这样会降低 RocketMQ 的高可用和高吞吐量。**分区顺序消息：** 分区顺序消息同样需要生产端和消费端配合，生产端根据同一个订单 ID 把消息路由到同一个 MessageQueue，消费端控制从同一个 MessageQueue 取出的消息不被并发处理。**生成端发送分区顺序消息：** 
+**全局顺序消息：** RocketMQ 的一个 Topic 下默认有八个读队列和八个写队列，如果要保证全局顺序消息的话需要在生产端只保留一个读写队列，然后消费端只有一个消费线程，这样会降低 RocketMQ 的高可用和高吞吐量。**分区顺序消息：** 分区顺序消息同样需要生产端和消费端配合，生产端根据同一个订单 ID 把消息路由到同一个 MessageQueue，消费端控制从同一个 MessageQueue 取出的消息不被并发处理。**生成端发送分区顺序消息：**
 
 ```java
 SendResult sendResult = Producer.send(msg , new MessageQueueSelector() {
@@ -100,8 +100,10 @@ return ConsumeOrderlyStatus.SUCCESS ;
 MessageListenerOrderly 底层会将 MessageQueue 锁住保证了同一个 MessageQueue 的消息不会并发消费。
 14\. 如何解决消息队列的延时以及过期失效问题？
 =========================
+
 当消费端宕机或者消费速度很慢导致 Broker 中消息大量积压，如有积压时长超过阈值就会被清理掉导致数据丢失。
 RocketMQ 会把消息持久化到 CommitLog 文件里面，并且在以下的几种情况下会定期清理 CommitLog 文件：
+
 1. CommitLog 文件里面的消息积压超过了 72 小时，并且到了凌晨 4 点，清理线程会删除该文件；
 2. CommitLog 文件里面的消息积压超过了 72 小时，并且磁盘占用率达到了 75%，清理线程也会删除该文件；
 3. 磁盘占用率达到了 85%，不管积压的消息是否过期都会触发线程批量清理文件，直到内存充足；
@@ -116,19 +118,21 @@ RocketMQ 会把消息持久化到 CommitLog 文件里面，并且在以下的几
 ![img](../assets/da280630-9ea5-11ea-a506-f32f5295a5a9.png)
 16\. 如何解决高性能读写数据的问题？
 ==================== **普通 IO 和 NIO** *   普通 IO 是基于字节的单向阻塞式传输；
-*   NIO 引入 FileChannel 全双工通道和 ByteBuffer 数据容器，ByteBuffer 可以精准的控制写入磁盘的数据大小。
+- NIO 引入 FileChannel 全双工通道和 ByteBuffer 数据容器，ByteBuffer 可以精准的控制写入磁盘的数据大小。
 如下图所示 FileChannel#write() 方法会将 ByteBuffer 里面的数据写到 PageCache 中，然后操作系统会定期将 PageCache 中的数据进行刷盘，如果想要立马通知操作系统进行刷盘可以调用 FileChannel#force() 方法。
 ![img](../assets/0c805c40-9ea6-11ea-853e-a34978cba4d6.png)
 不管是普通 IO 还是没有使用 MMAP 的 NIO 都会有多次数据拷贝的问题。
-*   读磁盘的过程：先把磁盘里面的数据 DMA 拷贝到内核态 IO 缓冲区，然后再把内核态的数据 CPU 拷贝到用户态内存空间；
-*   写磁盘的过程：把用户态内存空间的数据 CPU 拷贝到内存态 IO 缓冲区，然后再把内核态的数据 DMA 拷贝到磁盘；
-*   不管是读还是写都需要两次数据拷贝，如果采用 MMAP 技术就可以把磁盘里面的文件映射到用户态空间的虚拟内存中，省去了内核态到用户态的 CPU 拷贝。
+- 读磁盘的过程：先把磁盘里面的数据 DMA 拷贝到内核态 IO 缓冲区，然后再把内核态的数据 CPU 拷贝到用户态内存空间；
+- 写磁盘的过程：把用户态内存空间的数据 CPU 拷贝到内存态 IO 缓冲区，然后再把内核态的数据 DMA 拷贝到磁盘；
+- 不管是读还是写都需要两次数据拷贝，如果采用 MMAP 技术就可以把磁盘里面的文件映射到用户态空间的虚拟内存中，省去了内核态到用户态的 CPU 拷贝。
 ![img](../assets/2cb23e20-9ea6-11ea-a7cd-ef13827cf727.png) **内存映射 MMAP（零拷贝技术）** NIO 可以采用 MappedByteBuffer 数据容器进行读写数据，而 MappedByteBuffer#map() 底层采用了 MMAP 技术进行了文件映射。
 
 ```plaintext
 ```
+
 MappedByteBuffer mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, position, fileSize)
 ize);
+
 ```
 
 
@@ -159,4 +163,3 @@ MMAP 虽然可以提高磁盘读写的性能，但是仍然有诸多缺陷和限
 ==
 RocketMQ 的底层设计还是很有趣的，大家有空还是要看下其源代码，将其巧妙的设计转化为自己的技能。
 ```
-

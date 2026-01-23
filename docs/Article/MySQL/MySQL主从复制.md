@@ -125,7 +125,7 @@ mysql 支持一主一从和一主多从。但是每个 slave 必须只能是一�
 
 ![img](../assets/733013-20180528194339716-360937433.png)
 
-1. **配置 master 和 slave 的配置文件。** 
+1. **配置 master 和 slave 的配置文件。**
 
 ```bash
 [mysqld]          # master
@@ -147,7 +147,7 @@ server-id=111
     service mysqld restart
     ```
 
-2. **在 master 上创建复制专用的用户。** 
+2. **在 master 上创建复制专用的用户。**
 
     ```bash
     create user 'repl'@'192.168.100.%' identified by 'P@ssword1!';
@@ -248,10 +248,10 @@ mysql> select * from backuptest.num_isam limit 10;
 +----+
 ```
 
-### 4.2.1 获取 master binlog 的坐标 
+### 4.2.1 获取 master binlog 的坐标
 
 **如果 master 是全新的数据库实例，或者在此之前没有开启过 binlog，那么它的坐标位置是 position=4**。之所以是 4 而非 0，是因为 binlog 的前 4 个记录单元是每个 binlog 文件的头部信息。
-如果 master 已有数据，或者说 master 以前就开启了 binlog 并写过数据库，那么需要手动获取 position。**为了安全以及没有后续写操作，必须先锁表。** 
+如果 master 已有数据，或者说 master 以前就开启了 binlog 并写过数据库，那么需要手动获取 position。**为了安全以及没有后续写操作，必须先锁表。**
 
 ```bash
 mysql> flush tables with read lock;
@@ -274,11 +274,11 @@ mysql> show master status;   # 为了排版，简化了输出结果
 
 下面给出 3 种备份方式以及对应 slave 的恢复方法。建议备份所有库到 slave 上，如果要筛选一部分数据库或表进行复制，应该在 slave 上筛选(筛选方式见后文[筛选要复制的库和表](https://www.cnblogs.com/f-ck-need-u/p/9155003.html#blog6.1))，而不应该在 master 的备份过程中指定。
 
-**方式一：冷备份直接 cp。这种情况只适用于没有新写入操作。严谨一点，只适合拷贝完成前 master 不能有写入操作。** 
+**方式一：冷备份直接 cp。这种情况只适用于没有新写入操作。严谨一点，只适合拷贝完成前 master 不能有写入操作。**
 
 1. 如果要复制所有库，那么直接拷贝整个 datadir。
 2. 如果要复制的是某个或某几个库，直接拷贝相关目录即可。但注意，这种冷备份的方式只适合 MyISAM 表和开启了`innodb_file_per_table=ON`的 InnoDB 表。如果没有开启该变量，innodb 表使用公共表空间，无法直接冷备份。
-3. 如果要冷备份 innodb 表，最安全的方法是先关闭 master 上的 mysql，而不是通过表锁。 所以，**如果没有涉及到 innodb 表，那么在锁表之后，可以直接冷拷贝。最后释放锁。** 
+3. 如果要冷备份 innodb 表，最安全的方法是先关闭 master 上的 mysql，而不是通过表锁。 所以，**如果没有涉及到 innodb 表，那么在锁表之后，可以直接冷拷贝。最后释放锁。**
 
 ```bash
    mysql> flush tables with read lock;
@@ -310,7 +310,7 @@ shell> rsync -avz data 192.168.100.150:
 
 然后重启 master 和 slave。因为重启了 master，所以 binlog 已经滚动了，不过这次不用再查看 binlog 坐标，因为重启造成的 binlog 日志移动不会影响 slave。
 
-**方式二：使用 mysqldump 进行备份恢复。** 
+**方式二：使用 mysqldump 进行备份恢复。**
 
 这种方式简单的多，而且对于 innodb 表很适用，但是 slave 上恢复时速度慢，因为恢复时数据全是通过 insert 插入的。因为 mysqldump 可以进行定时点恢复甚至记住 binlog 的坐标，所以无需再手动获取 binlog 的坐标。
 
@@ -320,7 +320,7 @@ shell> mysqldump -uroot -p --all-databases --master-data=2 >dump.db
 
 注意，`--master-data`选项将再 dump.db 中加入`change master to`相关的语句，值为 2 时，`change master to`语句是注释掉的，值为 1 或者没有提供值时，这些语句是直接激活的。同时，`--master-data`会锁定所有表(如果同时使用了`--single-transaction`，则不是锁所有表，详细内容请参见[mysqldump](https://www.cnblogs.com/f-ck-need-u/p/9013458.html))。
 
-因此，可以直接从 dump.db 中获取到 binlog 的坐标。**记住这个坐标。** 
+因此，可以直接从 dump.db 中获取到 binlog 的坐标。**记住这个坐标。**
 
 ```bash
 [root@xuexi ~]# grep -i -m 1 'change master to' dump.db 
@@ -332,7 +332,8 @@ shell> mysqldump -uroot -p --all-databases --master-data=2 >dump.db
 ```bash
 shell> mysql -uroot -p -h 192.168.100.150 -e 'source dump.db'
 ```
-**方式三：使用 xtrabackup 进行备份恢复。** 
+
+**方式三：使用 xtrabackup 进行备份恢复。**
 
 这是三种方式中最佳的方式，安全性高、速度快。因为 xtrabackup 备份的时候会记录 master 的 binlog 的坐标，因此也无需手动获取 binlog 坐标。
 
@@ -364,7 +365,7 @@ drwxr-x--- 2 root root    12288 May 29 04:12 sys
 -rw-r----- 1 root root     2560 May 29 04:12 xtrabackup_logfile
 ```
 
-其中 xtrabackup_binlog_info 中记录了 binlog 的坐标。**记住这个坐标。** 
+其中 xtrabackup_binlog_info 中记录了 binlog 的坐标。**记住这个坐标。**
 
 ```bash
 [root@xuexi ~]# cat backup2018-05-29_04-12-15xtrabackup_binlog_info 
@@ -429,6 +430,7 @@ shell> mysql -uroot -p -e 'select * from backuptest.num_isam limit 10;'
 | 10 |
 +----+
 ```
+
 ## 4.3 slave 开启复制
 
 经过前面的一番折腾，总算是把该准备的数据都准备到 slave 上，也获取到 master 上 binlog 的坐标(154)。现在还欠东风：连接 master。
@@ -613,12 +615,12 @@ Relay_Master_Log_File: master-bin.000002
 
 理解这几行的意义至关重要，前面因为排版限制，描述看上去有些重复。所以这里完整地描述它们：
 
-*   `Master_Log_File`：IO 线程正在读取的 master binlog；
-*   `Read_Master_Log_Pos`：IO 线程已经读取到 master binlog 的哪个位置；
-*   `Relay_Log_File`：SQL 线程正在读取和执行的 relay log；
-*   `Relay_Log_Pos`：SQL 线程已经读取和执行到 relay log 的哪个位置；
-*   `Relay_Master_Log_File`：SQL 线程最近执行的操作对应的是哪个 master binlog；
-*   `Exec_Master_Log_Pos`：SQL 线程最近执行的操作对应的是 master binlog 的哪个位置。
+- `Master_Log_File`：IO 线程正在读取的 master binlog；
+- `Read_Master_Log_Pos`：IO 线程已经读取到 master binlog 的哪个位置；
+- `Relay_Log_File`：SQL 线程正在读取和执行的 relay log；
+- `Relay_Log_Pos`：SQL 线程已经读取和执行到 relay log 的哪个位置；
+- `Relay_Master_Log_File`：SQL 线程最近执行的操作对应的是哪个 master binlog；
+- `Exec_Master_Log_Pos`：SQL 线程最近执行的操作对应的是 master binlog 的哪个位置。
 
 所以，(Relay_Master_Log_File, Exec_Master_log_Pos)构成一个坐标，这个坐标表示 slave 上已经将 master 上的哪些数据重放到自己的实例中，它可以用于下一次`change master to`时指定的 binlog 坐标。
 
@@ -646,8 +648,8 @@ mysql> show processlist;   # slave上的信息，为了排版，简化了输出
 ```
 
 可以看到：
-*   `Id=8`的线程负责连接 master 并读取 binlog，它是 IO 线程，它的状态指示"等待 master 发送更多的事件"；
-*   `Id=9`的线程负责读取 relay log，它是 SQL 线程，它的状态指示"已经读取了所有的 relay log"。
+- `Id=8`的线程负责连接 master 并读取 binlog，它是 IO 线程，它的状态指示"等待 master 发送更多的事件"；
+- `Id=9`的线程负责读取 relay log，它是 SQL 线程，它的状态指示"已经读取了所有的 relay log"。
 
 再看看此时 master 上的信息。
 
@@ -698,16 +700,15 @@ mysql: [Warning] Using a password on the command line interface can be insecure.
 
 从中获取到的信息有：
 
-1.  IO 线程的状态
-2.  SQL 线程的状态
-3.  IO 线程读取到 master binlog 的哪个位置：512685413
-4.  SQL 线程已经执行到 relay log 的哪个位置：336989434
-5.  SQL 线程执行的位置对应于 master binlog 的哪个位置：336989219
+1. IO 线程的状态
+2. SQL 线程的状态
+3. IO 线程读取到 master binlog 的哪个位置：512685413
+4. SQL 线程已经执行到 relay log 的哪个位置：336989434
+5. SQL 线程执行的位置对应于 master binlog 的哪个位置：336989219
 
 可以看出，IO 线程比 SQL 线程超前了很多很多，所以 SQL 线程比 IO 线程的延迟较大。
 
 ## 4.5 MySQL 复制如何实现断开重连
-
 
 很多人以为`change master to`语句是用来连接 master 的，实际上这种说法是错的。连接 master 是 IO 线程的事情，`change master to`只是为 IO 线程连接 master 时提供连接参数。
 
@@ -730,26 +731,26 @@ skip-slave-start
 
 默认情况下，slave 连接到 master 后会在 slave 的 datadir 下生成 master.info 和 relay-log.info 文件，但是这是可以通过设置变量来改变的。
 
-* `master-info-repository={TABLE|FILE}`：master 的信息是记录到文件 master.info 中还是记录到表 mysql.slave_master_info 中。默认为 file。
-* `relay-log-info-repository={TABLE|FILE}`：slave 的信息是记录到文件 relay-log.info 中还是记录到表 mysql.slave_relay_log_info 中。默认为 file。
+- `master-info-repository={TABLE|FILE}`：master 的信息是记录到文件 master.info 中还是记录到表 mysql.slave_master_info 中。默认为 file。
+- `relay-log-info-repository={TABLE|FILE}`：slave 的信息是记录到文件 relay-log.info 中还是记录到表 mysql.slave_relay_log_info 中。默认为 file。
 
 IO 线程每次从 master 复制日志要写入到 relay log 中，但是它是先放在内存的，等到一定时机后才会将其刷到磁盘上的 relay log 文件中。刷到磁盘的时机可以由变量控制。
 
 另外，IO 线程每次从 master 复制日志后都会更新 master.info 的信息，也是先更新内存中信息，在特定的时候才会刷到磁盘的 master.info 文件；同理 SQL 线程更新 realy-log.info 也是一样的。它们是可以通过变量来设置更新时机的。
 
-* `sync-relay-log=N`：设置为大于 0 的数表示每从 master 复制 N 个事件就刷一次盘。设置为 0 表示依赖于操作系统的 sync 机制。
-* `sync-master-info=N`：依赖于`master-info-repository`的设置，如果为 file，则设置为大于 0 的值时表示每更新多少次 master.info 将其写入到磁盘的 master.info 中，设置为 0 则表示由操作系统来决定何时调用`fdatasync()`函数刷到磁盘。如果设置为 table，则设置为大于 0 的值表示每更新多少次 master.info 就更新 mysql.slave_master_info 表一次，如果设置为 0 则表示永不更新该表。
-* `sync-relay-log-info=N`：同上。
+- `sync-relay-log=N`：设置为大于 0 的数表示每从 master 复制 N 个事件就刷一次盘。设置为 0 表示依赖于操作系统的 sync 机制。
+- `sync-master-info=N`：依赖于`master-info-repository`的设置，如果为 file，则设置为大于 0 的值时表示每更新多少次 master.info 将其写入到磁盘的 master.info 中，设置为 0 则表示由操作系统来决定何时调用`fdatasync()`函数刷到磁盘。如果设置为 table，则设置为大于 0 的值表示每更新多少次 master.info 就更新 mysql.slave_master_info 表一次，如果设置为 0 则表示永不更新该表。
+- `sync-relay-log-info=N`：同上。
 
 # 5.一主多从
 
 一主多从有两种情况，结构图如下。
 
-以下是一主多从的结构图(和一主一从的配置方法完全一致)： 
+以下是一主多从的结构图(和一主一从的配置方法完全一致)：
 
 ![img](../assets/733013-20180528163904784-673253663.png)
 
-以下是一主多从，但某 slave 是另一群 MySQL 实例的 master： 
+以下是一主多从，但某 slave 是另一群 MySQL 实例的 master：
 
 ![img](../assets/733013-20180528163917913-780164983.png)
 
@@ -771,7 +772,7 @@ IO 线程每次从 master 复制日志要写入到 relay log 中，但是它是�
 
 其实 **临时关闭一个 slave 对业务影响很小，所以我个人建议，新添加 slave 时采用冷备份 slave 的方式**，不仅备份恢复的速度最快，配置成 slave 也最方便，这一点和前面配置"一主一从"不一样。但冷备份 slave 的时候需要注意几点：
 
-1.  可以考虑将 slave1 完全 shutdown 再将整个 datadir 拷贝到新的 slave2 上。
+1. 可以考虑将 slave1 完全 shutdown 再将整个 datadir 拷贝到新的 slave2 上。
 2. **建议新的 slave2 配置文件中的"relay-log"的值和 slave1 的值完全一致**，否则应该手动从 slave2 的 relay-log.info 中获取 IO 线程连接 master 时的坐标，并在 slave2 上使用`change master to`语句设置连接参数。 方法很简单，所以不做演示了。
 
 ## 5.2 配置一主多从(从中有从)
@@ -797,7 +798,7 @@ mysql> show variables like "read_only";
 +---------------+-------+
 ```
 
-1.  在 slave 上没有开启`log-slave-updates`和 binlog 选项时，重放 relay log 不会记录 binlog。**所以如果 slave2 要作为某些 slave 的 master，那么在 slave2 上必须要开启 log-slave-updates 和 binlog 选项。为了安全和数据一致性，在 slave2 上还应该启用 read-only 选项。** 环境如下：
+1. 在 slave 上没有开启`log-slave-updates`和 binlog 选项时，重放 relay log 不会记录 binlog。**所以如果 slave2 要作为某些 slave 的 master，那么在 slave2 上必须要开启 log-slave-updates 和 binlog 选项。为了安全和数据一致性，在 slave2 上还应该启用 read-only 选项。** 环境如下：
 
 ![img](../assets/733013-20180608100823680-1104661841.png)
 
@@ -848,16 +849,16 @@ shell> mysqladmin -uroot -p shutdown
 shell> mysqladmin -uroot -p shutdown
 shell> rsync -az --delete /data 192.168.100.19:/
 shell> service mysqld start
-``` 
+```
 
 **冷备份时，以下几点千万注意** ：
 
 1. 因为 slave2 是 slave1 的从，所以在启动 MySQL 前必须将备份到 slave2 上的和复制有关的文件都删除 。包括：
-    * (1).master.info。除非配置文件中指定了`skip-slave-start`，否则 slave2 将再次连接到 master 并作为 master 的 slave。
-    * (2).relay-log.info。因为 slave1 启动后会继续执行 relay log 中的内容(如果有未执行的)，这时 slave1 会将这部分写入 binlog 并传送到 slave2。
-    * (3).删除 relay log 文件。其实不是必须删除，但建议删除。
-    * (4).删除 relay log index 文件。
-    * (5).删除 DATADIR/auto.conf。这个文件必须删除，因为这里面保留了 mysql server 的 UUID，而 master 和 slave 的 UUID 必须不能一致。在启动 mysql 的时候，如果没有这个文件会自动生成自己的 UUID 并保存到 auto.conf 中。
+    - (1).master.info。除非配置文件中指定了`skip-slave-start`，否则 slave2 将再次连接到 master 并作为 master 的 slave。
+    - (2).relay-log.info。因为 slave1 启动后会继续执行 relay log 中的内容(如果有未执行的)，这时 slave1 会将这部分写入 binlog 并传送到 slave2。
+    - (3).删除 relay log 文件。其实不是必须删除，但建议删除。
+    - (4).删除 relay log index 文件。
+    - (5).删除 DATADIR/auto.conf。这个文件必须删除，因为这里面保留了 mysql server 的 UUID，而 master 和 slave 的 UUID 必须不能一致。在启动 mysql 的时候，如果没有这个文件会自动生成自己的 UUID 并保存到 auto.conf 中。
 
 2. 检查 slave1 上从 master 复制过来的专门用于复制的用户`repl`是否允许 slave2 连接。如果不允许，应该去 master 上修改这个用户。
 
@@ -958,7 +959,6 @@ mysql> show slave hosts;
 +-----------+----------------+------+-----------+--------------------------------------+
 ```
 
-
 ## 6.4 多线程复制
 
 在老版本中，只有一个 SQL 线程读取 relay log 并重放。重放的速度肯定比 IO 线程写 relay log 的速度慢非常多，导致 SQL 线程非常繁忙，且 **实现到从库上延迟较大**。**没错，多线程复制可以解决主从延迟问题，且使用得当的话效果非常的好(关于主从复制延迟，是生产环境下最常见的问题之一，且没有很好的办法来避免。后文稍微介绍了一点方法)**。
@@ -1013,7 +1013,7 @@ mysql> show full processlist;
 
 那么如何避免这种问题，出现这种问题如何解决？
 
-**1.如何避免 gap。** 
+**1.如何避免 gap。**
 
 前面说了，多个 SQL 线程是通过协调器来调度的。默认情况下，可能会出现 gap 的情况，这是因为变量`slave_preserve_commit_order`的默认值为 0。该变量指示协调器是否让每个 SQL 线程执行的事务按 master binlog 中的顺序提交。因此，将其设置为 1，然后重启 SQL 线程即可保证 SQL 线程按序提交，也就不可能会有 gap 的出现。
 
@@ -1036,15 +1036,16 @@ log-slave-updates
 slave_parallel_workers=1
 slave_parallel_type=LOGICAL_CLOCK
 shell>service mysqld start
-``` 
+```
+
 **2.如何处理已经存在的 gap。**
 
 方法之一，是从 master 上重新备份恢复到 slave 上，这种方法是处理不当的最后解决办法。
 
 正常的处理方法是，使用`START SLAVE [SQL_THREAD] UNTIL SQL_AFTER_MTS_GAPS;`，它表示 SQL 线程只有先填充 gaps 后才能启动。实际上，它涉及了两个操作：
 
-* (1).填充 gaps
-* (2).自动停止 SQL 线程(所以之后需要手动启动 SQL 线程)
+- (1).填充 gaps
+- (2).自动停止 SQL 线程(所以之后需要手动启动 SQL 线程)
 
 一般来说，在填充完 gaps 之后，应该先`reset slave`移除已经执行完的 relay log，然后再去启动 sql_thread。
 
@@ -1117,7 +1118,6 @@ mysql> set sql_log_bin=1;
 
 ## 6.7 主从高延迟的解决思路
 
-
 slave 通过 IO 线程获取 master 的 binlog，并通过 SQL 线程来应用获取到的日志。因为各个方面的原因，经常会出现 slave 的延迟(即`Seconds_Behind_Master`的值)非常高(动辄几天的延迟是常见的，几个小时的延迟已经算短的)，使得主从状态不一致。
 
 一个很容易理解的延迟示例是：假如 master 串行执行一个大事务需要 30 分钟，那么 slave 应用这个事务也大约要 30 分钟，从 master 提交的那一刻开始，slave 的延迟就是 30 分钟，更极端一点，由于 binlog 的记录时间点是在事务提交时，如果这个大事务的日志量很大，比如要传输 10 多分钟，那么很可能延迟要达到 40 分钟左右。而且更严重的是，这种延迟具有滚雪球的特性，从延迟开始，很容易导致后续加剧延迟。
@@ -1135,4 +1135,3 @@ slave 通过 IO 线程获取 master 的 binlog，并通过 SQL 线程来应用�
 4. 使用组复制或者 Galera/PXC 的多写节点，此外还可以设置相关参数，让它们对延迟自行调整。但一般都不需要调整，因为有默认设置。
 
 还有比较细致的方面可以降低延迟，比如设置为 row 格式的 Binlog 要比 statement 要好，因为不需要额外执行语句，直接修改数据即可。比如 master 设置保证数据一致性的日志刷盘规则(sync_binlog/innodb_flush_log_at_trx_commit 设置为 1)，而 slave 关闭 binlog 或者设置性能优先于数据一致性的 binlog 刷盘规则。再比如设置 slave 的隔离级别使得 slave 的锁粒度放大，不会轻易锁表(多线程复制时避免使用此方法)。还有很多方面，选择好的磁盘，设计好分库分表的结构等等，这些都是直接全局的，实在没什么必要在这里多做解释。
-

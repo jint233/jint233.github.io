@@ -188,7 +188,7 @@ _因为事务 T 已经提交了，所以没有活跃的事务。_
 
 #### REPEATABLE READ ——首次读取数据会创建 ReadView
 
-假设，现在系统只有一个活跃的事务 T，事务 id 是 100，事务中修改了数据，但是还没有提交，形成的版本链是这样的： 
+假设，现在系统只有一个活跃的事务 T，事务 id 是 100，事务中修改了数据，但是还没有提交，形成的版本链是这样的：
 
 ![image.png](https://upload-images.jianshu.io/upload_images/15100432-cae882ecd4fc0a0a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 

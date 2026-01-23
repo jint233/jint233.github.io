@@ -729,7 +729,7 @@ ObjectInputStream.readObject -> readObject0 -> readOrdinaryObject -> readClassDe
 ### IDEA 提示
 
 为了确保我们不会忘记定义 `serialVersionUID`，可以调节一下 Intellij IDEA 的配置，在实现 `Serializable` 接口后，如果没定义 `serialVersionUID` 的话，IDEA（eclipse 一样）会进行提示：
- 
+
 ![img](../assets/15455657868672.jpg)
 
 并且可以一键生成一个：
@@ -797,7 +797,7 @@ ObjectInputStream.readObject -> readObject0 -> readOrdinaryObject -> readClassDe
 
 s 中保存的是一个重新创建出来的 String 对象的引用。
 
-那么，在 Java 中到底如何进行字符串拼接呢？字符串拼接有很多种方式，这里简单介绍几种比较常用的。 
+那么，在 Java 中到底如何进行字符串拼接呢？字符串拼接有很多种方式，这里简单介绍几种比较常用的。
 
 **使用+拼接字符串** 在 Java 中，拼接字符串最简单的方式就是直接使用符号 `+` 来拼接。如：
 

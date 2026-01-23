@@ -199,7 +199,7 @@ gfsh start server --name=${servername} --locators=${locators} --locator-wait-tim
     Successfully connected to: JMX Manager [host=192.168.33.15, port=1099]
     Cluster configuration service is up and running.
     ```
-    
+
     我们可以看到当我们启动的时候，打印的日志会告诉我们链接到了谁。
 
 2. connect 到 locator 后的日志：
@@ -211,7 +211,7 @@ gfsh start server --name=${servername} --locators=${locators} --locator-wait-tim
     Connecting to Manager at [host=192.168.33.15, port=1099] ..
     Successfully connected to: [host=192.168.33.15, port=1099]
     ```
-    
+
     我们可以看到，当我们链接 33.23 的时候，它会转到 manager 地址，这就是当前的 locator leader 了。
 
 #### 打开 pulse 控制台
@@ -305,12 +305,12 @@ gfsh>create region --name=test --type=PARTITION_REDUNDANT_PERSISTENT_OVERFLOW --
 
 注意：`--type` 参数，我们可以看到是由四个单词组成，分区、复制、持久化、磁盘，基本所有的类型都是由这四个拼凑的。
 
-*   PARTITION：分区
-*   REPLICATE：复制
-*   PERSISTENT：持久化
-*   OVERFLOW：内存不足减少内存使用
-*   REDUNDANT：冗余 -> 可配置冗余数量，但是不知道是否会参与 read 不清楚
-*   HEAP_LRU：最近最少使用清除内存
+- PARTITION：分区
+- REPLICATE：复制
+- PERSISTENT：持久化
+- OVERFLOW：内存不足减少内存使用
+- REDUNDANT：冗余 -> 可配置冗余数量，但是不知道是否会参与 read 不清楚
+- HEAP_LRU：最近最少使用清除内存
 
 ```plaintext
 LOCAL                                     LOCAL_HEAP_LRU                            LOCAL_OVERFLOW                            LOCAL_PERSISTENT
@@ -349,10 +349,10 @@ list gateways             list indexes              list jdbc-mappings        li
 
 我们常用的有：
 
-*   list members：查看所有成员
-*   list regions：查看所有 region
-*   list clients：查看链接的客户端
-*   list functions：查看函数（线上我们还未使用函数计算功能）
+- list members：查看所有成员
+- list regions：查看所有 region
+- list clients：查看链接的客户端
+- list functions：查看函数（线上我们还未使用函数计算功能）
 
 像 indexs、lucene、gateways 现在都未用到。
 
@@ -518,15 +518,15 @@ Continue?  (Y/n): y
 
 我们将应用的实体类打包上传到 Geode 集群中，然后通过 deploy 命令进行部署。
 
-*   deploy 后不需要重启，直接生效
-*   只 deploy 一次即可 全站生效
-*   注意对象要实现序列化接口
+- deploy 后不需要重启，直接生效
+- 只 deploy 一次即可 全站生效
+- 注意对象要实现序列化接口
 
 实现序列化的三种方式：
 
-*   PDX 反序列化快
-*   Geode Serializable 序列化比 PDX 快 25%
-*   Java 序列化效率一般
+- PDX 反序列化快
+- Geode Serializable 序列化比 PDX 快 25%
+- Java 序列化效率一般
 
 我们示例中使用的是 Java 序列化。关于序列化，Geode 官方文档中使用了一个章节来说明 [请看这里](https://geode.apache.org/docs/guide/19/developing/data_serialization/chapter_overview.html)。
 
@@ -611,11 +611,11 @@ Cluster-254 gfsh>query --query="select age, count(\*), max(id)  from /user t whe
 
 #### 查询小结
 
-*   注意对象的序列化
-*   注意使用的类要部署到服务端
-*   提高查询效率可以使用索引
-*   查询时保证不要查太多数据
-*   关于分页还未找到好的方式
+- 注意对象的序列化
+- 注意使用的类要部署到服务端
+- 提高查询效率可以使用索引
+- 查询时保证不要查太多数据
+- 关于分页还未找到好的方式
 
 ### Geode 连续查询
 
@@ -712,8 +712,8 @@ id=1574827945765
 
 那么我们思考一下这个连续查询能为我们做什么呢？
 
-*   类似 ZK 的通知？
-*   类似消息队列的订阅模型？
+- 类似 ZK 的通知？
+- 类似消息队列的订阅模型？
 
 ### Goede 与 Spring 结合
 
@@ -1171,7 +1171,7 @@ rm -rf apache-geode-1.9.2.tgz
     gfsh>
 ```
 
-##### **修改 /etc/profile 更改环境变量** 
+##### **修改 /etc/profile 更改环境变量**
 
 1. 执行 `vi /ect/profile`
 
@@ -1199,10 +1199,10 @@ rm -rf apache-geode-1.9.2.tgz
     Running on: /192.168.33.15, 4 cpu(s), amd64 Linux 2.6.32-696.23.1.el6.x86_64
     ```
 
-##### **启动新 locator** 
+##### **启动新 locator**
 
 1. 启动新的主 locator，执行启动脚本 start_locator_33_15.sh
-    
+
     ```java
     Locator in /opt/geode_work18/locator_33_15 on 192.168.33.15[10334] as locator_33_15 is currently online.
     Process ID: 30782
@@ -1234,7 +1234,7 @@ rm -rf apache-geode-1.9.2.tgz
 1. 停止 server
 
     注意：要在主 locator 节点上的 gfsh 里执行，现在我们的主是 33.20 因此我们上到这台机器并连接 JMX 进行管理。
-    
+
     ```plaintext
     stop server --name=server_33_15
     ```
@@ -1246,7 +1246,7 @@ rm -rf apache-geode-1.9.2.tgz
    - 更改 /etc/profile 配置
 
 3. 去 33.15 机器上执行启动 server 的脚本。
-    
+
     ```plaintext
     sh start_server_33_15.sh
     ```
@@ -1547,7 +1547,7 @@ list is: [[ent(27134):60330/45855, ent(27130):60333/36743]]
 
 > [https://gitee.com/gavinage/geode_study](https://gitee.com/gavinage/geode_study)
 
-#### Geode 扩展功能 **memCache 适配器** 
+#### Geode 扩展功能 **memCache 适配器**
 
 ```plaintext
 gfsh>start server
@@ -1558,7 +1558,7 @@ gfsh>start server
 ```
 
 **HTTP 分布式 session** 之前接触的分布式 session 方案是 Redis-cluster + Tomcat 来做的， 其实道理是一样的， Geode 替换了 Redis 就成功 geode-session-Tomcat 了。
-Geode 使用了不小的篇幅来描述该扩展功能，[详见](https://geode.apache.org/docs/guide/110/tools_modules/http_session_mgmt/quick_start.html)。**Redis 适配器** 
+Geode 使用了不小的篇幅来描述该扩展功能，[详见](https://geode.apache.org/docs/guide/110/tools_modules/http_session_mgmt/quick_start.html)。**Redis 适配器**
 
 ```plaintext
 gfsh> start server --name=server1 --redis-bind-address=localhost \

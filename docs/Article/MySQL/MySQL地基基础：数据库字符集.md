@@ -182,22 +182,22 @@ mysqld --default-character-set=gbk
 
 #### 数据库级设置字符集
 
-*   创建数据库时指定字符集（create database ... ）
-*   修改数据库时修改字符集（alter database ...）
+- 创建数据库时指定字符集（create database ... ）
+- 修改数据库时修改字符集（alter database ...）
 
 注：对于已经存在的数据修改字符集无效。
 
 #### 表级设置字符集
 
-*   创建表时指定字符集（create table ...）
-*   修改表时修改字符集（alter table ...）
+- 创建表时指定字符集（create table ...）
+- 修改表时修改字符集（alter table ...）
 
 注：对于已经存在的数据修改字符集无效。
 
 #### 列级设置字符集
 
-*   创建表时指定列字符集（create table ...）
-*   修改表时修改列字符集（alter table ...）
+- 创建表时指定列字符集（create table ...）
+- 修改表时修改列字符集（alter table ...）
 
 注：对于已经存在的数据修改字符集无效。
 
@@ -221,9 +221,9 @@ create database db1 default character set utf8 collate utf8_bin;
 
 说明：
 
-*   如果指定了字符集和校对规则，则使用指定的
-*   如果指定了字符集未指定校对规则，则使用指定字符集和默认校对规则
-*   如果未指定字符集和校对规则，则使用服务器字符集和校对规则
+- 如果指定了字符集和校对规则，则使用指定的
+- 如果指定了字符集未指定校对规则，则使用指定字符集和默认校对规则
+- 如果未指定字符集和校对规则，则使用服务器字符集和校对规则
 
 **2. 为表设置字符集和校对规则**
 
@@ -241,9 +241,9 @@ create table tab1(column1 varchar(5)) default character set utf8 collate utf8_bi
 
 说明：
 
-*   如果指定了字符集和校对规则，则使用指定的
-*   如果指定了字符集未指定校对规则，则使用指定字符集和默认校对规则
-*   如果未指定字符集和校对规则，则使用数据库字符集和校对规则
+- 如果指定了字符集和校对规则，则使用指定的
+- 如果指定了字符集未指定校对规则，则使用指定字符集和默认校对规则
+- 如果未指定字符集和校对规则，则使用数据库字符集和校对规则
 
 **3. 为列设置字符集和校对规则**
 
@@ -261,35 +261,35 @@ create table tab1(column1 varchar(5) character set utf8 collate utf8_bin);
 
 说明：
 
-*   如果指定了字符集和校对规则，则使用指定的
-*   如果指定了字符集未指定校对规则，则使用指定字符集和默认校对规则
-*   如果未指定字符集和校对规则，则使用表字符集和校对规则
+- 如果指定了字符集和校对规则，则使用指定的
+- 如果指定了字符集未指定校对规则，则使用指定字符集和默认校对规则
+- 如果未指定字符集和校对规则，则使用表字符集和校对规则
 
-**4. 如何处理带数据的字符集** 当表中已经存在数据，直接更改字符集，不会更改既有的数据字符集，我们需要先将数据导出，调整字符集再导入。**第一步：导出表结构** 
+**4. 如何处理带数据的字符集** 当表中已经存在数据，直接更改字符集，不会更改既有的数据字符集，我们需要先将数据导出，调整字符集再导入。**第一步：导出表结构**
 
 ```plaintext
 mysqldump -uroot -p --default-character-set=gbk -d db1> createtab.sql
 ```
 
-**第二步：修改表字符集** 编辑修改 createtab.sql 文件，将表结构定义中的字符集改为新的字符集。**第三步：导出所有数据** 
+**第二步：修改表字符集** 编辑修改 createtab.sql 文件，将表结构定义中的字符集改为新的字符集。**第三步：导出所有数据**
 
 ```plaintext
 mysqldump -uroot -p --quick --no-create-info --extended-insert --default-character-set=latin1 db1> data.sql
 ```
 
-**第四步：修改数据字符集** 编辑修改 data.sql，将 set names latin1 修改成 set names gbk。**第五步：创建数据库** 
+**第四步：修改数据字符集** 编辑修改 data.sql，将 set names latin1 修改成 set names gbk。**第五步：创建数据库**
 
 ```plaintext
 create database db1 default charset gbk;
 ```
 
-**第六步：创建表** 
+**第六步：创建表**
 
 ```plaintext
 mysql -uroot -p db1 < createtab.sql
 ```
 
-**第七步：导入数据** 
+**第七步：导入数据**
 
 ```plaintext
 mysql -uroot -p db1 \< data.sql

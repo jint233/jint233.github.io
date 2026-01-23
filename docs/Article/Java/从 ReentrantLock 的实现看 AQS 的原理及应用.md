@@ -584,7 +584,7 @@ private void cancelAcquire(Node node) {
     (1) 当前节点是尾节点。
 
     (2) 当前节点是 Head 的后继节点。
-    
+
     (3) 当前节点不是 Head 的后继节点，也不是尾节点。
 
 根据上述第二条，我们来分析每一种情况的流程。

@@ -150,6 +150,7 @@ public WebApplicationContext initWebApplicationContext(ServletContext servletCon
 - \<4.1> 处，如果未刷新（激活）。默认情况下，是符合这个条件的，所以会往下执行。
 
 - \<4.2> 处，无父容器，则进行加载和设置。默认情况下，ContextLoader#loadParentContext(ServletContext servletContext) 方法，返回 null。代码如下：
+
 ```
 
 // ContextLoader.java
@@ -195,8 +196,9 @@ public WebApplicationContext initWebApplicationContext(ServletContext servletCon
 
 // ContextLoader.java
   /**
-   * Config param for the root WebApplicationContext implementation class to use: {@value}.
-   * @see #determineContextClass(ServletContext)
+
+- Config param for the root WebApplicationContext implementation class to use: {@value}.
+- @see #determineContextClass(ServletContext)
    */
   public static final String CONTEXT_CLASS_PARAM = "contextClass";
   protected Class<?> determineContextClass(ServletContext servletContext) {
@@ -236,15 +238,16 @@ public WebApplicationContext initWebApplicationContext(ServletContext servletCon
 
 // ContextLoader.java
   /**
-   * Config param for the root WebApplicationContext id,
-   * to be used as serialization id for the underlying BeanFactory: {@value}.
+
+- Config param for the root WebApplicationContext id,
+- to be used as serialization id for the underlying BeanFactory: {@value}.
    */
   public static final String CONTEXT_ID_PARAM = "contextId";
   /**
-   * Name of servlet context parameter (i.e., {@value}) that can specify the
-   * config location for the root context, falling back to the implementation's
-   * default otherwise.
-   * @see org.springframework.web.context.support.XmlWebApplicationContext#DEFAULT_CONFIG_LOCATION
+- Name of servlet context parameter (i.e., {@value}) that can specify the
+- config location for the root context, falling back to the implementation's
+- default otherwise.
+- @see org.springframework.web.context.support.XmlWebApplicationContext#DEFAULT_CONFIG_LOCATION
    */
   public static final String CONFIG_LOCATION_PARAM = "contextConfigLocation";
   public static final String CONTEXT_ID_PARAM = "contextId";
@@ -275,7 +278,7 @@ public WebApplicationContext initWebApplicationContext(ServletContext servletCon
       if (env instanceof ConfigurableWebEnvironment) {
           ((ConfigurableWebEnvironment) env).initPropertySources(sc, null);
       }
-      // <4> 执行自定义初始化 context 
+      // <4> 执行自定义初始化 context
       customizeContext(sc, wac);
       // <5> 刷新 context，执行初始化
       wac.refresh();
@@ -472,8 +475,6 @@ protected void initServletBean() throws ServletException {
 }
 ```
 
-
-
 ```plaintext
 #### 2.2 FrameworkServlet
 ```
@@ -666,8 +667,6 @@ protected void initStrategies(ApplicationContext context) {
 }
 ```
 
-
-
 ```plaintext
 #### 2.3 DispatcherServlet
 ```
@@ -767,8 +766,6 @@ public interface MultipartResolver {
 }
 ```
 
-
-
 ```plaintext
 ##### **2.3.2 LocaleResolver**
 ```
@@ -788,8 +785,6 @@ public interface LocaleResolver {
     void setLocale(HttpServletRequest request, @Nullable HttpServletResponse response, @Nullable Locale locale);
 }
 ```
-
-
 
 ```plaintext
 ##### **2.3.3 ThemeResolver**
@@ -901,8 +896,6 @@ public interface HandlerExceptionResolver {
             HttpServletRequest request, HttpServletResponse response, @Nullable Object handler, Exception ex);
 }
 ```
-
-
 
 ```plaintext
 ##### **2.3.7 RequestToViewNameTranslator**
@@ -1101,13 +1094,9 @@ protected final void doDelete(HttpServletRequest request, HttpServletResponse re
 }
 ```
 
-
-
 ```plaintext
 #### 3.3 针对 doOptions 请求的处理
 ```
-
-
 
 ```java
 // FrameworkServlet.java
@@ -1152,8 +1141,6 @@ OPTIONS 请求方法，实际场景下用的少。
 ```plaintext
 #### 3.4 针对 doTrace 请求的处理
 ```
-
-
 
 ```java
 // FrameworkServlet.java
@@ -1228,8 +1215,6 @@ protected final void processRequest(HttpServletRequest request, HttpServletRespo
 }
 ```
 
-
-
 ```javascript
 #### 3.6 DispatcherServlet 处理请求
 ```
@@ -1283,8 +1268,6 @@ protected void doService(HttpServletRequest request, HttpServletResponse respons
     }
 }
 ```
-
-
 
 ```plaintext
 #### 3.7 请求的分发
@@ -1461,8 +1444,6 @@ protected String getDefaultViewName(HttpServletRequest request) throws Exception
 
 #### 4.1 处理请求响应的结果数据
 ```
-
-
 
 ```plaintext
 DispatcherServlet#processDispatchResult(HttpServletRequest request, HttpServletResponse response, HandlerExecutionChain mappedHandler, ModelAndView mv, Exception exception)
@@ -1669,6 +1650,7 @@ protected View resolveViewName(String viewName, @Nullable Map<String, Object> mo
 ```
 
 Spring MVC 的初始化及请求分发处理请求的流程总结：
+
 ```
 
 - ContextLoaderListener 监听 Servlet 容器（tomcat、jetty、jboss 等）的启动事件，调用 `ContextLoaderListener #contextInitialized(ServletContextEvent event)` 方法，初始化 Root WebApplicationContext 容器。

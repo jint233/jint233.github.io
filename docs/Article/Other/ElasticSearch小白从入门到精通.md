@@ -468,7 +468,7 @@ curl -X PUT "localhost:9200/my_index/_mapping/my_type?pretty" -H 'Content-Type: 
 
 ##### **Lucene 如何处理文档** 在 Lucene 中一个文档由键值对组成。在索引文档的时候，每个字段的值都会添加到相关字段的倒排序中
 
-##### **类型如何实现** 每个文档的类型名称将会保存在 _type 字段上，当要检索字段的时候，ES 会自动在 _type 字段上检索
+##### **类型如何实现** 每个文档的类型名称将会保存在 _type 字段上，当要检索字段的时候，ES 会自动在_type 字段上检索
 
 例如在 User 类型中，name 字段会映射声明为 string 类型，并索引到 name 的倒排序中，需要使用 whitespace 分词器分析。
 

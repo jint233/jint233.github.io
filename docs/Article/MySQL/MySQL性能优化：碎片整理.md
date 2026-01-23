@@ -79,7 +79,7 @@ mysql> select count(*) from titles;
 
 接下来我们开始看看都有哪些碎片吧。这里介绍两种方式查看表碎片。
 
-**1. 通过表状态信息查看** 
+**1. 通过表状态信息查看**
 
 ```plaintext
 show table status like '%table_name%';
@@ -133,7 +133,9 @@ where t.table_schema = 'employees';
 ```
 
 根据结果显示，data_free 列数据就是我们要查询的表的碎片大小内容，是 4M。
+
 ### 如何清理碎片
+
 找到表碎片了，我们如何清理呢？有两种方法。**1. 分析表** 命令：
 
 ```plaintext
@@ -188,4 +190,5 @@ mysql> select count(*) from salaries;
 ```
 
 速度还是提高了不少，清理碎片后提高了查询速度。**总结一下** ：清理表的碎片可以提高 MySQL 性能，在日常工作中我们可以定期执行表碎片整理，从而提高 MySQL 性能。
+
 ```

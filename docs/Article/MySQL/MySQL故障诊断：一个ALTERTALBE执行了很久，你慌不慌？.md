@@ -16,7 +16,7 @@ performance_schema 这个是什么，是不是用它来让我们解除慌张？
 
 有关 MySQL 数据字典，可以看我的另外一个 Chat：
 
-> [MySQL 地基基础：数据字典](./MySQL 地基基础：数据字典.md)
+> [MySQL 地基基础：数据字典](./MySQL地基基础：数据字典.md)
 
 ### 使用一些重要的重要功能
 
@@ -34,7 +34,7 @@ performance_schema 这个是什么，是不是用它来让我们解除慌张？
 
 想要使用这个能力，我们需要开启几个功能。
 
-**Enable the stage/innodb/alter% instruments** 
+**Enable the stage/innodb/alter% instruments**
 
 ```sql
 mysql> UPDATE performance_schema.setup_instruments
@@ -49,7 +49,7 @@ Query OK, 0 rows affected (0.01 sec)
 Rows matched: 7  Changed: 0  Warnings: 0
 ```
 
-**Enable the stage event consumer tables** 
+**Enable the stage event consumer tables**
 
 ```sql
 mysql> UPDATE performance_schema.setup_consumers
@@ -85,7 +85,9 @@ Rows matched: 1  Changed: 1  Warnings: 0
 ```
 
 功能开启了，接下来我们进行直观的验证环节。
+
 ### 直观的观察事件执行进度
+
 首先，我们有一张大表（你可以用 SysBench 建一个，或者其他各种途径都可以），这里我已经有一张大表 sbtest.sbtest1，表结构如下：
 
 ```plaintext
@@ -146,7 +148,7 @@ THREAD_ID: 28
       EVENT_ID: 14
   END_EVENT_ID: NULL
     EVENT_NAME: stage/innodb/alter table (read PK and internal sort)
-        SOURCE: 
+        SOURCE:
    TIMER_START: 159726265417733000
      TIMER_END: 159819571346680000
     TIMER_WAIT: 93305928947000
@@ -169,7 +171,7 @@ THREAD_ID: 28
       EVENT_ID: 14
   END_EVENT_ID: NULL
     EVENT_NAME: stage/innodb/alter table (read PK and internal sort)
-        SOURCE: 
+        SOURCE:
    TIMER_START: 159726265417733000
      TIMER_END: 159910492100061000
     TIMER_WAIT: 184226682328000
@@ -185,18 +187,19 @@ NESTING_EVENT_TYPE: STATEMENT
 ```
 
 多执行几次，发现数据是有变化的，这些内容代表了什么呢？
-*   THREAD_ID：线程 ID
-*   EVENT_ID：事件 ID
-*   END_EVENT_ID：结束事件 ID
-*   EVENT_NAME：事件名称，说明了当前执行的事件
-*   SOURCE：源码位置
-*   TIMER_START：事件开始时间（皮秒）
-*   TIMER_END：事件结束时间（皮秒，如果没有执行完成，时间就是当前之间）
-*   TIMER_WAIT：事件等待事件（皮秒）
-*   WORK_COMPLETED：任务完成情况
-*   WORK_ESTIMATED：任务估算情况
-*   NESTING_EVENT_ID：事件对应的父事件 ID
-*   NESTING_EVENT_TYPE：父事件类型（STATEMENT、STAGE、WAIT）
+
+* THREAD_ID：线程 ID
+* EVENT_ID：事件 ID
+* END_EVENT_ID：结束事件 ID
+* EVENT_NAME：事件名称，说明了当前执行的事件
+* SOURCE：源码位置
+* TIMER_START：事件开始时间（皮秒）
+* TIMER_END：事件结束时间（皮秒，如果没有执行完成，时间就是当前之间）
+* TIMER_WAIT：事件等待事件（皮秒）
+* WORK_COMPLETED：任务完成情况
+* WORK_ESTIMATED：任务估算情况
+* NESTING_EVENT_ID：事件对应的父事件 ID
+* NESTING_EVENT_TYPE：父事件类型（STATEMENT、STAGE、WAIT）
 
 ### 收下这个常用的 SQL
 
@@ -237,4 +240,5 @@ NESTING_EVENT_TYPE: STATEMENT
     ```
 
 ### 总结
+
 这样我们通过 MySQL 的这个数据字典就可以很直观地看到 ALTER 的执行情况了，当你看到这样的执行进度，是不是就不那么慌了。

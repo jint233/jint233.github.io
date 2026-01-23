@@ -89,7 +89,7 @@ Raft 将共识问题分解三个子问题：
 follower 收到日志复制请求的处理流程：
 
 1. follower 会使用前一个日志的任期号和日志索引来对比自己的数据：
-   
+
    - 如果相同，接收复制请求，回复 ok；
    - 否则回拒绝复制当前日志，回复 error；
 
@@ -104,7 +104,7 @@ follower 收到日志复制请求的处理流程：
 
 举个例子，最上面表示日志索引，这个是保证唯一性。每个方块代表指定任期内的数据操作，目前来看，LogIndex 1-4 的日志已经完成同步，LogIndex 5 的正在同步，LogIndex6 还未开始同步。Raft 日志提交的过程有点类似两阶段原子提交协议 2PC，不过和 2PC 的最大区别是，Raft 要求超过一般节点同意即可 commited，2PC 要求所有节点同意才能 commited。
 
-![img](../assets/v2-2f3ad84935c439bf16b0018351162173_1440w.jpg) 
+![img](../assets/v2-2f3ad84935c439bf16b0018351162173_1440w.jpg)
 
 **日志不一致问题** ：在正常情况下，leader 和 follower 的日志复制能够保证整个集群的一致性，但是遇到 leader 崩溃的时候，leader 和 follower 日志可能出现了不一致的状态，此时 follower 相比 leader 缺少部分日志。
 
@@ -140,7 +140,7 @@ Raft 算法规定，所有的数据请求都要交给 leader 节点处理，要�
 
 ## 2.3.4 Leader Completeness 选举完备性：leader 必须具备最新提交日志
 
-Raft 规定：只 **有拥有最新提交日志的 follower 节点才有资格成为 leader 节点。** 
+Raft 规定：只 **有拥有最新提交日志的 follower 节点才有资格成为 leader 节点。**
 
 具体做法：candidate 竞选投票时会携带最新提交日志，follower 会用自己的日志和 candidate 做比较
 

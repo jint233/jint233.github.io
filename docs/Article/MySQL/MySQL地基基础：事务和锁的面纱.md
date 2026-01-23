@@ -429,8 +429,8 @@ select * from table where ... for update;
 
 MySQL 在数据库内部自动管理，协调并发连接的资源争用。内部锁再具体来看分为：
 
-*   行锁：会话事务将访问的行数据加锁
-*   表锁：会话事务将访问的表整体加锁
+- 行锁：会话事务将访问的行数据加锁
+- 表锁：会话事务将访问的表整体加锁
 
 **外部锁** 会话层使用特殊的手段显示获取锁，阻塞其他会话对数据的操作。我们通过外部操作命令实现外部锁，比如使用 lock table 和 unlock tables。
 
@@ -442,8 +442,8 @@ MySQL 在数据库内部自动管理，协调并发连接的资源争用。内�
 
 前面这个举例，其过程升级优化为：
 
-*   事务 1 先申请获取 IS 锁，成功后，获取 S 锁
-*   事务 2 发现表中有 IS 锁了，事务 2 获取表锁会被阻塞
+- 事务 1 先申请获取 IS 锁，成功后，获取 S 锁
+- 事务 2 发现表中有 IS 锁了，事务 2 获取表锁会被阻塞
 
 那么这四个锁之间兼容性如何呢？
 
@@ -665,7 +665,7 @@ mysql> update t_account set balance=balance-100 where name='A';
 mysql> update t_account set balance=balance+100 where name='B';
 ```
 
-**设置事务保存点** 
+**设置事务保存点**
 
 ```plaintext
 mysql> savepoint T_A_TO_B;
@@ -771,10 +771,10 @@ Record lock, heap no 2 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
 1: len 5; hex 8000000001; asc      ;;
 ```
 
-*   `HOLDS THE LOCK(S)` 持有锁的内容
-*   `lock_mode X locks` 持有锁的锁等待内容是一个 x 锁
-*   `WAITING FOR THIS LOCK TO BE GRANTED` 等待锁的内容
-*   `lock_mode X locks gap before rec insert intention waiting` 等待锁的锁等待内容也是一个 x 锁
+- `HOLDS THE LOCK(S)` 持有锁的内容
+- `lock_mode X locks` 持有锁的锁等待内容是一个 x 锁
+- `WAITING FOR THIS LOCK TO BE GRANTED` 等待锁的内容
+- `lock_mode X locks gap before rec insert intention waiting` 等待锁的锁等待内容也是一个 x 锁
 
 通过这些日志，我们发现日志中的事务 1，持有 S 锁，S 锁的出现是因为需要检查数据唯一性，我们的 no 字段确实有唯一索引，这一点也正好验证了。日志中的事务 1，持有一个 X 锁，又等待一个 X 锁。所以场景 1 中的两个事务都在锁等，造成了死锁。
 
@@ -787,4 +787,5 @@ Record lock, heap no 2 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
 **合理的在线、离线数据库** 比如我们的系统数据量日益增加，还有一些业务需要查询大量的数据，我们可以改造系统为在线、离线数据库，在线表提供高效事务能力，离线表提供数据查询服务，互不影响。**提高 delete 操作效率的思考**
 
 如果你对表有大量数据的 delete 操作，比如定期的按日、月、年删除数据，可以设计表为日表、月表、年表亦或是相对应的分区表，这样清理数据会由大事务降低为小事务。
+
 ```

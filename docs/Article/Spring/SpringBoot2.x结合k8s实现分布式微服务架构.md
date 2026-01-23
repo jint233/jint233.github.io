@@ -42,13 +42,13 @@ ConfigMap，看到这个名字可以理解：它是用于保存配置信息的�
 
 创建一个 ConfigMap 有多种方式如下。
 
-**1. key-value 字符串创建** 
+**1. key-value 字符串创建**
 
 ```plaintext
 kubectl create configmap test-config --from-literal=baseDir=/usr
 ```
 
-上面的命令创建了一个名为 test-config，拥有一条 key 为 baseDir，value 为 "/usr" 的键值对数据。**2. 根据 yml 描述文件创建** 
+上面的命令创建了一个名为 test-config，拥有一条 key 为 baseDir，value 为 "/usr" 的键值对数据。**2. 根据 yml 描述文件创建**
 
 ```plaintext
 apiVersion: v1
@@ -83,6 +83,7 @@ application.yaml: |-
 greeting:
   message: Say Hello to the World
 ---
+
 spring:
   profiles: dev
 greeting:
@@ -98,24 +99,29 @@ greeting:
 
 ```plaintext
 ```
+
 注意点：
-1.  ConfigMap 必须在 Pod 使用其之前创建。
-2.  Pod 只能使用同一个命名空间的 ConfigMap。
+
+1. ConfigMap 必须在 Pod 使用其之前创建。
+2. Pod 只能使用同一个命名空间的 ConfigMap。
 当然，还有其他更多用途，具体可以参考官网。
 Service，顾名思义是一个服务，什么样的服务呢？它是定义了一个服务的多种 pod 的逻辑合集以及一种访问 pod 的策略。
 service 的类型有四种：
-*   ExternalName：创建一个 DNS 别名指向 service name，这样可以防止 service name 发生变化，但需要配合 DNS 插件使用。
-*   ClusterIP：默认的类型，用于为集群内 Pod 访问时，提供的固定访问地址,默认是自动分配地址,可使用 ClusterIP 关键字指定固定 IP。
-*   NodePort：基于 ClusterIp，用于为集群外部访问 Service 后面 Pod 提供访问接入端口。
-*   LoadBalancer：它是基于 NodePort。
+- ExternalName：创建一个 DNS 别名指向 service name，这样可以防止 service name 发生变化，但需要配合 DNS 插件使用。
+- ClusterIP：默认的类型，用于为集群内 Pod 访问时，提供的固定访问地址,默认是自动分配地址,可使用 ClusterIP 关键字指定固定 IP。
+- NodePort：基于 ClusterIp，用于为集群外部访问 Service 后面 Pod 提供访问接入端口。
+- LoadBalancer：它是基于 NodePort。
+
 ### 如何使用 K8s 来实现服务注册与发现
+
 从上面讲的 Service，我们可以看到一种场景：所有的微服务在一个局域网内，或者说在一个 K8s 集群下，那么可以通过 Service 用于集群内 Pod 的访问，这就是 Service 默认的一种类型 ClusterIP，ClusterIP 这种的默认会自动分配地址。
 那么问题来了，既然可以通过上面的 ClusterIp 来实现集群内部的服务访问，那么如何注册服务呢？其实 K8s 并没有引入任何的注册中心，使用的就是 K8s 的 kube-dns 组件。然后 K8s 将 Service 的名称当做域名注册到 kube-dns 中，通过 Service 的名称就可以访问其提供的服务。那么问题又来了，如果一个服务的 pod 对应有多个，那么如何实现 LB？其实，最终通过 kube-proxy，实现负载均衡。
 说到这，我们来看下 Service 的服务发现与负载均衡的策略，Service 负载分发策略有两种：
-*   RoundRobin：轮询模式，即轮询将请求转发到后端的各个 pod 上，其为默认模式。
-*   SessionAffinity：基于客户端 IP 地址进行会话保持的模式，类似 IP Hash 的方式，来实现服务的负载均衡。
+- RoundRobin：轮询模式，即轮询将请求转发到后端的各个 pod 上，其为默认模式。
+- SessionAffinity：基于客户端 IP 地址进行会话保持的模式，类似 IP Hash 的方式，来实现服务的负载均衡。
 其实，K8s 利用其 Service 实现服务的发现，其实说白了，就是通过域名进行层层解析，最后解析到容器内部的 ip 和 port 来找到对应的服务，以完成请求。
 下面写一个很简单的例子：
+
 ```
 
 apiVersion: v1
@@ -193,8 +199,6 @@ greeting:
   message: Say Hello to the Prod
 ```
 
-
-
 ```plaintext
 上面创建了一个 yml 文件，同时，通过 spring.profiles 指定了开发、测试、生产等每种环境的配置。
 具体代码：
@@ -258,8 +262,6 @@ spec:
       path: /var/pai/cas-server
 ```
 
-
-
 ```plaintext
 这样，当我们启动容器时，通过 `--spring.profiles.active=dev` 来指定当前容器的活跃环境，即可获取 ConfigMap 中对应的配置。是不是感觉跟 Java 中的 Config 配置多个环境的配置有点类似呢？但是，我们不用那么复杂，这些统统可以交给 K8s 来处理。只需要你启动这一命令即可，是不是很简单？
 ### Spring Boot 2.x 的新特性
@@ -290,8 +292,6 @@ kubernetes:
     mode: polling
     period: 500
 ```
-
-
 
 ```plaintext
 如上，我们打开了自动更新配置的开关，并且设置了自动更新的方式为主动拉取，时间间隔为 500ms，同时，还提供了另外一种方式——event 事件通知模式。这样，在 ConfigMap 发生改变时，无需重启 pod 即可获取最新的数据信息。
@@ -326,8 +326,6 @@ kubernetes:
   discovery:
     all-namespaces: true
 ```
-
-
 
 ```plaintext
 开启后，我们在《[微服务 Spring Cloud 架构设计]》一文中讲过，其实最终是向 K8s 的 API Server 发起 http 请求，获取 Service 资源的数据列表。然后根据底层的负载均衡策略来实现服务的发现，最终解析到某个 pod 上。那么为了同一服务的多个 pod 存在，我们需要执行：
@@ -400,8 +398,6 @@ config:
     readTimeout: 3000 #客户端读超时设置
     loggerLevel: full
 ```
-
-
 
 ```plaintext
 其他的可以自定义负载均衡策略，这一点是基于 Ribbon 的，所以是一样的。
@@ -546,8 +542,6 @@ config:
     </dependency>
 </dependencies>
 ```
-
-
 
 ```plaintext
 上面我们使用了比较新的版本：Spring Boot 2.1.13，Cloud 版本是 Greenwich.SR3，其次，我们配置了 K8s 的 ConfigMap 所用的依赖，加上了数据库的一些配置，具体其他的，实现过程中，大家可以自行添加。
@@ -695,8 +689,6 @@ public void setMessage(String message) {
 }
 ```
 
-
-
 ```plaintext
 这就是配置 ConfigMap 中的属性的类。剩下的可以自己定义一个接口类，来实现服务生产者。
 最后，我们需要在 K8s 下部署的话，需要准备几个脚本。**1. 创建 ConfigMap** ```
@@ -743,7 +735,7 @@ data:
       message: Say Hello to the Prod
 ```
 
-设置了不同环境的配置，注意，这里的 namespace 需要与服务部署的 namespace 一致，这里默认的是 default，而且在创建服务之前，先得创建这个。**2. 创建服务部署脚本** 
+设置了不同环境的配置，注意，这里的 namespace 需要与服务部署的 namespace 一致，这里默认的是 default，而且在创建服务之前，先得创建这个。**2. 创建服务部署脚本**
 
 ```plaintext
 apiVersion: apps/v1
@@ -783,7 +775,7 @@ spec:
 
   containers:
 
-  - name: cas-server
+- name: cas-server
 
     image: cas-server
 
@@ -791,21 +783,21 @@ spec:
 
     ports:
 
-      - name: cas-server01
+  - name: cas-server01
 
         containerPort: 2000
 
     volumeMounts:
 
-    - mountPath: /home/cas-server
+  - mountPath: /home/cas-server
 
       name: cas-server-path
 
-    - mountPath: /data/cas-server
+  - mountPath: /data/cas-server
 
       name: cas-server-log-path
 
-    - mountPath: /etc/kubernetes
+  - mountPath: /etc/kubernetes
 
       name: kube-config-path
 
@@ -813,19 +805,19 @@ spec:
 
   volumes:
 
-  - name: cas-server-path
+- name: cas-server-path
 
     hostPath:
 
       path: /var/pai/cas-server
 
-  - name: cas-server-log-path
+- name: cas-server-log-path
 
     hostPath:
 
       path: /data/cas-server
 
-  - name: kube-config-path
+- name: kube-config-path
 
     hostPath:
 
@@ -835,6 +827,7 @@ spec:
 ```
 
 注意：这里有个属性 replicas，其作用是当前 pod 所启动的副本数，即我们常说的启动的节点个数，当然，你也可以通过前面讲的脚本来执行生成多个 pod 副本。如果这里没有设置多个的话，也可以通过命令来执行：
+
 ```
 
 kubectl scale --replicas=3 deployment cas-server-deployment
@@ -1172,6 +1165,7 @@ ports:
 这里大部分的依赖跟生产者一样，但，需要加入服务发现的依赖，以及所用的负载均衡的策略依赖、服务的熔断机制。
 
 接下来 bootstrap 文件中的配置跟生产者一样，这里不在说了，唯一不同的是 application 文件：
+
 ```
 
 backend:
@@ -1221,7 +1215,9 @@ isolation:
 
 ```plaintext
 ```
+
 threadpool:
+
 ```
 
 BackendCallThread:
@@ -1234,6 +1230,7 @@ coreSize: 5
 引入了负载均衡的机制以及策略（可以自定义策略）。
 
 接下来看启动类：
+
 ```
 
 /**
@@ -1251,7 +1248,9 @@ public static void main(String[] args) {
 
 ```bash
 ```
+
 SpringApplication.run(AdminApp.class, args);
+
 ```
 
 }
@@ -1298,6 +1297,7 @@ return rt;
 可以看到，这种方式的分布式负载均衡实现起来很简单，直接注入一个初始化 Bean，加上一个注解 @LoadBalanced 即可。
 
 在实现类中，我们只要直接调用服务生产者：
+
 ```
 
 java
@@ -1330,6 +1330,7 @@ private Response<Object> admin_service_fallBack(HttpServletRequest req, HttpServ
         logger.info("admin_service_fallBack token: {}", token);
         return Response.ok(200, -5, "服务挂啦!", null);
     }
+
 ```
 
 其返回的对象必须与原函数一致，否则可能会报错。具体的可以参考《[Spring cloud 之熔断机制](https://mp.weixin.qq.com/s/TcwAONaCexKIeT-63ClGsg)》。

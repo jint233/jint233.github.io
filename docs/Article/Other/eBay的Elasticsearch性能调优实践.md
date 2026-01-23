@@ -83,7 +83,7 @@ Pronto 团队为每种类型的机器和每个支持的 Elasticsearch 版本运�
 
 从上图可以看出，随着刷新时间间隔的增加，吞吐量增加，响应时间减少。我们可以使用下面的请求来检查我们有多少段以及刷新和合并花了多少时间。
 
-`Index/_stats?filter_path= indices. **.refresh,indices.**.segments,indices. **.merges`-** 减少副本数量。**对于每个索引请求，Elasticsearch 需要将文档写入主分片和所有副本分片。显然，副本过多会减慢索引速度，但另一方面，这将提高搜索性能。我们将在本文后面讨论这个问题。
+`Index/_stats?filter_path= indices. **.refresh,indices.**.segments,indices. **.merges`-**减少副本数量。**对于每个索引请求，Elasticsearch 需要将文档写入主分片和所有副本分片。显然，副本过多会减慢索引速度，但另一方面，这将提高搜索性能。我们将在本文后面讨论这个问题。
 
 ![img](../assets/47d20b17cdc09959f3e1eedb03a296de.png) 性能和副本数之间的关系
 

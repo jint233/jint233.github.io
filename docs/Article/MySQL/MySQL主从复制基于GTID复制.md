@@ -455,9 +455,9 @@ Auto_Position: 1
 
 其中：
 
-*   `Retrieved_Gtid_Set`：在开启了 gtid 复制(即 gtid_mode=on)时，slave 在启动 io 线程的时候会检查自己的 relay log，并从中检索出 gtid 集合。也就是说，这代表的是 slave 已经从 master 中复制了哪些事务过来。检索出来的 gtid 不会再请求 master 发送过来。
-*   `Executed_Gtid_Set`：在开启了 gtid 复制(即 gtid_mode=on)时，它表示已经向自己的 binlog 中写入了哪些 gtid 集合。注意，这个值是根据一些状态信息计算出来的，并非 binlog 中能看到的那些。举个特殊一点的例子，可能 slave 的 binlog 还是空的，但这里已经显示一些已执行 gtid 集合了。
-*   `Auto_Position`：开启 gtid 时是否自动获取 binlog 坐标。1 表示开启，这是 gtid 复制的默认值。
+- `Retrieved_Gtid_Set`：在开启了 gtid 复制(即 gtid_mode=on)时，slave 在启动 io 线程的时候会检查自己的 relay log，并从中检索出 gtid 集合。也就是说，这代表的是 slave 已经从 master 中复制了哪些事务过来。检索出来的 gtid 不会再请求 master 发送过来。
+- `Executed_Gtid_Set`：在开启了 gtid 复制(即 gtid_mode=on)时，它表示已经向自己的 binlog 中写入了哪些 gtid 集合。注意，这个值是根据一些状态信息计算出来的，并非 binlog 中能看到的那些。举个特殊一点的例子，可能 slave 的 binlog 还是空的，但这里已经显示一些已执行 gtid 集合了。
+- `Auto_Position`：开启 gtid 时是否自动获取 binlog 坐标。1 表示开启，这是 gtid 复制的默认值。
 
 6.2 binlog 中关于 gtid 的信息
 --------------------
@@ -535,17 +535,17 @@ DELIMITER ;
 
 其中：
 
-*   "注意行 1"中`Previous-GTIDs`代表的 gtid 集合是曾经的 gtid，换句话说是被 purge 掉的事务。
-*   "注意行 2"和"注意行 4"是两个事务的 gtid 信息。它们写在每个事务的前面。
-*   "注意行 3"和"注意行 5"设置了 GTID_NEXT 的值，表示读取到了该事务后，那么必须要执行的是稍后列出的这个事务。
-*   "注意行 6"是在所有事务执行结束时设置的，表示自动获取 gtid 的值。它对复制是隐身的(也就是说不会 dump 线程不会将它 dump 出去)，该行的结尾也说了，这一行是 mysqlbinlog 添加的。
+- "注意行 1"中`Previous-GTIDs`代表的 gtid 集合是曾经的 gtid，换句话说是被 purge 掉的事务。
+- "注意行 2"和"注意行 4"是两个事务的 gtid 信息。它们写在每个事务的前面。
+- "注意行 3"和"注意行 5"设置了 GTID_NEXT 的值，表示读取到了该事务后，那么必须要执行的是稍后列出的这个事务。
+- "注意行 6"是在所有事务执行结束时设置的，表示自动获取 gtid 的值。它对复制是隐身的(也就是说不会 dump 线程不会将它 dump 出去)，该行的结尾也说了，这一行是 mysqlbinlog 添加的。
 
 6.3 一些重要的变量
 -----------
 
-*   `gtid_mode`：是否开启 gtid 复制模式。只允许 on/off 类的布尔值，不允许其他类型(如 1/0)的布尔值，实际上这个变量是枚举类型的。要设置 _gtid_mode=on_ ，必须同时设置 _enforce_gtid_consistency_ 开。在 MySQL 5.6 中，还必须开启 _log_slave_updates_ ，即使是 master 也要开启。
+- `gtid_mode`：是否开启 gtid 复制模式。只允许 on/off 类的布尔值，不允许其他类型(如 1/0)的布尔值，实际上这个变量是枚举类型的。要设置 _gtid_mode=on_ ，必须同时设置 _enforce_gtid_consistency_ 开。在 MySQL 5.6 中，还必须开启 _log_slave_updates_ ，即使是 master 也要开启。
 
-*   
+-
 
 ```enforce_gtid_consistency
 ```
@@ -557,6 +557,7 @@ DELIMITER ;
     *   不能在事务内部创建和删除临时表。只能在事务外部进行，且 autocommit 需要设置为 1。
     *   不能执行 _create table ... select_ 语句。该语句除了创建一张新表并填充一些数据，其他什么事也没干。
     *   不能在事务内既更新事务表又更新非事务表。
+
 - `gtid_executed`：已经执行过的 GTID。 _reset master_ 会清空该项的全局变量值。
 
 - `gtid_purged`：已经 purge 掉的 gtid。要设置该项，必须先保证 _gtid_executed_ 已经为空，这意味着也一定会同时设置该项为空。在 slave 上设置该项时，表示稍后启动 io 线程和 SQL 线程都跳过这些 gtid，slave 上设置时应该让此项的 gtid 集合等于 master 上 _gtid_executed_ 的值。
@@ -571,6 +572,7 @@ DELIMITER ;
 -------------------------
 
 MySQL 5.7 中添加了一张记录已执行 gtid 的表`mysql.gtid_executed`，所以 slave 上的 binlog 不是必须开启的。
+
 ```
 
 mysql> select * from mysql.gtid_executed;
@@ -600,4 +602,3 @@ mysql> select * from mysql.gtid_executed;
 
 备份数据到 slave 上，方式可以是 mysqldump、冷备份、xtrabackup 备份都行。由于 gtid 复制的特性，所需要的操作都很少，也很简单，前提是理解了"gtid 的生命周期"。
 ```
-

@@ -69,7 +69,7 @@ Spring Batch 的文档很全面，但对于初学者来说，整个文档读完�
 
 实现步骤：
 
-**1. 新建一个 Spring Boot 工程引入** 
+**1. 新建一个 Spring Boot 工程引入**
 
 ```java
 <dependency>
@@ -99,7 +99,7 @@ spring:
       enabled: false
 ```
 
-**2. 多数据源配置** 
+**2. 多数据源配置**
 
 ```java
 package cn.gitchat.share.config;
@@ -171,7 +171,7 @@ protected JobRepository createJobRepository() throws Exception {
 }
 ```
 
-**3. 读取的配置** 
+**3. 读取的配置**
 
 ```java
 /**
@@ -272,7 +272,7 @@ public CompositeItemWriter<PayRecord> compositePayRecordItemWriter(@Qualifier("d
 }
 ```
 
-写入的配置这里面使用了两个配置，一个是写入新的数据源，一个是删除原来的迁移数据连接的是原来的主数据源。写入器使用的是框架提供的 JdbcBatchItemWriter ，看名字就知道这个类的作用了，它支持批量的写入，性能非常高。Spring Batch 支持各种 Writer 的组合，通过 CompositeItemWriter 来实现。在这里只是为了演示组合 Writer 的用法，实际中最好分成两步来完成这种任务。**5. Step 的配置** 
+写入的配置这里面使用了两个配置，一个是写入新的数据源，一个是删除原来的迁移数据连接的是原来的主数据源。写入器使用的是框架提供的 JdbcBatchItemWriter ，看名字就知道这个类的作用了，它支持批量的写入，性能非常高。Spring Batch 支持各种 Writer 的组合，通过 CompositeItemWriter 来实现。在这里只是为了演示组合 Writer 的用法，实际中最好分成两步来完成这种任务。**5. Step 的配置**
 
 ```java
 @Bean
@@ -306,7 +306,7 @@ public class PayRecordExtProcessor implements ItemProcessor<PayRecord,PayRecordE
 
 在这里进行数据处理。
 
-taskExecutor 这个是线程池的配置。因为每条记录的读取、处理、写入都是独立的，互相之间没有任何的影响，所以使用线程池可以实现流程的并行处理，提高处理速度。throttleLimit 用来控制最大的线程数。线程太多了会造成资源的浪费。**6. Job 的配置** 
+taskExecutor 这个是线程池的配置。因为每条记录的读取、处理、写入都是独立的，互相之间没有任何的影响，所以使用线程池可以实现流程的并行处理，提高处理速度。throttleLimit 用来控制最大的线程数。线程太多了会造成资源的浪费。**6. Job 的配置**
 
 ```java
 @Bean
@@ -482,7 +482,9 @@ return this.jobBuilderFactory.get("splitPayRecordJob")
 
 在这里面我们定义了一个 ClassifierCompositeItemWriter 根据 Id % 表个数进行分片。具体的实现可以看代码。**3. 迁移过程中数据有变更和增量的场景** 一般来说有单表性能的表数据，都有一个特点，随着时间的迁移会有大量的冷数据，上千万频繁变更的场景还是比较少的。如果想保证系统不间断运行，同时又能进行系统的迁移，迁移完成后再进行用户无感知的切换。需要考虑到迁移过程中有增量变更的情况。这种情况下我们一般引入 CDC (change data capture) 组件。比较常用的如阿里的 Canal、Debezium，这种中间件监听数据的变更。关于它们的使用可以去看官方的文档，非常的简单，添加好配置项就可以了。
 配置好后将变更的数据再导入的新的数据源。切换后完成再通过 Spring Batch 进行比对迁移的数据和变化数据就可以了。如果变化的量级特别大，最好选用后半夜，数据变更较小的情况下进行数据迁移。因为亿级别的数据实时同步这个是不可能的，找一个折中的方案即可。
+
 #### 如何控制部署的实例不同时运行
+
 为了保证服务的可靠性，通常我们部署的迁移服务实例是多个的，在这种情况下，我们需要保证数据不能迁移重复。在 Spring Batch 里面 Job 的概念相当于任务，还有一个概念叫 JobInstance。
 什么意思呢，上面提到 Step 相当于配置的流程，Job 是任务，那么任务是可能有多个的，就像一个类，我们可以 new 出来多个对象一样。一个 JonInstance 在相同的 JobParameter 下只会执行一次。这样在多实例的情况下，实际上部署多台实例也能控制任务不会重复执行，只不过会报一个任务已经存在的异常。但是在实际的项目迁移中我们希望 Job 的参数可以每天动态计算，比如在任务之前我们需要动态的计算出，今天的任务要迁移哪些数据。
 

@@ -1184,20 +1184,20 @@ public @interface SpringBootApplication {
 
 ![img](../assets/720bf4e0-61e6-11ea-861e-fb2bdb9ba1ba.jpg)
 
-- **包目录不同** 
+- **包目录不同**
   - spring-beans.jar 中 org.springframework.beans.factory.BeanFactory
   - spring-context.jar 中 org.springframework.context.ApplicationContext
 
-- **国际化** 
+- **国际化**
   - BeanFactory 是不支持国际化功能的，因为 BeanFactory 没有扩展 Spring 中 MessageResource 接口。相反，由于 ApplicationContext 扩展了 MessageResource 接口，因而具有消息处理的能力（i18N）。
 
-- **强大的事件机制（Event）** 
+- **强大的事件机制（Event）**
   - 基本上牵涉到事件（Event）方面的设计，就离不开观察者模式，ApplicationContext 的事件机制主要通过 ApplicationEvent 和 ApplicationListener 这两个接口来提供的，和 Java swing 中的事件机制一样。即当 ApplicationContext 中发布一个事件时，所有扩展了 ApplicationListener 的 Bean 都将接受到这个事件，并进行相应的处理。
 
-- **底层资源的访问** 
+- **底层资源的访问**
   - ApplicationContext 扩展了 ResourceLoader（资源加载器）接口，从而可以用来加载多个 Resource，而 BeanFactory 是没有扩展 ResourceLoader。
 
-- **对 Web 应用的支持** 
+- **对 Web 应用的支持**
   - 与 BeanFactory 通常以编程的方式被创建，ApplicationContext 能以声明的方式创建，如使用 ContextLoader。 当然你也可以使用 ApplicationContext 的实现方式之一，以编程的方式创建 ApplicationContext 实例。
 
 - **延迟加载**
@@ -1206,8 +1206,8 @@ public @interface SpringBootApplication {
   可以看到，ApplicationContext 继承了 BeanFactory，BeanFactory 是 Spring 中比较原始的 Factory，它不支持 AOP、Web 等 Spring 插件。而 ApplicationContext 不仅包含了 BeanFactory 的所有功能，还支持 Spring 的各种插件，还以一种面向框架的方式工作以及对上下文进行分层和实现继承。
   BeanFactory 是 Spring 框架的基础设施，面向 Spring 本身；而 ApplicationContext 面向使用 Spring 的开发者，相比 BeanFactory 提供了更多面向实际应用的功能，几乎所有场合都可以直接使用 ApplicationContext，而不是底层的 BeanFactory。
 
-- **常用容器** 
-  BeanFactory 类型的有 XmlBeanFactory，它可以根据 XML 文件中定义的内容，创建相应的 Bean。 
+- **常用容器**
+  BeanFactory 类型的有 XmlBeanFactory，它可以根据 XML 文件中定义的内容，创建相应的 Bean。
   ApplicationContext 类型的常用容器有：
   1. ClassPathXmlApplicationContext：从 ClassPath 的 XML 配置文件中读取上下文，并生成上下文定义。应用程序上下文从程序环境变量中取得。
   2. FileSystemXmlApplicationContext：由文件系统中的 XML 配置文件读取上下文。
@@ -1322,18 +1322,21 @@ ZooKeeper 允许客户端向服务端的某个 znode 注册一个 Watcher 监听
 大致分为三个步骤：
 
 客户端注册 Watcher
+
 1. 调用 getData、getChildren、exist 三个 API，传入 Watcher 对象；
 2. 标记请求 request，封装 Watcher 到 WatchRegistration；
 3. 封装成 Packet 对象，发服务端发送 request；
 4. 收到服务端响应后，将 Watcher 注册到 ZKWatcherManager 中进行管理；
 5. 请求返回，完成注册。
-   
+
 服务端处理 Watcher
+
 1. 务端接收 Watcher 并存储；
 2. Watcher 触发；
 3. 调用 process 方法来触发 Watcher。
-   
+
 客户端回调 Watcher
+
 1. 客户端 SendThread 线程接收事件通知，交由 EventThread 线程回调 Watcher。
 2. 客户端的 Watcher 机制同样是一次性的，一旦被触发后，该 Watcher 就失效了。
 
