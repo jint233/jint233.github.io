@@ -119,7 +119,7 @@ private static int ctlOf (int rs, int wc) { return rs | wc; }   // 通过状态�
 
 ThreadPoolExecutor 的运行状态有 5 种，分别为：
 
-![img](../assets/62853fa44bfa47d63143babe3b5a4c6e82532.png){ width="80%" }
+![img](../assets/62853fa44bfa47d63143babe3b5a4c6e82532.png)
 
 其生命周期转换如下入所示：
 
@@ -170,7 +170,7 @@ ThreadPoolExecutor 的运行状态有 5 种，分别为：
 
 使用不同的队列可以实现不一样的任务存取策略。在这里，我们可以再介绍下阻塞队列的成员：
 
-![img](../assets/725a3db5114d95675f2098c12dc331c3316963.png){ width="80%" }
+![img](../assets/725a3db5114d95675f2098c12dc331c3316963.png)
 
 #### 2.3.3 任务申请
 
@@ -219,7 +219,7 @@ Worker 这个工作线程，实现了 Runnable 接口，并持有一个线程 th
 Worker 执行任务的模型如下图所示：
 
 <figure markdown="span">
-  ![img](../assets/03268b9dc49bd30bb63064421bb036bf90315.png){ width="80%" }
+  ![img](../assets/03268b9dc49bd30bb63064421bb036bf90315.png)
   <figcaption> 图 7 Worker 执行任务 </figcaption>
 </figure>
 
@@ -408,7 +408,7 @@ try {
  **权限校验** ：只有应用开发负责人才能够修改应用的线程池参数。
 
 <figure markdown="span">
-  ![img](../assets/6c0091e92e90f50f89fd83f3b9eb5472135718.png){ width="80%" }
+  ![img](../assets/6c0091e92e90f50f89fd83f3b9eb5472135718.png)
   <figcaption> 图 18 动态化线程池功能架构 </figcaption>
 </figure>
 
