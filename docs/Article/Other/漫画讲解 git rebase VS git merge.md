@@ -19,7 +19,7 @@ Chat 内容：
 1. 本地仓库拉取远端仓库时产生
 2. 本地主分支合并代码分支时产生
 
-下面我通过漫画的形式来演示两种场景。首先准备两个本地客户端和一个代码仓库，两个客户端为了好记，姑且就叫熊大熊二吧（简称A和B）。
+下面我通过漫画的形式来演示两种场景。首先准备两个本地客户端和一个代码仓库，两个客户端为了好记，姑且就叫熊大熊二吧（简称 A 和 B）。
 
 ![img](../assets/ff588160-e255-11eb-ba41-db0ddab65c9b.jpg)
 
@@ -42,7 +42,7 @@ git commit -m "熊大 add today-food-menu.txt"
 git push origin master
 ```
 
-熊大添加了一个`today-food-menu.txt`文件，并在里面填入了apple，表示他今晚的食物想吃苹果。
+熊大添加了一个`today-food-menu.txt`文件，并在里面填入了 apple，表示他今晚的食物想吃苹果。
 
 ![img](../assets/17c31da0-e256-11eb-ba41-db0ddab65c9b.png)
 
@@ -105,7 +105,7 @@ git push origin master
 
 ![img](../assets/38e775d0-e256-11eb-a751-c93d727cbe27.png)
 
-**总结：这里我们可以看到，冲突的原因就是当本地的文件和远端的文件都做了修改时，本地拉取远端时首先会告知由于远端有变更，需要git pull，执行git pull之后 Git 迷糊了，心想你们到底想要哪个内容呢，算了我不管了，直接给你们算冲突吧，你们自己决定保留哪些内容。** 
+**总结：这里我们可以看到，冲突的原因就是当本地的文件和远端的文件都做了修改时，本地拉取远端时首先会告知由于远端有变更，需要 git pull，执行 git pull 之后 Git 迷糊了，心想你们到底想要哪个内容呢，算了我不管了，直接给你们算冲突吧，你们自己决定保留哪些内容。** 
 
 ### 本地主分支合并代码分支时产生
 
@@ -125,7 +125,7 @@ git add .
 git commit -m 'update today-food-menu.txt: eat apple'
 ```
 
-熊二今天依旧想吃蜂蜜，于是他将昨天的更新改拉取到本地后，将其更改为honey。
+熊二今天依旧想吃蜂蜜，于是他将昨天的更新改拉取到本地后，将其更改为 honey。
 
 ![img](../assets/46f97330-e256-11eb-8735-4b8052bf93fe.png)
 
@@ -139,14 +139,14 @@ git push origin master
 
 ![img](../assets/4cfa29a0-e256-11eb-9ac8-8334dbfe7cef.png)
 
-熊大切换到master分支拉取，查看代码变化。
+熊大切换到 master 分支拉取，查看代码变化。
 
 ```bash
 git checkout master
 git pull
 ```
 
-熊大拉取代码后发现`today-food-menu.txt`被更改为了honey。
+熊大拉取代码后发现`today-food-menu.txt`被更改为了 honey。
 
 ![img](../assets/5284c5b0-e256-11eb-b23b-e34e5b5fc461.png)
 
@@ -194,7 +194,7 @@ git push origin master
 
 ![img](../assets/6368a7c0-e256-11eb-808b-51f805f15e47.png)
 
-从图中可以看到，`master merge food: eat apple`这次commit将前面的两次提交进行了合并，因为前面的这两次commit的代码完全相同的点在`merge confilc`这次提交，所以从`merge confic`到`master merge food:eat apple`这里多出来一个分叉的历史记录（绿线）。
+从图中可以看到，`master merge food: eat apple`这次 commit 将前面的两次提交进行了合并，因为前面的这两次 commit 的代码完全相同的点在`merge confilc`这次提交，所以从`merge confic`到`master merge food:eat apple`这里多出来一个分叉的历史记录（绿线）。
 
 在实际的生产开发过程中，采用这种方式会导致分叉的 commit 记录非常多，不利于开发人员代码审查。下面我们来看一下`git rebase`又是如何解决的呢？
 
@@ -233,7 +233,7 @@ git commit -m 'update today-food-menu.txt:banana'
 git push origin master
 ```
 
-熊大此时准备将代码push到远端，首先他切换到master分支，拉取最新的代码。
+熊大此时准备将代码 push 到远端，首先他切换到 master 分支，拉取最新的代码。
 
 ```bash
 git checkout master
@@ -313,7 +313,7 @@ git rebase --continue
 
 > Applying: update today-food-menu.txt:coffee
 
-此时没有提示任何的信息，所以 rebase 结束。其实版本高一点的 Git（2.22及以上），是有 rebase 进度条展示的，可以看到 rebase 的进度，如图所示：
+此时没有提示任何的信息，所以 rebase 结束。其实版本高一点的 Git（2.22 及以上），是有 rebase 进度条展示的，可以看到 rebase 的进度，如图所示：
 
 ![img](../assets/8542bb60-e256-11eb-8735-4b8052bf93fe.png)
 
@@ -327,7 +327,7 @@ git push origin master
 
 ![img](../assets/8b0cf880-e256-11eb-9839-c199edf90ba6.png)
 
-可以看到，一共有3次 commit 记录，分别是熊大2次和熊二1次。没有多出来 merge 的 commit 记录。
+可以看到，一共有 3 次 commit 记录，分别是熊大 2 次和熊二 1 次。没有多出来 merge 的 commit 记录。
 
 我们再来云端看一下提交结构图：
 
@@ -345,16 +345,16 @@ git push origin master
 
 `git rebase` 
 
-操作实际上是将当前执行 rebase 分支的所有基于原分支提交点之后的 commit 打散成一个一个的 patch，并重新生成一个新的 commit hash 值，再次基于原分支目前最新的commit点上进行提交，并不根据两个分支上实际的每次提交的时间点排序，rebase 完成后，切到基分支进行合并另一个分支时也不会生成一个新的 commit 点，可以保持整个分支树的完美线性。**从效果出发，如果代码版本迭代快，项目大，参与人多，建议最好用 rebase 方式合并。反之则直接用 merge 即可。** 加餐学习：git stash 解决线上代码冲突
+操作实际上是将当前执行 rebase 分支的所有基于原分支提交点之后的 commit 打散成一个一个的 patch，并重新生成一个新的 commit hash 值，再次基于原分支目前最新的 commit 点上进行提交，并不根据两个分支上实际的每次提交的时间点排序，rebase 完成后，切到基分支进行合并另一个分支时也不会生成一个新的 commit 点，可以保持整个分支树的完美线性。**从效果出发，如果代码版本迭代快，项目大，参与人多，建议最好用 rebase 方式合并。反之则直接用 merge 即可。** 加餐学习：git stash 解决线上代码冲突
 
 以上的演示合并冲突，是为了让我们的 commit 历史记录更加的便于审查。接下来我要说的`git stash`则是应急所需，平时工作中都是迫不得已的时候采用的，学会了以备不时之需。
 
 1. 当正在 dev 分支上开发某个项目，这时项目中出现一个 bug，需要紧急修复，但是正在开发的内容只是完成一半，还不想提交，这时可以用`git stash`命令将修改的内容保存至堆栈区，然后顺利切换到 hotfix 分支进行 bug 修复，修复完成后，再次切回到 dev 分支，从堆栈中恢复刚刚保存的内容。
-2. 由于疏忽，本应该在 dev 分支开发的内容，却在 master上进行了开发，需要重新切回到 dev 分支上进行开发，可以用git stash将内容保存至堆栈中，切回到 dev 分支后，再次恢复内容即可。
+2. 由于疏忽，本应该在 dev 分支开发的内容，却在 master 上进行了开发，需要重新切回到 dev 分支上进行开发，可以用 git stash 将内容保存至堆栈中，切回到 dev 分支后，再次恢复内容即可。
 
 `git stash`命令的作用就是将目前还不想提交的但是已经修改的内容保存至堆栈中，后续可以在某个分支上恢复出堆栈中的内容。这也就是说，stash 中的内容不仅仅可以 **恢复到原先开发的分支，也可以恢复到其他任意指定的分支上**。`git stash`作用的范围包括工作区和暂存区中的内容，也就是说没有提交的内容都会保存至堆栈中。
 
-下面是一些有关stash的常用命令：
+下面是一些有关 stash 的常用命令：
 
 - `git stash`：能够将所有未提交的修改（工作区和暂存区）保存至堆栈中，用于后续恢复当前工作目录
 - `git stash list`：查看当前 stash 的列表，因为有些时候会存多个暂存区

@@ -1,4 +1,4 @@
-# MySQL优化：优化 select count()
+# MySQL 优化：优化 select count()
 
 ### 业务反馈，开发崩溃
 

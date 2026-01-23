@@ -29,7 +29,7 @@
 <servlet>
     <servlet-name>spring</servlet-name>
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-        <!-- 可以自定义servlet.xml配置文件的位置和名称，默认为WEB-INF目录下，名称为[<servlet-name>]-servlet.xml，如spring-servlet.xml-->
+        <!-- 可以自定义 servlet.xml 配置文件的位置和名称，默认为 WEB-INF 目录下，名称为[<servlet-name>]-servlet.xml，如 spring-servlet.xml-->
         <init-param>
             <param-name>contextConfigLocation</param-name>
             <param-value>/WEB-INF/spring-servlet.xml</param-value> // 默认
@@ -308,7 +308,7 @@ public WebApplicationContext initWebApplicationContext(ServletContext servletCon
 <servlet>
     <servlet-name>spring</servlet-name>
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-    <!-- 可以自定义servlet.xml配置文件的位置和名称，默认为WEB-INF目录下，名称为[<servlet-name>]-servlet.xml，如spring-servlet.xml-->
+    <!-- 可以自定义 servlet.xml 配置文件的位置和名称，默认为 WEB-INF 目录下，名称为[<servlet-name>]-servlet.xml，如 spring-servlet.xml-->
         <init-param>
             <param-name>contextConfigLocation</param-name>
             <param-value>/WEB-INF/spring-servlet.xml</param-value> // 默认

@@ -136,7 +136,7 @@
 
 ## 微信
 
-虽然微信很多基础框架都是自研，但这并不妨碍我们理解微信的架构设计。从微信公开的《[从0到1：微信后台系统的演进之路](https://mp.weixin.qq.com/s/fMF_FjcdLiXc_JVmf4fl0w)》这篇文章可以看出，微信采用的主要是：写扩散 + 推拉结合。由于群聊使用的也是写扩散，而写扩散很消耗资源，因此微信群有人数上限（目前是 500）。所以这也是写扩散的一个明显缺点，如果需要万人群就比较难了。
+虽然微信很多基础框架都是自研，但这并不妨碍我们理解微信的架构设计。从微信公开的《[从 0 到 1：微信后台系统的演进之路](https://mp.weixin.qq.com/s/fMF_FjcdLiXc_JVmf4fl0w)》这篇文章可以看出，微信采用的主要是：写扩散 + 推拉结合。由于群聊使用的也是写扩散，而写扩散很消耗资源，因此微信群有人数上限（目前是 500）。所以这也是写扩散的一个明显缺点，如果需要万人群就比较难了。
 
 从文中还可以看出，微信采用了多数据中心架构：
 
@@ -152,9 +152,9 @@
 
 ## 钉钉
 
-钉钉公开的资料不多，从《[阿里钉钉技术分享：企业级IM王者——钉钉在后端架构上的过人之处](http://www.52im.net/thread-2848-1-1.html)》这篇文章我们只能知道，钉钉最开始使用的是写扩散模型，为了支持万人群，后来貌似优化成了读扩散。
+钉钉公开的资料不多，从《[阿里钉钉技术分享：企业级 IM 王者——钉钉在后端架构上的过人之处](http://www.52im.net/thread-2848-1-1.html)》这篇文章我们只能知道，钉钉最开始使用的是写扩散模型，为了支持万人群，后来貌似优化成了读扩散。
 
-但聊到阿里的 IM 系统，不得不提的是阿里自研的 Tablestore。一般情况下，IM 系统都会有一个自增 ID 生成系统，但 Tablestore 创造性地引入了[主键列自增](https://help.aliyun.com/document_detail/47731.html?spm=5176.10695662.1996646101.searchclickresult.6bc54277FuOVpL)，即把 ID 的生成整合到了 DB 层，支持了用户级别递增（传统 MySQL 等 DB 只能支持表级自增，即全局自增）。具体可以参考：《[如何优化高并发IM系统架构](https://help.aliyun.com/document_detail/143555.html?spm=a2c4g.11174283.6.686.66f930afTL8fnv)》
+但聊到阿里的 IM 系统，不得不提的是阿里自研的 Tablestore。一般情况下，IM 系统都会有一个自增 ID 生成系统，但 Tablestore 创造性地引入了[主键列自增](https://help.aliyun.com/document_detail/47731.html?spm=5176.10695662.1996646101.searchclickresult.6bc54277FuOVpL)，即把 ID 的生成整合到了 DB 层，支持了用户级别递增（传统 MySQL 等 DB 只能支持表级自增，即全局自增）。具体可以参考：《[如何优化高并发 IM 系统架构](https://help.aliyun.com/document_detail/143555.html?spm=a2c4g.11174283.6.686.66f930afTL8fnv)》
 
 ## Twitter
 
@@ -305,34 +305,34 @@ Access Schedule Service 可以实现根据各种策略来分配 Access Service�
 
 [融云首度披露高并发系统架构设计四大要点](http://m.c114.com.cn/w241-1114151.html)
 
-[一个海量在线用户即时通讯系统（IM）的完整设计Plus](https://cloud.tencent.com/developer/article/1478773)
+[一个海量在线用户即时通讯系统（IM）的完整设计 Plus](https://cloud.tencent.com/developer/article/1478773)
 
-[即时通讯网（IM开发者社区）— 技术精选](http://www.52im.net/forum.php?mod=collection&op=all)
+[即时通讯网（IM 开发者社区）— 技术精选](http://www.52im.net/forum.php?mod=collection&op=all)
 
-[从0到1：微信后台系统的演进之路](https://mp.weixin.qq.com/s/fMF_FjcdLiXc_JVmf4fl0w)
+[从 0 到 1：微信后台系统的演进之路](https://mp.weixin.qq.com/s/fMF_FjcdLiXc_JVmf4fl0w)
 
 [万亿级调用系统：微信序列号生成器架构设计及演变](https://mp.weixin.qq.com/s/JqIJupVKUNuQYIDDxRtfqA)
 
-[微信PaxosStore：深入浅出Paxos算法协议](https://mp.weixin.qq.com/s/CnrePM7ITVyWEUbqg9sDfw)
+[微信 PaxosStore：深入浅出 Paxos 算法协议](https://mp.weixin.qq.com/s/CnrePM7ITVyWEUbqg9sDfw)
 
 [微信后台基于时间序的海量数据冷热分级架构设计实践](https://mp.weixin.qq.com/s/XlZF0GDt7dnHyYuS1an6tg)
 
 [钉钉企业级 IM 存储架构创新之道](https://www.infoq.cn/article/J4m6a2I66MziISJVzFEe)
 
-[现代IM系统中聊天消息的同步和存储方案探讨](http://www.52im.net/thread-1230-1-1.html)
+[现代 IM 系统中聊天消息的同步和存储方案探讨](http://www.52im.net/thread-1230-1-1.html)
 
-[阿里钉钉技术分享：企业级IM王者——钉钉在后端架构上的过人之处](https://juejin.im/post/5ddcd45b6fb9a07add57c4b8#heading-4)
+[阿里钉钉技术分享：企业级 IM 王者——钉钉在后端架构上的过人之处](https://juejin.im/post/5ddcd45b6fb9a07add57c4b8#heading-4)
 
-[如何优化高并发IM系统架构](https://help.aliyun.com/document_detail/143555.html?spm=a2c4g.11174283.6.686.66f930afTL8fnv)
+[如何优化高并发 IM 系统架构](https://help.aliyun.com/document_detail/143555.html?spm=a2c4g.11174283.6.686.66f930afTL8fnv)
 
-[现代IM系统中的消息系统—架构](https://help.aliyun.com/document_detail/130781.html?spm=a2c4g.11186623.6.692.68b41071MDSY3O)
+[现代 IM 系统中的消息系统—架构](https://help.aliyun.com/document_detail/130781.html?spm=a2c4g.11186623.6.692.68b41071MDSY3O)
 
-[现代IM系统中的消息系统—模型](https://help.aliyun.com/document_detail/131018.html?spm=a2c4g.11186623.6.693.78ac7ffbjlmPep)
+[现代 IM 系统中的消息系统—模型](https://help.aliyun.com/document_detail/131018.html?spm=a2c4g.11186623.6.693.78ac7ffbjlmPep)
 
-[现代IM系统中的消息系统—实现](https://help.aliyun.com/document_detail/131110.html?spm=a2c4g.11186623.6.694.13852ba3lr8AoP)
+[现代 IM 系统中的消息系统—实现](https://help.aliyun.com/document_detail/131110.html?spm=a2c4g.11186623.6.694.13852ba3lr8AoP)
 
 [How We Learned to Stop Worrying and Love Fan-In at Twitter](https://www.youtube.com/watch?v=WEgCjwyXvwc&t=1971s)
 
-[58到家通用实时消息平台架构细节](https://cloud.tencent.com/developer/article/1048052)
+[58 到家通用实时消息平台架构细节](https://cloud.tencent.com/developer/article/1048052)
 
-[如何保证IM实时消息的“时序性”与“一致性”](http://www.52im.net/thread-714-1-1.html)
+[如何保证 IM 实时消息的“时序性”与“一致性”](http://www.52im.net/thread-714-1-1.html)

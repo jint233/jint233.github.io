@@ -103,7 +103,7 @@ server.requestHandler(request -> {
 
 ![img](../assets/event-loop.png)
 
-图片来自 Vert.x官网：<https://vertx.io/docs/guide-for-java-devs/>
+图片来自 Vert.x 官网：<https://vertx.io/docs/guide-for-java-devs/>
 
 Vert.x 保证自己的 API 是非阻塞的,并且不会阻塞 _Event Loop_，但是但是无法控制你自己的代码是否是阻塞的,所以会对这部分进行监控，并通过日志警告你。我们来造一个阻塞操作看看：
 
@@ -179,7 +179,7 @@ vertx.deployVerticle(blockWarningDemo, options);
 
 ![img](../assets/event-bus.png)
 
-图片来自 Vert.x官网：<https://vertx.io/docs/guide-for-java-devs/>
+图片来自 Vert.x 官网：<https://vertx.io/docs/guide-for-java-devs/>
 
 #### 链式 API 与异步 ( Fluent API & Asynchronous )
 
@@ -333,7 +333,7 @@ Vert.x 不止支持 Java，还官方支持 Ceylon 、 Grovvy 、 JavaScript 、R
 npm install vertx3-full
 ```
 
-或者MacOS 通过 Homebrew 安装 vertx ：
+或者 MacOS 通过 Homebrew 安装 vertx ：
 
 ```Shell
 brew install vert.x
@@ -423,6 +423,6 @@ StaticHandler 会去找 webroot 的静态资源，直接对外提供服务。
 ### 学习资料
 
 1. 我们可以通过 Vert.x 的官方文档系统学习它，地址为：<https://vertx.io/docs/>
-2. 同时github上有人翻译了中文版：<https://vertxchina.github.io/vertx-translation-chinese/>
-3. 官网同时有一本电子书《使用Java构建响应式微服务》，大家可以学习参考：<https://developers.redhat.com/promotions/building-reactive-microservices-in-java/>
-4. Vert.x生态的各种信息和例子，都可以从这个项目里找到：<https://github.com/vert-x3/vertx-awesome>
+2. 同时 github 上有人翻译了中文版：<https://vertxchina.github.io/vertx-translation-chinese/>
+3. 官网同时有一本电子书《使用 Java 构建响应式微服务》，大家可以学习参考：<https://developers.redhat.com/promotions/building-reactive-microservices-in-java/>
+4. Vert.x 生态的各种信息和例子，都可以从这个项目里找到：<https://github.com/vert-x3/vertx-awesome>

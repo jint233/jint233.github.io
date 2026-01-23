@@ -175,10 +175,10 @@ duration_step 可以设置为两天（或更长），每隔一天异步到 DB �
 
 [Twitter IDs (snowflake)](https://developer.twitter.com/en/docs/basics/twitter-ids)
 
-[Leaf——美团点评分布式ID生成系统](https://tech.meituan.com/2017/04/21/mt-leaf.html)
+[Leaf——美团点评分布式 ID 生成系统](https://tech.meituan.com/2017/04/21/mt-leaf.html)
 
 [万亿级调用系统：微信序列号生成器架构设计及演变](https://mp.weixin.qq.com/s/JqIJupVKUNuQYIDDxRtfqA)
 
-[百度UidGenerator](https://github.com/baidu/uid-generator/blob/master/README.zh_cn.md.html)
+[百度 UidGenerator](https://github.com/baidu/uid-generator/blob/master/README.zh_cn.md.html)
 
 [MongoDB ObjectID](https://docs.mongodb.com/v3.2/reference/method/ObjectId/)

@@ -89,7 +89,7 @@ API docs preview will be running at http://localhost:9000
 
 ### CLI
 
-API 已经介绍完了，我们来看下 `docker` CLI，在我们前两次的 Chat中，我们聊过现在 Docker 中有两个构建系统，一个是 v1 版本的 `builder` 另一个是 v2 版本的即 `buildkit` 我们来分别深入源码来看看在构建镜像时，他们各自的行为吧。
+API 已经介绍完了，我们来看下 `docker` CLI，在我们前两次的 Chat 中，我们聊过现在 Docker 中有两个构建系统，一个是 v1 版本的 `builder` 另一个是 v2 版本的即 `buildkit` 我们来分别深入源码来看看在构建镜像时，他们各自的行为吧。
 
 #### 准备代码
 

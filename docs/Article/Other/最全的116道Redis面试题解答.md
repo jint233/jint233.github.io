@@ -493,7 +493,7 @@ struct sdshdr{
 
 SDS 的存储示例如下：
 
-![SDS存储方式](../assets/1c647990-6466-11ea-9b0c-5b7924682571.jpg)
+![SDS 存储方式](../assets/1c647990-6466-11ea-9b0c-5b7924682571.jpg)
 
 #### 13. Redis 的链表数据结构的特征有哪些？
 
@@ -988,7 +988,7 @@ LFU 是 Least Frequently Used 的缩写，中文意思是最不经常使用。�
 
 #### 20. 以下关于 NoSQL 的说法，不对的是
 
-A. Redis 支持字符串、哈希、列表、集合、有序集合等数据结构，目前 Redis 不支持事务。 B. MongoDB 支持 CAP 定理中的 AP，MySQL 支持 CAP 中的 CA，全部都支持不可能存在。 C. MongoDB 不用先创建 Collection 的结构就可以直接插入数据，目前 MongoDB 不支持事务。 D. Memcache 既支持 TCP 协议，也支持UDP协议，我们可以把 PHP的 Session 存放到 Memcache 中。
+A. Redis 支持字符串、哈希、列表、集合、有序集合等数据结构，目前 Redis 不支持事务。 B. MongoDB 支持 CAP 定理中的 AP，MySQL 支持 CAP 中的 CA，全部都支持不可能存在。 C. MongoDB 不用先创建 Collection 的结构就可以直接插入数据，目前 MongoDB 不支持事务。 D. Memcache 既支持 TCP 协议，也支持 UDP 协议，我们可以把 PHP 的 Session 存放到 Memcache 中。
 
 答案：A
 
@@ -1100,7 +1100,7 @@ hash 类型：map
 3. 读取所有数据：`Map<String,String> map = jedis.hgetall(String key);`
 4. 删除数据：`jedis.hdel(String key,String field);`
 
-list类型，可以重复：
+list 类型，可以重复：
 
 1. 向列表最左边添加数据：`jedis.lpush(String key,String...strings);`可以存储多个数据，逗号隔开。
 2. 向列表最右边添加数据：`jedis.rpush(String key,String...strings);`
@@ -1108,13 +1108,13 @@ list类型，可以重复：
 4. 删除列表最左边的数据：`jedis.lpop(String key);`
 5. 删除列表最右边的数据：`jedis.rpop(String key);`
 
-set类型，不可重复：
+set 类型，不可重复：
 
 1. 存储数据：`jedis.sadd(String key,String...strings);` 可以存储多个数据，逗号隔开。
 2. 获取数据：`jedis.smembers(String key);`
 3. 删除数据：`jedis.srem(String key,String strings);` 可以删除多个数据，逗号隔开。
 
-sorted类型，不可重复，有序：
+sorted 类型，不可重复，有序：
 
 1. 存储数据：`jedis.zadd(String key,double score,String value);`
 2. 获取数据：`jedis.zrange(String key,long start,long end);`

@@ -1,18 +1,18 @@
-# Spring MyBatis和Spring整合的奥秘
+# Spring MyBatis 和 Spring 整合的奥秘
 
-_本篇博客源码分析基于Spring 5.1.16.RELEASE，mybatis-spring 2.0.0，较高版本的mybatis-spring源码有较大区别。_
+_本篇博客源码分析基于 Spring 5.1.16.RELEASE，mybatis-spring 2.0.0，较高版本的 mybatis-spring 源码有较大区别。_
 
-Spring之所以是目前Java最受欢迎的框架，几乎所有的Java项目都在使用，就是因为它良好的生态，很多技术可以与之整合，为什么其他技术可以和Spring相整合，就是因为Spring拥有很多扩展点，阅读Spring源码，有一部分原因就是有必要清楚的知道Spring提供了哪些扩展点，而怎么合理的利用这些扩展点，就需要了解其他技术是如何利用这些扩展点的。
+Spring 之所以是目前 Java 最受欢迎的框架，几乎所有的 Java 项目都在使用，就是因为它良好的生态，很多技术可以与之整合，为什么其他技术可以和 Spring 相整合，就是因为 Spring 拥有很多扩展点，阅读 Spring 源码，有一部分原因就是有必要清楚的知道 Spring 提供了哪些扩展点，而怎么合理的利用这些扩展点，就需要了解其他技术是如何利用这些扩展点的。
 
-今天我就来带着大家看下，国内最流行的数据库框架MyBatis是如何利用Spring的扩展点的，从而双剑合璧，让Spring+MyBatis成为国内最流行的技术搭配。
+今天我就来带着大家看下，国内最流行的数据库框架 MyBatis 是如何利用 Spring 的扩展点的，从而双剑合璧，让 Spring+MyBatis 成为国内最流行的技术搭配。
 
 ### 前置知识
 
-为了后面的故事可以顺利展开，很有必要先给大家介绍下，阅读mybatis-spring源码的前置知识，没有这些前置知识阅读mybatis-spring源码是寸步难行。
+为了后面的故事可以顺利展开，很有必要先给大家介绍下，阅读 mybatis-spring 源码的前置知识，没有这些前置知识阅读 mybatis-spring 源码是寸步难行。
 
-#### mybatis-spring使用
+#### mybatis-spring 使用
 
-因为现在有了SpringBoot，所以Mybatis和Spring的整合变得非常简单，但是如果没有SpringBoot，该怎么整合呢？我翻阅了百度的前几页，不知道是不是搜索关键词问题，几乎全是用XML的方式去整合Mybatis和Spring的，零XML配置，它不香吗？
+因为现在有了 SpringBoot，所以 Mybatis 和 Spring 的整合变得非常简单，但是如果没有 SpringBoot，该怎么整合呢？我翻阅了百度的前几页，不知道是不是搜索关键词问题，几乎全是用 XML 的方式去整合 Mybatis 和 Spring 的，零 XML 配置，它不香吗？
 
 代码结构： ![image.png](../assets/15100432-c2a982e6c0145a65.png)
 
@@ -84,9 +84,9 @@ public class Main {
 [Student{id=1, name='疫苗王', age=20}, Student{id=2, name='阿修罗独角仙', age=18}, Student{id=3, name='地底王', age=18}]
 ```
 
-#### Import注解
+#### Import 注解
 
-如果我们想把一个类注册到Spring容器中，可以采用的方法有很多，其中一种是利用Import注解，Import注解有三种用法，mybatis-spring利用的是其中一种用法，Import了ImportBeanDefinitionRegistrar类，所以我们这里只看Import ImportBeanDefinitionRegistrar。
+如果我们想把一个类注册到 Spring 容器中，可以采用的方法有很多，其中一种是利用 Import 注解，Import 注解有三种用法，mybatis-spring 利用的是其中一种用法，Import 了 ImportBeanDefinitionRegistrar 类，所以我们这里只看 Import ImportBeanDefinitionRegistrar。
 
 ##### 如何使用
 
@@ -98,7 +98,7 @@ public class MyBeanDefinitionRegistrar implements ImportBeanDefinitionRegistrar 
 }
 ```
 
-写一个类实现ImportBeanDefinitionRegistrar ，重写其中的registerBeanDefinitions方法。
+写一个类实现 ImportBeanDefinitionRegistrar ，重写其中的 registerBeanDefinitions 方法。
 
 ```java
 @Import(MyBeanDefinitionRegistrar.class)
@@ -119,7 +119,7 @@ public class AppConfig {
 }
 ```
 
-在配置上加上@Import注解，写上刚才写的MyBeanDefinitionRegistrar类。
+在配置上加上@Import 注解，写上刚才写的 MyBeanDefinitionRegistrar 类。
 
 运行结果：
 
@@ -127,11 +127,11 @@ public class AppConfig {
 [org.springframework.context.annotation.Import, org.springframework.context.annotation.ComponentScan, org.mybatis.spring.annotation.MapperScan]
 ```
 
-从registerBeanDefinitions两个入参的命名来看，第一个参数，Spring把注解元数据给你了，而第二个参数，Spring是直接把beanDefinition的注册器给你了。
+从 registerBeanDefinitions 两个入参的命名来看，第一个参数，Spring 把注解元数据给你了，而第二个参数，Spring 是直接把 beanDefinition 的注册器给你了。
 
 ##### 追本溯源
 
-下面我们来看看Spring在什么时候处理@Import注解的，又是什么时候调用registerBeanDefinitions方法的，当然这里不是Spring源码分析，我不会详细一行行翻译，而是简单的找到源头。
+下面我们来看看 Spring 在什么时候处理@Import 注解的，又是什么时候调用 registerBeanDefinitions 方法的，当然这里不是 Spring 源码分析，我不会详细一行行翻译，而是简单的找到源头。
 
 ```plaintext
 //AnnotationConfigApplicationContext#AnnotationConfigApplicationContext(Class<?>... componentClasses)
@@ -142,23 +142,23 @@ public class AppConfig {
  }
 ```
 
-进入第三行的refresh()方法。
+进入第三行的 refresh()方法。
 
-refresh方法做了很多事情，我们只需要关心invokeBeanFactoryPostProcessors方法：
+refresh 方法做了很多事情，我们只需要关心 invokeBeanFactoryPostProcessors 方法：
 
 ```plaintext
 //AbstractApplicationContext#refresh
 invokeBeanFactoryPostProcessors(beanFactory);
 ```
 
-执行invokeBeanFactoryPostProcessors方法，顾名思义，这个方法是执行BeanFactoryPostProcessor的。什么，你不知道什么是BeanFactoryPostProcessor？你可以简单的理解为Spring遵循插件化式的开发，其中有一个插件叫ConfigurationClassPostProcessor，实现了BeanDefinitionRegistryPostProcessor，同时BeanDefinitionRegistryPostProcessor又实现了BeanFactoryPostProcessor，通过ConfigurationClassPostProcessor的postProcessBeanDefinitionRegistry的方法，Spring完成了扫描。
+执行 invokeBeanFactoryPostProcessors 方法，顾名思义，这个方法是执行 BeanFactoryPostProcessor 的。什么，你不知道什么是 BeanFactoryPostProcessor？你可以简单的理解为 Spring 遵循插件化式的开发，其中有一个插件叫 ConfigurationClassPostProcessor，实现了 BeanDefinitionRegistryPostProcessor，同时 BeanDefinitionRegistryPostProcessor 又实现了 BeanFactoryPostProcessor，通过 ConfigurationClassPostProcessor 的 postProcessBeanDefinitionRegistry 的方法，Spring 完成了扫描。
 
 ```plaintext
 //PostProcessorRegistrationDelegate#invokeBeanFactoryPostProcessors
 invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
 ```
 
-这一步传入了BeanDefinitionRegistryPostProcessor的集合，要执行BeanDefinitionRegistryPostProcessor的postProcessBeanDefinitionRegistry方法，集合有一个元素是我们关心的，就是上面提到的ConfigurationClassPostProcessor。
+这一步传入了 BeanDefinitionRegistryPostProcessor 的集合，要执行 BeanDefinitionRegistryPostProcessor 的 postProcessBeanDefinitionRegistry 方法，集合有一个元素是我们关心的，就是上面提到的 ConfigurationClassPostProcessor。
 
 ```plaintext
 //PostProcessorRegistrationDelegate#invokeBeanDefinitionRegistryPostProcessors
@@ -167,7 +167,7 @@ for (BeanDefinitionRegistryPostProcessor postProcessor : postProcessors) {
 }
 ```
 
-循环传入的BeanDefinitionRegistryPostProcessor集合，调用postProcessBeanDefinitionRegistry方法，我们直接进入到ConfigurationClassPostProcessor的processConfigBeanDefinitions方法，找到关键解析代码：
+循环传入的 BeanDefinitionRegistryPostProcessor 集合，调用 postProcessBeanDefinitionRegistry 方法，我们直接进入到 ConfigurationClassPostProcessor 的 processConfigBeanDefinitions 方法，找到关键解析代码：
 
 ```plaintext
 //ConfigurationClassPostProcessor#processConfigBeanDefinitions
@@ -180,7 +180,7 @@ doProcessConfigurationClass(configClass, sourceClass);
 processImports(configClass, sourceClass, getImports(sourceClass), true);
 ```
 
-重点来了，终于找到了我们的目标：处理@Import注解。
+重点来了，终于找到了我们的目标：处理@Import 注解。
 
 ```plaintext
 //ConfigurationClassParser#processImports
@@ -189,18 +189,18 @@ configClass.addImportBeanDefinitionRegistrar(registrar, currentSourceClass.getMe
 this.importBeanDefinitionRegistrars.put(registrar, importingClassMetadata);
 ```
 
-这个importBeanDefinitionRegistrars就是一个Map：
+这个 importBeanDefinitionRegistrars 就是一个 Map：
 
 ```java
 //ConfigurationClass
 private final Map<ImportBeanDefinitionRegistrar, AnnotationMetadata> importBeanDefinitionRegistrars = new LinkedHashMap<>();
 ```
 
-让我们就监视下configClass： ![image.png](../assets/15100432-df700f54b54cb88d.png) 可以看到我们写的MyBeanDefinitionRegistrar被放入了importBeanDefinitionRegistrars ，我们需要记住这个集合，至于还有一个什么，这里不用关心，当然，聪明的小伙伴肯定知道这是什么了。
+让我们就监视下 configClass： ![image.png](../assets/15100432-df700f54b54cb88d.png) 可以看到我们写的 MyBeanDefinitionRegistrar 被放入了 importBeanDefinitionRegistrars ，我们需要记住这个集合，至于还有一个什么，这里不用关心，当然，聪明的小伙伴肯定知道这是什么了。
 
-我们写的MyBeanDefinitionRegistrar只是被放入了一个Map，并没有执行，下面我们要找找它是在哪里执行的。
+我们写的 MyBeanDefinitionRegistrar 只是被放入了一个 Map，并没有执行，下面我们要找找它是在哪里执行的。
 
-我们需要回到ConfigurationClassPostProcessor的processConfigBeanDefinitions方法：
+我们需要回到 ConfigurationClassPostProcessor 的 processConfigBeanDefinitions 方法：
 
 ```plaintext
 //ConfigurationClassPostProcessor#processConfigBeanDefinitions
@@ -211,7 +211,7 @@ loadBeanDefinitionsForConfigurationClass(configClass, trackedConditionEvaluator)
 loadBeanDefinitionsFromRegistrars(configClass.getImportBeanDefinitionRegistrars());
 ```
 
-这个集合是不是有点眼熟，就是我在上面让大家记住的集合，这个集合就存放着我们的写的MyBeanDefinitionRegistrar类，让我们继续点进去：
+这个集合是不是有点眼熟，就是我在上面让大家记住的集合，这个集合就存放着我们的写的 MyBeanDefinitionRegistrar 类，让我们继续点进去：
 
 ```plaintext
 //ConfigurationClassBeanDefinitionReader#loadBeanDefinitionsFromRegistrars
@@ -221,11 +221,11 @@ loadBeanDefinitionsFromRegistrars(configClass.getImportBeanDefinitionRegistrars(
  }
 ```
 
-循环传入的ImportBeanDefinitionRegistrar集合，调用registerBeanDefinitions方法，我的天，终于找到执行方法了。
+循环传入的 ImportBeanDefinitionRegistrar 集合，调用 registerBeanDefinitions 方法，我的天，终于找到执行方法了。
 
 #### FactoryBean
 
-Spring就像是一个魔术师的袋子，而FactoryBean就是被魔术师装进袋子的香蕉，当魔术师打开袋子，发现香蕉变成鸽子了。
+Spring 就像是一个魔术师的袋子，而 FactoryBean 就是被魔术师装进袋子的香蕉，当魔术师打开袋子，发现香蕉变成鸽子了。
 
 ##### 如何使用
 
@@ -265,13 +265,13 @@ Teacher{name='琦玉老师'}
 442125849
 ```
 
-可以很清楚的看到从FactoryBean里面又生产出了一个Bean，生产出来的Bean就是FactoryBean中getObject方法返回的。
+可以很清楚的看到从 FactoryBean 里面又生产出了一个 Bean，生产出来的 Bean 就是 FactoryBean 中 getObject 方法返回的。
 
 ##### 追本溯源
 
-和上面一样，我们也要看看FactoryBean中的getObject是在哪里执行的，我们先来做个试验：
+和上面一样，我们也要看看 FactoryBean 中的 getObject 是在哪里执行的，我们先来做个试验：
 
-我们在getObject里面加上一句打印的代码：
+我们在 getObject 里面加上一句打印的代码：
 
 ```java
 @Component
@@ -288,7 +288,7 @@ public class MyFactoryBean implements FactoryBean<Teacher> {
 }
 ```
 
-然后只保留main方法中的创建ApplicationContext方法：
+然后只保留 main 方法中的创建 ApplicationContext 方法：
 
 ```java
 public class Main {
@@ -298,9 +298,9 @@ public class Main {
 }
 ```
 
-运行后，你会发现，控制台没有任何输出，我们大胆的猜想，FactoryBean生产出来的Bean并不是预先加载的，而是采用懒加载的机制，也就是只有需要，才会去加载。
+运行后，你会发现，控制台没有任何输出，我们大胆的猜想，FactoryBean 生产出来的 Bean 并不是预先加载的，而是采用懒加载的机制，也就是只有需要，才会去加载。
 
-我们继续改下main方法：
+我们继续改下 main 方法：
 
 ```java
     public static void main(String[] args) {
@@ -315,7 +315,7 @@ public class Main {
 Teacher{name='琦玉老师'}
 ```
 
-所以我们的猜想是正确的，这次入口是getBean。
+所以我们的猜想是正确的，这次入口是 getBean。
 
 下面还是枯燥无味的寻找，这次的寻找之旅更复杂：
 
@@ -336,13 +336,13 @@ return getBeanNamesForType(resolved, true, true);
 resolvedBeanNames = doGetBeanNamesForType(ResolvableType.forRawClass(type), includeNonSingletons, true);
 ```
 
-这个方法里面有一步是循环beanDefinitionNames，当循环到myFactoryBean的时候，判断这是一个FactoryBean：
+这个方法里面有一步是循环 beanDefinitionNames，当循环到 myFactoryBean 的时候，判断这是一个 FactoryBean：
 
 ```plaintext
 boolean isFactoryBean = isFactoryBean(beanName, mbd);
 ```
 
-随后执行isTypeMatch(beanName, type)方法：
+随后执行 isTypeMatch(beanName, type)方法：
 
 ```java
 //org.springframework.beans.factory.support.AbstractBeanFactory#isTypeMatch(java.lang.String, org.springframework.core.ResolvableType)
@@ -351,9 +351,9 @@ Class<?> type = getTypeForFactoryBean((FactoryBean<?>) beanInstance);
 return factoryBean.getObjectType();
 ```
 
-当执行到这里，我们写的MyFactoryBean的getObjectType方法被调用了，返回Teacher.class，而我们现在要找的也是Teacher.class，所以匹配。
+当执行到这里，我们写的 MyFactoryBean 的 getObjectType 方法被调用了，返回 Teacher.class，而我们现在要找的也是 Teacher.class，所以匹配。
 
-随后回到DefaultListableBeanFactory#doGetBeanNamesForType，把beanName放入一个集合中：
+随后回到 DefaultListableBeanFactory#doGetBeanNamesForType，把 beanName 放入一个集合中：
 
 ```plaintext
 if (matchFound) {
@@ -363,7 +363,7 @@ if (matchFound) {
 
 随后返回集合。
 
-再回到DefaultListableBeanFactory#resolveNamedBean，会判断返回出来的集合的元素的个数，显然只返回一个，执行
+再回到 DefaultListableBeanFactory#resolveNamedBean，会判断返回出来的集合的元素的个数，显然只返回一个，执行
 
 ```java
 //org.springframework.beans.factory.support.DefaultListableBeanFactory#resolveNamedBean
@@ -373,7 +373,7 @@ if (matchFound) {
   }
 ```
 
-继续点开getBean方法：
+继续点开 getBean 方法：
 
 ```java
 //org.springframework.beans.factory.support.AbstractBeanFactory#getBean(java.lang.String, java.lang.Class<T>, java.lang.Object...)
@@ -388,19 +388,19 @@ doGetObjectFromFactoryBean(factory, beanName);
 object = factory.getObject();
 ```
 
-直到这里，才执行了我们写的MyFactoryBean的getObject方法，拿到了我们返回的Teacher对象后。
+直到这里，才执行了我们写的 MyFactoryBean 的 getObject 方法，拿到了我们返回的 Teacher 对象后。
 
-因为有缓存机制如果我们再去拿，就不会再次调用getObject方法了，这个缓存机制就不再继续分析了，比较复杂，就算不了解也不影响我们今天的主题。
+因为有缓存机制如果我们再去拿，就不会再次调用 getObject 方法了，这个缓存机制就不再继续分析了，比较复杂，就算不了解也不影响我们今天的主题。
 
-#### JDK动态代理
+#### JDK 动态代理
 
-我以前写过JDK动态代理的博客，大家可以找来看一看 ，这里就不阐述了。
+我以前写过 JDK 动态代理的博客，大家可以找来看一看 ，这里就不阐述了。
 
-### mybatis-spring源码分析
+### mybatis-spring 源码分析
 
-前置知识介绍完成，有了上面的前置知识，我们就可以一探MyBatis和Spring整合的奥秘。
+前置知识介绍完成，有了上面的前置知识，我们就可以一探 MyBatis 和 Spring 整合的奥秘。
 
-Mybatis和Spring整合的入口很好找，就是我们再配置上添加的@MapperScan注解，当我们点开@MapperScan：
+Mybatis 和 Spring 整合的入口很好找，就是我们再配置上添加的@MapperScan 注解，当我们点开@MapperScan：
 
 ```plaintext
 @Retention(RetentionPolicy.RUNTIME)
@@ -412,9 +412,9 @@ public @interface MapperScan {
 }
 ```
 
-你会发现一个很熟悉的注解，就是我们上面讲的Import注解，Import了MapperScannerRegistrar。
+你会发现一个很熟悉的注解，就是我们上面讲的 Import 注解，Import 了 MapperScannerRegistrar。
 
-通过上面的源码分析明白，Spring会执行到registerBeanDefinitions方法：
+通过上面的源码分析明白，Spring 会执行到 registerBeanDefinitions 方法：
 
 ```java
 @Override
@@ -428,7 +428,7 @@ public @interface MapperScan {
   }
 ```
 
-继续深入registerBeanDefinitions方法：
+继续深入 registerBeanDefinitions 方法：
 
 ```cpp
 // 创建了一个扫描器，这个扫描器继承了Spring定义的扫描器：ClassPathBeanDefinitionScanner，
@@ -473,7 +473,7 @@ scanner.registerFilters()中有一行代码，比较重要：
   }
 ```
 
-继续看processBeanDefinitions方法：
+继续看 processBeanDefinitions 方法：
 
 ```plaintext
 // 省略
@@ -483,7 +483,7 @@ scanner.registerFilters()中有一行代码，比较重要：
 //省略
 ```
 
-这个循环中，有一行代码很是重要，把扫描出来的bean的BeanClass都设置成了mapperFactoryBean，这个mapperFactoryBean是何方神圣呢？没错，它就是我们上面分析过的FactoryBean，通过实验和分析，我们知道了最终产生的bean对象是FactoryBean中的getObject返回的对象。
+这个循环中，有一行代码很是重要，把扫描出来的 bean 的 BeanClass 都设置成了 mapperFactoryBean，这个 mapperFactoryBean 是何方神圣呢？没错，它就是我们上面分析过的 FactoryBean，通过实验和分析，我们知道了最终产生的 bean 对象是 FactoryBean 中的 getObject 返回的对象。
 
 ```java
   public T getObject() throws Exception {
@@ -522,7 +522,7 @@ scanner.registerFilters()中有一行代码，比较重要：
     }
 ```
 
-最终我们调用代理对象的方法，会执行到MapperProxy的invoke方法：
+最终我们调用代理对象的方法，会执行到 MapperProxy 的 invoke 方法：
 
 ```plaintext
  public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -538,4 +538,4 @@ scanner.registerFilters()中有一行代码，比较重要：
   }
 ```
 
-当我们点开mapperMethod.execute方法，你会觉得一切是那么的熟悉。
+当我们点开 mapperMethod.execute 方法，你会觉得一切是那么的熟悉。

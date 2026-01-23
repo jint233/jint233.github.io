@@ -37,7 +37,7 @@ SPI 的大概流程是：
 - 创建 SPI 的配置文件，实现类路径写入配置文件中
 - 通过 Java SPI 机制调用
 
-![java spi例子](../assets/ae6a1320-2dd6-11ea-83f2-fb971dbe5ef6.jpg)
+![java spi 例子](../assets/ae6a1320-2dd6-11ea-83f2-fb971dbe5ef6.jpg)
 
 # Spring Boot SPI 机制底层实现
 
