@@ -422,7 +422,7 @@ default model : Model[success=null, failure=false]
 
 在阿里巴巴 Java 开发手册中，对于 POJO 中如何选择变量的类型也有着一些规定：
 
-![img](../assets/640.jpeg)
+![img](../assets/640.jpg)
 
 这里建议我们使用包装类型，原因是什么呢？
 
