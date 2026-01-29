@@ -4,11 +4,11 @@
 
 ### UUID
 
-[uuid](<https://en.wikipedia.org/wiki/Universally%5C_unique%5C_identifier##:~:text=A> universally unique identifier (UUID,are for practical purposes unique.))
+[uuid](https://en.wikipedia.org/wiki/Universally_unique_identifier) universally unique identifier (UUID,are for practical purposes unique.))
 
 1 个 UUID 是 1 个 16 字节（128 位）的数字； 为了方便阅读，通常将 UUID 表示成如下的方式：
 
-```log
+```text
 123e4567-e89b-12d3-a456-426614174000
 ```
 
@@ -171,7 +171,7 @@ duration_step 可以设置为两天（或更长），每隔一天异步到 DB �
 
 ## 参考
 
-[Universally unique identifier](<https://en.wikipedia.org/wiki/Universally%5C_unique%5C_identifier##:~:text=A> universally unique identifier (UUID,are for practical purposes unique.))
+[Universally unique identifier](https://en.wikipedia.org/wiki/Universally_unique_identifier)
 
 [Twitter IDs (snowflake)](https://developer.twitter.com/en/docs/basics/twitter-ids)
 
