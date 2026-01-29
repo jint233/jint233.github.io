@@ -22,7 +22,7 @@ MySQL 数据字典的发展史：
 
 我们看看这个库中到底有什么内容。
 
-```sql
+```shell
 mysql> use sys
 mysql> select * from schema_object_overview where db='information_schema';
 +--------------------+-------------+-------+
@@ -39,7 +39,7 @@ mysql> select * from schema_object_overview where db='information_schema';
 
 都有什么视图内容呢？我们可以通过 show tables 命令查看。
 
-```plaintext
+```shell
 mysql> use information_schema
 mysql> show tables;
 ```
@@ -64,7 +64,7 @@ MySQL 在 5.7 开始，对数据字典的使用有了很大的改进，使用上
 
 我们先说一个你想不到的事情，MySQL 的 performance_schema 其实是一个引擎。
 
-```sql
+```shell
 mysql> select * from information_schema.engines;
 +--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
 | ENGINE             | SUPPORT | COMMENT                                                        | TRANSACTIONS | XA   | SAVEPOINTS |
@@ -88,14 +88,14 @@ mysql> select * from information_schema.engines;
 
 在 my.cnf 中配置如下：
 
-```plaintext
+```properties
 [mysqld]  
 performance_schema=ON
 ```
 
 验证一下参数是否启动：
 
-```plaintext
+```shell
 mysql> show variables like 'performance_schema';
 +--------------------+-------+
 | Variable_name      | Value |
@@ -107,7 +107,7 @@ mysql> show variables like 'performance_schema';
 
 虽然它是一个引擎，但是我们可以像使用数据库那样使用 use 来使用它。这个库里到底有什么内容呢？
 
-```sql
+```shell
 mysql> use sys;
 mysql> select * from schema_object_overview where db='performance_schema';
 +--------------------+-------------+-------+
@@ -118,7 +118,8 @@ mysql> select * from schema_object_overview where db='performance_schema';
 1 row in set (0.06 sec)
 ```
 
-结果显示，有 87 张表。我们知道 MySQL 有很多需要监控和统计的内容，而 performance_schema 将这些监控、统计信息之类的内容通过库中的表统计出来，都展现在这些表中。那么这些表都是做什么用的呢？我们就去研究一下。
+结果显示，有 87 张表。我们知道 MySQL 有很多需要监控和统计的内容，而 performance_schema
+将这些监控、统计信息之类的内容通过库中的表统计出来，都展现在这些表中。那么这些表都是做什么用的呢？我们就去研究一下。
 
 总体分类：
 
@@ -133,7 +134,7 @@ mysql> select * from schema_object_overview where db='performance_schema';
 
 #### setup 表
 
-```plaintext
+```shell
 mysql> use performance_schema
 mysql> show tables like '%setup%';
 +----------------------------------------+
@@ -152,7 +153,7 @@ mysql> show tables like '%setup%';
 
 作用：配置用户维度的监控，默认监控所有用户。
 
-```sql
+```shell
 mysql> select * from setup_actors;
 +------+------+------+---------+---------+
 | HOST | USER | ROLE | ENABLED | HISTORY |
@@ -168,7 +169,7 @@ mysql> select * from setup_actors;
 
 作用：配置事件的消费者类型，管理将收集的监控内容保存在哪些表中。
 
-```sql
+```shell
 mysql> select * from setup_consumers;
 +----------------------------------+---------+
 | NAME                             | ENABLED |
@@ -194,7 +195,7 @@ mysql> select * from setup_consumers;
 
 有 15 条记录，这些配置呢存在着上下级关系，原则是当上级监控生效，下级监控才起作用。上下级对应关系如下：
 
-```global_instrumentation
+```shell
 |----thread_instrumentation
 |         |----events_waits_current
 |         |           |----events_waits_history
@@ -219,7 +220,7 @@ mysql> select * from setup_consumers;
 
 配置内容很多，我们分组看一下几大类。
 
-```cpp
+```shell
 mysql> select name,count(*) from setup_instruments group by LEFT(name,5);
 +-------------------------------------------+----------+
 | name                                      | count(*) |
@@ -236,13 +237,13 @@ mysql> select name,count(*) from setup_instruments group by LEFT(name,5);
 
 如果你执行上面的这个分组报错如下：
 
-```javascript
+```shell
 ERROR 1055 (42000): Expression #1 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'performance_schema.setup_instruments.NAME' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
 ```
 
 解决方法：这是由于 `sql_mode=only_full_group_by` 导致。
 
-```sql
+```shell
 mysql> SELECT @@SESSION.sql_mode;
 +-------------------------------------------------------------------------------------------------------------------------------------------+
 | @@SESSION.sql_mode                                                                                                                        |
@@ -266,7 +267,7 @@ mysql> set @@session.sql_mode ='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE
 
 作用：配置监控对象。
 
-```sql
+```shell
 mysql> select * from setup_objects;
 +-------------+--------------------+-------------+---------+-------+
 | OBJECT_TYPE | OBJECT_SCHEMA      | OBJECT_NAME | ENABLED | TIMED |
@@ -306,7 +307,7 @@ mysql> select * from setup_objects;
 
 作用：配置每种类型统计的时间单位。
 
-```sql
+```shell
 mysql> select * from setup_timers;
 +-------------+-------------+
 | NAME        | TIMER_NAME  |
@@ -328,7 +329,7 @@ mysql> select * from setup_timers;
 
 那么为什么使用这样的时间呢，这个时间定义来源于 MySQL 的基础定义。
 
-```sql
+```shell
 mysql> select * from performance_timers;
 +-------------+-----------------+------------------+----------------+
 | TIMER_NAME  | TIMER_FREQUENCY | TIMER_RESOLUTION | TIMER_OVERHEAD |
@@ -346,7 +347,7 @@ TICK：是系统的相对时间单位，也称为系统的时基，来源于定�
 
 #### instance 表
 
-```plaintext
+```shell
 mysql> use performance_schema
 mysql> show tables like '%instances';
 +-------------------------------------------+
@@ -371,7 +372,7 @@ mysql> show tables like '%instances';
 
 #### wait event 表
 
-```plaintext
+```shell
 mysql> use performance_schema
 mysql> show tables like '%waits%';
 +-----------------------------------------------+
@@ -401,7 +402,7 @@ mysql> show tables like '%waits%';
 
 #### stage event 表
 
-```plaintext
+```shell
 mysql> use performance_schema
 mysql> show tables like '%stage%';
 +------------------------------------------------+
@@ -427,7 +428,7 @@ mysql> show tables like '%stage%';
 
 #### statement event 表
 
-```plaintext
+```shell
 mysql> use performance_schema
 mysql> show tables like '%statement%';
 +----------------------------------------------------+
@@ -456,7 +457,7 @@ mysql> show tables like '%statement%';
 
 #### transaction event 表
 
-```plaintext
+```shell
 mysql> use performance_schema
 mysql> show tables like '%transactions%';
 +------------------------------------------------------+
@@ -482,7 +483,7 @@ mysql> show tables like '%transactions%';
 
 #### summary 表
 
-```plaintext
+```shell
 mysql> use performance_schema
 mysql> show tables like '%summary%';
 +------------------------------------------------------+
@@ -542,19 +543,24 @@ mysql> show tables like '%summary%';
 
 #### other 表
 
-其他的表还有很多，可以监控统计 accounts、file、status、hosts、memory、metadata_locks、replication、session、socket、table、threads 等。
+其他的表还有很多，可以监控统计 accounts、file、status、hosts、memory、metadata_locks、replication、session、socket、table、threads
+等。
 
 好了，performance_schema 是数据库，是性能引擎，内部逻辑比较复杂，能做的事情也很多，这里就先介绍到这里，大家可以继续深入研究。
 
 ### MySQL sys 详解（演变进化）
 
-MySQL 在 5.7 版本引入了 sys Schema，这个 sys 可以理解为是一个 MySQL 系统库，这个库中提供了表、视图、函数、存储过程、触发器，这些就可以帮我们快捷、高效地知道 MySQL 数据库的元数据信息，比如我们可以了解：SQL 执行情况是否使用了索引，是否走了全表扫描，统计信息的情况、内存使用情况、IO 使用情况、会话连接等等。
+MySQL 在 5.7 版本引入了 sys Schema，这个 sys 可以理解为是一个 MySQL 系统库，这个库中提供了表、视图、函数、存储过程、触发器，这些就可以帮我们快捷、高效地知道
+MySQL 数据库的元数据信息，比如我们可以了解：SQL 执行情况是否使用了索引，是否走了全表扫描，统计信息的情况、内存使用情况、IO
+使用情况、会话连接等等。
 
-前面我们学习了 information_schema 和 performance_schema，这个 sys 提供的视图其实就是前面这两个化繁为简的总结，降低复杂度，让你更快乐的了解 MySQL 的现状。可见 MySQL 在自我优化方面是多么的努力，它帮你做了很多的工作，我们可以更简单的获取更直观的数据，怎么样，MySQL 优秀吧。
+前面我们学习了 information_schema 和 performance_schema，这个 sys 提供的视图其实就是前面这两个化繁为简的总结，降低复杂度，让你更快乐的了解
+MySQL 的现状。可见 MySQL 在自我优化方面是多么的努力，它帮你做了很多的工作，我们可以更简单的获取更直观的数据，怎么样，MySQL
+优秀吧。
 
 说这么多了，这个 sys 库里到底有什么内容呢？好，赶紧一睹芳容。
 
-```sql
+```shell
 mysql> use sys
 mysql> select * from schema_object_overview where db='sys';
 +-----+---------------+-------+
@@ -572,33 +578,14 @@ mysql> select * from schema_object_overview where db='sys';
 
 结果显示：
 
-类型
-
-数量
-
-函数
-
-22
-
-存储过程
-
-26
-
-视图
-
-100
-
-表
-
-1
-
-索引
-
-1
-
-触发器
-
-2
+| 类型   | 数量  |
+|------|-----|
+| 函数   | 22  |
+| 存储过程 | 26  |
+| 视图   | 100 |
+| 表    | 1   |
+| 索引   | 1   |
+| 触发器  | 2   |
 
 这些内容可以帮我们做什么呢？
 
@@ -610,7 +597,7 @@ mysql> select * from schema_object_overview where db='sys';
 
 在这些所有内容中，我们常用的就是这一张表和其他视图，我们先来看看这唯一一张表，它是 sys_config。
 
-```sql
+```shell
 mysql> select * from sys_config;
 +--------------------------------------+-------+---------------------+--------+
 | variable                             | value | set_time            | set_by |
@@ -629,7 +616,8 @@ mysql> select * from sys_config;
 
 参数说明
 
-- diagnostics.allow_i_s_tables：默认 OFF，这参数控制调用 diagnostics() 存储过程时会扫描 information_schema.tables 找到所有的基表与 statistics 表关联查询，扫描每个表的统计信息。
+- diagnostics.allow_i_s_tables：默认 OFF，这参数控制调用 diagnostics() 存储过程时会扫描 information_schema.tables 找到所有的基表与
+  statistics 表关联查询，扫描每个表的统计信息。
 - diagnostics.include_raw：默认 OFF，这参数控制调用 diagnostics() 存储过程输出包含 metrics 视图的原始信息。
 - ps_thread_trx_info.max_length：默认 65535，保存的是 ps_thread_trx_info() 函数生成的 json 输出内容的最大长度。
 - statement_performance_analyzer.limit：默认 100，返回不具有内置限制的视图的行数。
@@ -638,7 +626,7 @@ mysql> select * from sys_config;
 
 接下来我们测试修改一下 statement_truncate\\len 这个参数内容：
 
-```sql
+```shell
 # statement_truncate_len，调用 format_statement()函数返回是 64 字节长度的值，在未被调用过任何涉及到该配置选项的函数之前，该参数的值是 NULL。
 mysql> select @sys.statement_truncate_len;
 +----------------------------------------------------------+
@@ -691,7 +679,7 @@ mysql> select format_statement(@stmt);
 
 默认是 NULL，调用 diagnostics() 和 execute_prepared_stmt() 存储过程，执行检查。这个参数默认不存在，是临时使用的。
 
-```sql
+```shell
 # 会话级设置
 set @sys.debug = NULL;
 # 所有会话使用，需要插入到表中
@@ -719,15 +707,16 @@ mysql> update sys_config set value = 'OFF' where variable = 'debug';
 
 在 MySQL 5.7 开始提供了一个新的用户 mysql.sys，这个用户可避免修改或删除 root 用户时发生的问题，但是该用户被锁定是无法连接客户端的。
 
-接下来说的两个触发器，在定义时使用了 `[[email protected]](/cdn-cgi/l/email-protection)`，就是说只能用 mysql.sys 调用触发器，从而对表 sys_config 的内容做修改，如果 mysql.sys 用户不存在会报错
+接下来说的两个触发器，在定义时使用了 `[[email protected]](/cdn-cgi/l/email-protection)`，就是说只能用 mysql.sys 调用触发器，从而对表
+sys_config 的内容做修改，如果 mysql.sys 用户不存在会报错
 
-```plaintext
+```shell
 ERROR 1449 (HY000): The user specified as a definer ('mysql.sys'@'localhost') does not exist
 ```
 
 假如，我是说假如 mysql.sys 用户被你给误删除了，或者其他原因导致这个用户不存在了，我们如何补救呢？（建议：千万不要去动这个用户，以免造成不必要的麻烦）
 
-```sql
+```shell
 # 首先创建用户，并赋予使用触发器权限
 mysql> grant TRIGGER on sys.* to 'mysql.sys'@'localhost' identified by '123456';
 mysql> INSERT INTO sys.sys_config (variable, value) VALUES('debug', 'ON');    
@@ -741,13 +730,14 @@ Query OK, 1 row affected (0.02 sec)
 Rows matched: 1  Changed: 1  Warnings: 0
 ```
 
-**sysconfiginsertsetuser** 当对 sys.sys_config 表做 insert 操作时，该触发器会将 sys_config 表的 set_by 列设置为当前用户名。**sysconfigupdatesetuser**
+**sysconfiginsertsetuser** 当对 sys.sys_config 表做 insert 操作时，该触发器会将 sys_config 表的 set_by 列设置为当前用户名。
+**sysconfigupdatesetuser**
 
 当对 sys.sys_config 表做 insert 操作时，该触发器会将 sys_config 表的 set_by 列设置为当前用户名。
 
 这两个触发器可以更新 set_by 字段都有一个前提条件：
 
-```plaintext
+```shell
 mysql> set @sys.ignore_sys_config_triggers=0;
 ```
 
@@ -772,11 +762,14 @@ mysql> set @sys.ignore_sys_config_triggers=0;
 
 接下来我们重点介绍几个视图。
 
-- **host_summary** ：这个视图我们可以查看连接数据库的主机情况，统计每个主机 SQL 执行次数、SQL 执行时长、表扫描次数、文件 IO 情况、连接情况、用户情况、内存分布情况。通过这些信息我们可以快速了解连接数据库的主机情况。
+- **host_summary** ：这个视图我们可以查看连接数据库的主机情况，统计每个主机 SQL 执行次数、SQL 执行时长、表扫描次数、文件 IO
+  情况、连接情况、用户情况、内存分布情况。通过这些信息我们可以快速了解连接数据库的主机情况。
 - **hostsummarybyfileio_type** ：查询连接数据库每个主机的文件 IO 使用情况。
 - **hostsummarybyfileio** ：查询连接数据库主机的总 IO 使用情况。
-- **innodbbufferstatsbyschema** ：扫描整个 buffer pool 来统计查看每个库的内存占用情况。如果生产环境 buffer pool 很大，扫描会占用很多资源，造成性能问题，慎用。
-- **innodbbufferstatsbytable** ：扫描整个 buffer pool 来统计查看每个库的每个对象的内存占用情况。如果生产环境 buffer pool 很大，扫描会占用很多资源，造成性能问题，慎用。
+- **innodbbufferstatsbyschema** ：扫描整个 buffer pool 来统计查看每个库的内存占用情况。如果生产环境 buffer pool
+  很大，扫描会占用很多资源，造成性能问题，慎用。
+- **innodbbufferstatsbytable** ：扫描整个 buffer pool 来统计查看每个库的每个对象的内存占用情况。如果生产环境 buffer pool
+  很大，扫描会占用很多资源，造成性能问题，慎用。
 - **ioglobalbyfileby_bytes** ：查询数据库的 IO 情况。
 - **memorybyhostbycurrent_bytes** ：查询连接数据库的主机内存情况。
 - **memorybythreadbycurrent_bytes** ：查询连接数据库的线程内存情况。
@@ -802,4 +795,5 @@ mysql> set @sys.ignore_sys_config_triggers=0;
 - **waitclassesglobalbyavg_latency** ：查询等待事件的平均延迟时间情况。
 - **waitclassesglobalbylatency** ：查询等待事件的总体延迟时间情况。
 
-以上差不多就是 sys 库常用的视图了，基本满足我们的日常分析统计需求，大家可以通过官网继续深入学习，学好这一部分的内容，对 MySQL 的底层原理及性能分析有非常大的帮助。
+以上差不多就是 sys 库常用的视图了，基本满足我们的日常分析统计需求，大家可以通过官网继续深入学习，学好这一部分的内容，对
+MySQL 的底层原理及性能分析有非常大的帮助。

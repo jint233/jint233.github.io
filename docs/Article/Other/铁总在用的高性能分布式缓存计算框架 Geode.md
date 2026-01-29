@@ -55,13 +55,13 @@ Apache Geode 是一个数据管理平台，可在广泛分布的云架构中提�
 
 编辑 /etc/sysctl.conf
 
-```plaintext
+```shell
 net.ipv4.tcp_syncookies = 0 
 ```
 
 将此值设置为零，将禁用 SYN Cookie。
 
-```plaintext
+```shell
 sysctl -p 重载
 ```
 
@@ -92,45 +92,45 @@ sysctl -p 重载
 
 拷贝至：
 
-```plaintext
+```shell
 cp /tmp/upload_dir/ddh/apache-geode-1.8.0.tgz /opt/apache-geode-1.8.0.tgz
 ```
 
 tar 解压：
 
-```plaintext
+```shell
 tar xvf apache-geode-1.8.0.tgz
 ```
 
 删除包文件：
 
-```plaintext
+```shell
 rm -rf apache-geode-1.8.0.tgz
 ```
 
 当然上传目录不强制，但是我们需要使用的配置环境变量：
 
-```plaintext
+```shell
 vim /etc/profile
 ```
 
 最后一行加入：
 
-```plaintext
+```shell
 export PATH=$JAVA_HOME/bin:/opt/apache-geode-1.8.0/bin:$PATH
 ```
 
 退出使更改生效。
 
-```plaintext
+```shell
 source /etc/profile 
 gfsh version --full
 ```
 
 成功会输出如下（我这是 1.9.2 输出的版本）：
 
-```plaintext
-[email protected]/0 # gfsh version --full
+```shell
+gfsh version --full
 Build-Date: 2019-10-15 06:08:13 -0700
 Build-Id: jdeppe 0
 Build-Java-Version: 1.8.0_221
@@ -148,7 +148,7 @@ Running on: /192.168.33.23, 4 cpu(s), amd64 Linux 2.6.32-696.23.1.el6.x86_64
 
 locator 脚本 （以 33.15 的脚本为例子 ）：
 
-```plaintext
+```shell
 #! /bin/sh
 basedir=`dirname $0`
 echo "BASE DIR:$basedir"
@@ -166,7 +166,7 @@ gfsh start locator --name=${locatorname} --locators=${locators} --port=10334 \
 
 server 的启动脚本：
 
-```plaintext
+```shell
 #! /bin/sh
 basedir=`dirname $0`
 echo "BASE DIR:$basedir"
@@ -190,8 +190,8 @@ gfsh start server --name=${servername} --locators=${locators} --locator-wait-tim
 
 1. 启动成功的时候观察日志：
 
-    ```java
-    [email protected]/0 # sh start_locator_33_20.sh
+    ```shell
+    sh start_locator_33_20.sh
     Log File: /opt/geode_work18/locator_33_20/locator_33_20.log
     JVM Arguments: -Dgemfire.locators=192.168.33.15[10334],192.168.33.20[10334],192.168.33.23[10334] -Dgemfire.enable-cluster-configuration=true -Dgemfire.load-cluster-configuration-from-dir=false -Dgemfire.max-num-reconnect-tries=100 -Dgemfire.member-timeout=120000 -Dgemfire.distributed-system-id=254 -Xms512M -Xmx1G -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=60 -Dgemfire.launcher.registerSignalHandlers=true -Djava.awt.headless=true -Dsun.rmi.dgc.server.gcInterval=9223372036854775806
     Class-Path: /opt/apache-geode-1.9.2/lib/geode-core-1.9.2.jar:/opt/apache-geode-1.9.2/lib/geode-dependencies.jar
@@ -204,7 +204,7 @@ gfsh start server --name=${servername} --locators=${locators} --locator-wait-tim
 
 2. connect 到 locator 后的日志：
 
-    ```plaintext
+    ```shell
     gfsh>connect --locator=192.168.33.23[10334]
     Connecting to Locator at [host=192.168.33.23, port=10334] ..
     //请关注下边这行
@@ -218,7 +218,7 @@ gfsh start server --name=${servername} --locators=${locators} --locator-wait-tim
 
 确认了 leader 地址，我们就可以访问 Pulse 了。
 
-```plaintext
+```shell
 http://192.168.33.15:7070/pulse
 ```
 
@@ -244,8 +244,8 @@ gfsh 的作用：
 
 还记得我们安装的时候在环境变量中进行了配置 profile，因此我们只需要输入 gfsh 就可以调启命令行。
 
-```plaintext
-[email protected]/0 # gfsh
+```shell
+gfsh
     _________________________     __
    / _____/ ______/ ______/ /____/ /
   / /  __/ /___  /_____  / _____  / 
@@ -258,7 +258,7 @@ Monitor and Manage Apache Geode
 
 要管理 Goode 集群我们需要连接到主 locator 上， 有两种方式。**1. 直接使用 JMX 进行连接** 当我们知道哪个是主的时候，就直接使用 JMX 进行连接即可。
 
-```plaintext
+```shell
 gfsh>connect --jmx-manager=192.168.33.15
 Connecting to Manager at [host=192.168.33.15, port=1099] ..
 Successfully connected to: [host=192.168.33.15, port=1099]
@@ -271,13 +271,13 @@ Cluster-254 gfsh>
 
 注意看 shell 中的第三行
 
-```plaintext
+```shell
 Connecting to Manager at [host=192.168.33.15, port=1099] ..
 ```
 
 实际上 locator 也是会返回 leader 的 JMX 让本地进行连接。
 
-```plaintext
+```shell
 gfsh>connect --locator=192.168.33.23[10334]
 Connecting to Locator at [host=192.168.33.23, port=10334] ..
 Connecting to Manager at [host=192.168.33.15, port=1099] ..
@@ -291,7 +291,7 @@ Cluster-254 gfsh>
 
 #### 创建 region
 
-```plaintext
+```shell
 gfsh>create region --name=test --type=PARTITION_REDUNDANT_PERSISTENT_OVERFLOW --redundant-copies=1
 
 | Member                                                      | Status | Message                                  |
@@ -312,7 +312,7 @@ gfsh>create region --name=test --type=PARTITION_REDUNDANT_PERSISTENT_OVERFLOW --
 - REDUNDANT：冗余 -> 可配置冗余数量，但是不知道是否会参与 read 不清楚
 - HEAP_LRU：最近最少使用清除内存
 
-```plaintext
+```shell
 LOCAL                                     LOCAL_HEAP_LRU                            LOCAL_OVERFLOW                            LOCAL_PERSISTENT
 LOCAL_PERSISTENT_OVERFLOW                 PARTITION                                 PARTITION_HEAP_LRU                        PARTITION_OVERFLOW
 PARTITION_PERSISTENT                      PARTITION_PERSISTENT_OVERFLOW             PARTITION_PROXY                           PARTITION_PROXY_REDUNDANT
@@ -323,7 +323,7 @@ REPLICATE_PERSISTENT                      REPLICATE_PERSISTENT_OVERFLOW         
 
 #### get、put
 
-```java
+```shell
 Cluster-254 gfsh>put  --region=test --key=abc --value=abc_v
 Result      : true
 Key Class   : java.lang.String
@@ -340,7 +340,7 @@ Value       : "abc_v"
 
 #### list
 
-```javascript
+```shell
 list 的所有命令
 Cluster-254 gfsh>list
 list async-event-queues   list clients              list data-source          list deployed             list disk-stores          list durable-cqs          list functions
@@ -360,7 +360,7 @@ list gateways             list indexes              list jdbc-mappings        li
 
 所有的命令，我们可以看到，跟上个命令所能看的东西很像。
 
-```plaintext
+```shell
 Cluster-254 gfsh>describe
 describe client               describe config               describe connection           describe data-source          describe disk-store           describe jdbc-mapping
 describe jndi-binding         describe lucene               describe member               describe offline-disk-store   describe region
@@ -368,7 +368,7 @@ describe jndi-binding         describe lucene               describe member     
 
 查看 region 的描述：
 
-```plaintext
+```shell
 Cluster-254 gfsh>describe region --name=test
 Name            : test
 Data Policy     : persistent partition
@@ -385,7 +385,7 @@ Non-Default Attributes Shared By Hosting Members
 
 | data-policy        | PERSISTENT_PARTITION
 
-```plaintext
+```shell
 Eviction  | eviction-action    | overflow-to-disk
 | eviction-algorithm | lru-heap-percentage
 Partition | redundant-copies   | 1
@@ -393,7 +393,7 @@ Partition | redundant-copies   | 1
 
 查看 member 的描述：
 
-```plaintext
+```shell
 gfsh>describe member --name=server_33_15
 Name        : server_33_15
 Id          : 192.168.33.15(server_33_15:1530)<v85>:41001
@@ -430,13 +430,13 @@ Client Connections       : 1
 
 所有能查看的：
 
-```plaintext
+```shell
 status cluster-config-service   status gateway-receiver         status gateway-sender           status locator                  status server
 ```
 
 查看 locator 的状态：
 
-```java
+```shell
 gfsh>status locator --name=locator_33_15
 Locator in /opt/geode_work18/locator_33_15 on 192.168.33.15[10334] as locator_33_15 is currently online.
 Process ID: 1184
@@ -453,7 +453,7 @@ Cluster configuration service is up and running.
 
 可以做类似 SQL 语法的查询，这点其他缓存框架是做不到的。
 
-```sql
+```shell
 ## Cluster-254 gfsh>query --query="select * from /test" Result : true Limit  : 100 Rows   : 1 Result
 
 abc_v
@@ -465,14 +465,14 @@ query 更多实例我们在 OQL 一节去探讨。
 
 导出有日志、配置、集群配置、数据，我们常用的就是导出集群配置。
 
-```plaintext
+```shell
 Cluster-254 gfsh>export cluster-configuration --zip-file-name=./cluster-config-back.zip
 File saved to /opt/geode_work18/./cluster-config-back.zip
 ```
 
 有导出就有导入：
 
-```plaintext
+```shell
 Cluster-254 gfsh>import
 import cluster-configuration   import data
 Cluster-254 gfsh>import cluster-configuration --
@@ -481,7 +481,7 @@ Cluster-254 gfsh>import cluster-configuration --
 
 #### version
 
-```plaintext
+```shell
 Cluster-254 gfsh>version --full
 Build-Date: 2019-10-15 06:08:13 -0700
 Build-Id: jdeppe 0
@@ -502,7 +502,7 @@ OQL（object query language），对象查询语言，类 SQL 语法。
 
 请注意使用 OQL 查询的前提，你要将你的应用对象上传到服务器中，所以我们先学习一个命令 deploy。
 
-```plaintext
+```shell
 Cluster-254 gfsh>deploy --jar /opt/geode-study.jar
 Deploying files: geode-study.jar
 Total file size is: 0.00MB
@@ -546,7 +546,7 @@ private Date createTime;
 
 keySet、values、entries 跟我们的 map 中的属性是一样的。
 
-```sql
+```shell
 ## Cluster-254 gfsh>query --query="select * from /user.keySet limit 1" Result
 
 ## test.user.1574821108359 Cluster-254 gfsh>query --query="select *from /user.values limit 1" id       |  name  | age | createTime ------------- | ------ | --- | ------------- 1574821108359 | "xy27" | 27  | 1574821108359 Cluster-254 gfsh>query --query="select* from /user.entries limit 1" test.user.1574821108359
@@ -560,7 +560,7 @@ id       |  name  | age | createTime
 
 #### 条件查询和排序
 
-```sql
+```shell
 Cluster-254 gfsh>query --query="select * from /user t where t.age > 90 and t.age \< 95 order by t.age desc "
 id       |  name  | age | createTime
 \------------- | ------ | --- | -------------
@@ -574,7 +574,7 @@ id       |  name  | age | createTime
 
 暂时未准备数据，不过估计查询效率不会高了。
 
-```sql
+```shell
 SELECT portfolio1.ID, portfolio2.status FROM /exampleRegion portfolio1,
 /exampleRegion2 portfolio2 WHERE portfolio1.status = portfolio2.status
 ```
@@ -583,7 +583,7 @@ SELECT portfolio1.ID, portfolio2.status FROM /exampleRegion portfolio1,
 
 实例中使用了 Spring 的 endsWith 和 length 方法。
 
-```sql
+```shell
 Cluster-254 gfsh>query --query="select name , name.length from /user t where t.name.endsWith('99') "
 
 | name | length |
@@ -593,7 +593,7 @@ Cluster-254 gfsh>query --query="select name , name.length from /user t where t.n
 
 #### 聚合查询
 
-```sql
+```shell
 Cluster-254 gfsh>query --query="select age, count(\*), max(id)  from /user t where t.age > 90 group by t.age "
 
 | age | 0   | id            |
@@ -622,87 +622,88 @@ Cluster-254 gfsh>query --query="select age, count(\*), max(id)  from /user t whe
 连续查询就是，当我们指定了一个查询语句的时候，比如 `age > 99`，那么会直接返回当前的查询结果，同时你可以注册一个监听，后续有 `age > 99` 的记录的创建、更新、删除，都会回调到你的这个监听中来，这个后续满足条件的回调就是所谓的连续了。
 
 ```java
-@Test
-public void cqTest() throws CqException, CqExistsException {
-GeodeService geodeService = new GeodeService(str);
-geodeService.init();
-ClientCache clientCache = geodeService.geodeClient();
-//获取查询的service
-QueryService queryService = clientCache.getQueryService();
-CqAttributesFactory cqf = new CqAttributesFactory();
-CqListener tradeEventListener = new UserCqListener();
-cqf.addCqListener(tradeEventListener);
-//创建 cq 属性
-CqAttributes cqa = cqf.create();
-//命名
-String cqName = "user-cq-test";
-String queryStr = "SELECT * FROM /user t where t.age > 98";
-//创建cq 查询
-CqQuery userCq = queryService.newCq(cqName, queryStr, cqa);
-SelectResults sResults = null;
-try {
-//执行查询
-sResults = userCq.executeWithInitialResults();
-for (Object o : sResults) {
-Struct s = (Struct) o;
-User to = (User) s.get("value");
-System.out.println("Intial result includes: " + to);
-}
-//写入一个数据
-User user = new User();
-user.setId(id());
-user.setName("xy100");
-user.setAge(100);
-user.setCreateTime(new Date());
-geodeService.setObject(GeodeRegion.user, user.getId()+"", user);
-Thread.sleep(1000);
-//更新一个数据
-user.setName("xy100-1");
-geodeService.setObject(GeodeRegion.user, user.getId()+"", user);
-//销毁一个数据
-Thread.sleep(1000);
-geodeService.remove(GeodeRegion.user, user.getId() + "");
-} catch (RegionNotFoundException e) {
-e.printStackTrace();
-} catch (InterruptedException e) {
-e.printStackTrace();
-}
-}
+ @Test
+ public void cqTest() throws CqException, CqExistsException {
+     GeodeService geodeService = new GeodeService(str);
+     geodeService.init();
+     ClientCache clientCache = geodeService.geodeClient();
+     // 获取查询的service
+     QueryService queryService = clientCache.getQueryService();
+     CqAttributesFactory cqf = new CqAttributesFactory();
+     CqListener tradeEventListener = new UserCqListener();
+     cqf.addCqListener(tradeEventListener);
+     // 创建 cq 属性
+     CqAttributes cqa = cqf.create();
+     // 命名
+     String cqName = "user-cq-test";
+     String queryStr = "SELECT * FROM /user t where t.age > 98";
+     // 创建cq 查询
+     CqQuery userCq = queryService.newCq(cqName, queryStr, cqa);
+     SelectResults sResults = null;
+     try {
+         // 执行查询
+         sResults = userCq.executeWithInitialResults();
+         for (Object o : sResults) {
+             Struct s = (Struct) o;
+             User to = (User) s.get("value");
+             System.out.println("Intial result includes: " + to);
+         }
+         // 写入一个数据
+         User user = new User();
+         user.setId(id());
+         user.setName("xy100");
+         user.setAge(100);
+         user.setCreateTime(new Date());
+         geodeService.setObject(GeodeRegion.user, user.getId() + "", user);
+         Thread.sleep(1000);
+         // 更新一个数据
+         user.setName("xy100-1");
+         geodeService.setObject(GeodeRegion.user, user.getId() + "", user);
+         // 销毁一个数据
+         Thread.sleep(1000);
+         geodeService.remove(GeodeRegion.user, user.getId() + "");
+     } catch (RegionNotFoundException e) {
+         e.printStackTrace();
+     } catch (InterruptedException e) {
+         e.printStackTrace();
+     }
+ }
 ```
 
 监听器：
 
 ```java
-@Slf4j
-public class UserCqListener implements CqListener {
-//事件接受
-@Override
-public void onEvent(CqEvent cqEvent) {
-Operation queryOperation = cqEvent.getQueryOperation();
-Object key = cqEvent.getKey();
-User user = (User)cqEvent.getNewValue();
-//更新
-if (queryOperation.isUpdate()) {
-log.info("cq update {}, {}", key,user);
-//创建
-} else if (queryOperation.isCreate()) {
-log.info("cq create {}, {}", key,user);
-//删除
-} else if (queryOperation.isDestroy()) {
-log.info("cq destroy {}, {}", key,user);
-}
-}
-//错误事件
-@Override
-public void onError(CqEvent aCqEvent) {
-log.info("error {}" , aCqEvent);
-}
-}
+ @Slf4j
+ public class UserCqListener implements CqListener {
+     // 事件接受
+     @Override
+     public void onEvent(CqEvent cqEvent) {
+         Operation queryOperation = cqEvent.getQueryOperation();
+         Object key = cqEvent.getKey();
+         User user = (User) cqEvent.getNewValue();
+         // 更新
+         if (queryOperation.isUpdate()) {
+             log.info("cq update {}, {}", key, user);
+             // 创建
+         } else if (queryOperation.isCreate()) {
+             log.info("cq create {}, {}", key, user);
+             //删除
+         } else if (queryOperation.isDestroy()) {
+             log.info("cq destroy {}, {}", key, user);
+         }
+     }
+
+     //错误事件
+     @Override
+     public void onError(CqEvent aCqEvent) {
+         log.info("error {}", aCqEvent);
+     }
+ }
 ```
 
 最终输出：
 
-```sql
+```shell
 Intial result includes: User(id=1574821109586, name=xy99, age=99, createTime=Wed Nov 27 10:18:29 CST 2019)
 id=1574827945765
 2019-11-27 12:12:25.830 INFO  [Cache Client Updater Thread  on 192.168.33.20(server_33_20:32746)<v6>:41001 port 40401] |UserCqListener|cq create test.user.1574827945765, User(id=1574827945765, name=xy100, age=100, createTime=Wed Nov 27 12:12:25 CST 2019)
@@ -725,7 +726,7 @@ spring-data-geode 符合 data 系列的一贯作风，提供 template 和 reposi
 
 POM 文件：
 
-```plaintext
+```shell
 <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -769,25 +770,25 @@ public class GeodeStudyApplication {
 配置 region 和 template：
 
 ```java
-@Bean("userRegion")
-    public ClientRegionFactoryBean userRegion(GemFireCache gemFireCache) {
-        ClientRegionFactoryBean<String, String> customers = new ClientRegionFactoryBean<>();
-        customers.setCache(gemFireCache);
-        customers.setClose(true);
-        customers.setName("user");
-        customers.setShortcut(ClientRegionShortcut.PROXY);
-        return customers;
-    }
-    @Resource(name = "userRegion")
-    private Region userRegion;
-    // template 是针对每个 region 的，因此每个 region 都需要 template
-    @Bean("userGemfireTemplate")
-    public GemfireTemplate userGemfireTemplate() {
-        GemfireTemplate gemfireTemplate = new GemfireTemplate();
-        log.info("user region==>"  + userRegion);
-        gemfireTemplate.setRegion(userRegion);
-        return gemfireTemplate;
-    }
+ @Bean("userRegion")
+ public ClientRegionFactoryBean userRegion(GemFireCache gemFireCache) {
+     ClientRegionFactoryBean<String, String> customers = new ClientRegionFactoryBean<>();
+     customers.setCache(gemFireCache);
+     customers.setClose(true);
+     customers.setName("user");
+     customers.setShortcut(ClientRegionShortcut.PROXY);
+     return customers;
+ }
+ @Resource(name = "userRegion")
+ private Region userRegion;
+ // template 是针对每个 region 的，因此每个 region 都需要 template
+ @Bean("userGemfireTemplate")
+ public GemfireTemplate userGemfireTemplate() {
+     GemfireTemplate gemfireTemplate = new GemfireTemplate();
+     log.info("user region==>"  + userRegion);
+     gemfireTemplate.setRegion(userRegion);
+     return gemfireTemplate;
+ }
 ```
 
 创建 UserService，更多 API 大家可以自行探索。
@@ -954,7 +955,7 @@ public class GeodeService {
 
 默认情况下，当一个事务正在进行时，它的更改只在运行该事务的线程中可见。同一进程中的其他线程和其他进程中的线程在提交操作开始之前不能看到更改。在开始提交之后，更改在缓存中是可见的，但是访问更改数据的其他线程可能会看到事务的部分结果，从而导致脏读。当然 Geode 提供严格的隔离性。
 
-```plaintext
+```shell
 -Dgemfire.detectReadConflicts=true
 ```
 
@@ -972,36 +973,36 @@ Caused by: java.lang.UnsupportedOperationException: Operations on persist-backup
 
 同样地 Geode 也提供了针对持久性的支持：
 
-```plaintext
+```shell
 -Dgemfire.ALLOW_PERSISTENT_TRANSACTIONS=true
 ```
 
 **但是请注意：** 这个系统配置仅仅是消除了上边报出来的异常，是的程序能继续执行，但是对于磁盘写入的原子性并不能保证！
 
 ```java
-@Test
-    public void transaction() {
-        GeodeService geodeService = new GeodeService(str);
-        geodeService.init();
-        ClientCache clientCache = geodeService.geodeClient();
-        //获取事务管理器
-        CacheTransactionManager transactionManager = clientCache.getCacheTransactionManager();
-        try {
-            //开始事务
-            transactionManager.begin();
-            User user = new User();
-            user.setId(id());
-            user.setName("u1");
-            user.setCreateTime(new Date());
-            geodeService.setObject(GeodeRegion.test1, user.getId()+"", JSON.toJSONString(user));
-            //提交事务
-            transactionManager.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-            //回滚事务
-            transactionManager.rollback();
-        }
-    }
+ @Test
+ public void transaction() {
+     GeodeService geodeService = new GeodeService(str);
+     geodeService.init();
+     ClientCache clientCache = geodeService.geodeClient();
+     //获取事务管理器
+     CacheTransactionManager transactionManager = clientCache.getCacheTransactionManager();
+     try {
+         //开始事务
+         transactionManager.begin();
+         User user = new User();
+         user.setId(id());
+         user.setName("u1");
+         user.setCreateTime(new Date());
+         geodeService.setObject(GeodeRegion.test1, user.getId()+"", JSON.toJSONString(user));
+         //提交事务
+         transactionManager.commit();
+     } catch (Exception e) {
+         e.printStackTrace();
+         //回滚事务
+         transactionManager.rollback();
+     }
+ }
 ```
 
 ### Geode RESTful
@@ -1018,7 +1019,7 @@ REST API 目前相对较弱，只能处理如下的需求：
 
 #### 加入参数
 
-```plaintext
+```shell
 basedir=`dirname $0`
 echo "BASE DIR:$basedir"
 cd $basedir
@@ -1033,7 +1034,7 @@ gfsh start server --name=${servername} --locators=${locators} --locator-wait-tim
 
 我们加入下了如下参数：
 
-```plaintext
+```shell
 --start-rest-api=true//启用 
 --http-service-bind-address=192.168.33.15 //配置 ip 
 --J=-Dgemfire.http-service-port=8888 //配置端口
@@ -1043,7 +1044,7 @@ gfsh start server --name=${servername} --locators=${locators} --locator-wait-tim
 
 Geode 非常贴心地为我们继承了 Swagger 插件：
 
-```plaintext
+```shell
 <http://192.168.33.15:8888/geode/swagger-ui.html#/> 
 ```
 
@@ -1085,7 +1086,7 @@ Geode 非常贴心地为我们继承了 Swagger 插件：
 
 链接到主 Locatior 上进行导出操作：
 
-```java
+```shell
 gfsh>connect --jmx-manager=192.168.33.15
 Connecting to Manager at [host=192.168.33.15, port=1099] ..
 Successfully connected to: [host=192.168.33.15, port=1099]
@@ -1122,19 +1123,19 @@ File saved to /opt/./cluster-config-back.zip
 
 准备好 1.9.2 版本并上传至服务器，拷贝至：
 
-```plaintext
+```shell
 cp /tmp/upload_dir/ddh/apache-geode-1.9.2.tgz apache-geode-1.9.2.tgz
 ```
 
 tar 解压：
 
-```plaintext
+```shell
 tar xvf apache-geode-1.9.2.tgz
 ```
 
 删除包文件：
 
-```plaintext
+```shell
 rm -rf apache-geode-1.9.2.tgz
 ```
 
@@ -1148,27 +1149,27 @@ rm -rf apache-geode-1.9.2.tgz
 停止主 locator 要特别注意，经常停止不了，要用 ps 来查看 `ps -ef | grep geode`，如果不能正常停止就用 `kill -9 {locator的PID}` 来强行停止。
 
 ```bash
-    gfsh>connect --jmx-manager=192.168.33.15
-    Connecting to Manager at [host=192.168.33.15, port=1099] ..
-    Successfully connected to: [host=192.168.33.15, port=1099]
-    Cluster-254 gfsh>list member
-        Name      | Id
-    ------------- | ---------------------------------------------------------
-    locator_33_15 | 192.168.33.15(locator_33_15:19946:locator)<ec><v14>:41000
-    locator_33_20 | 192.168.33.20(locator_33_20:15112:locator)<ec><v2>:41000
-    server_33_23  | 192.168.33.23(server_33_23:32677)<v4>:41000
-    server_33_29  | 192.168.33.29(server_33_29:14735)<v5>:41000
-    server_33_15  | 192.168.33.15(server_33_15:20234)<v15>:41001
-    server_33_20  | 192.168.33.20(server_33_20:15305)<v3>:41001
-    Cluster-254 gfsh>stop locator --name=locator_33_15
-    Stopping Locator running in /opt/geode_work18/locator_33_15 on 192.168.33.15[10334] as       locator_33_15...
-    Process ID: 19946
-    Log File: /opt/geode_work18/locator_33_15/locator_33_15.log
-    ...........
-    No longer connected to 192.168.33.15[1099].
-    gfsh>
-    No longer connected to 192.168.33.15[1099].
-    gfsh>
+ gfsh>connect --jmx-manager=192.168.33.15
+ Connecting to Manager at [host=192.168.33.15, port=1099] ..
+ Successfully connected to: [host=192.168.33.15, port=1099]
+ Cluster-254 gfsh>list member
+     Name      | Id
+ ------------- | ---------------------------------------------------------
+ locator_33_15 | 192.168.33.15(locator_33_15:19946:locator)<ec><v14>:41000
+ locator_33_20 | 192.168.33.20(locator_33_20:15112:locator)<ec><v2>:41000
+ server_33_23  | 192.168.33.23(server_33_23:32677)<v4>:41000
+ server_33_29  | 192.168.33.29(server_33_29:14735)<v5>:41000
+ server_33_15  | 192.168.33.15(server_33_15:20234)<v15>:41001
+ server_33_20  | 192.168.33.20(server_33_20:15305)<v3>:41001
+ Cluster-254 gfsh>stop locator --name=locator_33_15
+ Stopping Locator running in /opt/geode_work18/locator_33_15 on 192.168.33.15[10334] as       locator_33_15...
+ Process ID: 19946
+ Log File: /opt/geode_work18/locator_33_15/locator_33_15.log
+ ...........
+ No longer connected to 192.168.33.15[1099].
+ gfsh>
+ No longer connected to 192.168.33.15[1099].
+ gfsh>
 ```
 
 ##### **修改 /etc/profile 更改环境变量**
@@ -1203,7 +1204,7 @@ rm -rf apache-geode-1.9.2.tgz
 
 1. 启动新的主 locator，执行启动脚本 start_locator_33_15.sh
 
-    ```java
+    ```shell
     Locator in /opt/geode_work18/locator_33_15 on 192.168.33.15[10334] as locator_33_15 is currently online.
     Process ID: 30782
     Uptime: 10 seconds
@@ -1218,7 +1219,7 @@ rm -rf apache-geode-1.9.2.tgz
 
 2. 校验新的 locator 是否正常。
 
-    ```plaintext
+    ```shell
     gfsh>connect --jmx-manager=192.168.33.15
     Connecting to Manager at [host=192.168.33.15, port=1099] ..
     Successfully connected to: [host=192.168.33.15, port=1099]
@@ -1235,7 +1236,7 @@ rm -rf apache-geode-1.9.2.tgz
 
     注意：要在主 locator 节点上的 gfsh 里执行，现在我们的主是 33.20 因此我们上到这台机器并连接 JMX 进行管理。
 
-    ```plaintext
+    ```shell
     stop server --name=server_33_15
     ```
 
@@ -1247,7 +1248,7 @@ rm -rf apache-geode-1.9.2.tgz
 
 3. 去 33.15 机器上执行启动 server 的脚本。
 
-    ```plaintext
+    ```shell
     sh start_server_33_15.sh
     ```
 
@@ -1257,7 +1258,7 @@ rm -rf apache-geode-1.9.2.tgz
 
 - 检查 locator 和 server => list member
 - 检查 region ==> list region
-- 检查 `<http://$>{主locator的IP}:7070/pulse/`
+- 检查 `<http://${主locator的IP}:7070/pulse/`
 
 #### 升级客户端
 
@@ -1344,7 +1345,7 @@ public class MultiGetFunction implements Function {
 
 **2. deploy 到服务器** 我们写好后打成 jar 包上传到服务器，gfsh 执行 deploy 命令：
 
-```plaintext
+```shell
 deploy --jar=/tmp/upload_dir/ddh/geode-study.jar
    Member    |  Deployed JAR   | Deployed JAR Location
 ------------ | --------------- | -----------------------------------------------
@@ -1356,7 +1357,7 @@ server_33_29 | geode-study.jar | /opt/geode_work/server_33_29/geode-study.v5.jar
 
 我们在做 deploy 的时候，Geode 会自动将实现了 function 接口的类型进行函数注册。**3. 执行函数** 方式一：
 
-```javascript
+```shell
 Cluster-254 gfsh>execute function --id=func-a --region=test99 --filter=KEY_4,KEY_7
    Member    | Status | Message
 ------------ | ------ | -------
@@ -1366,28 +1367,28 @@ server_33_15 | OK     | [7, 5]
 方式二：
 
 ```java
-@Test
-    public void testFunction() {
-        GeodeService geodeService = new GeodeService(str);
-        geodeService.init();
-        ClientCache clientCache = geodeService.geodeClient();
-        MultiGetFunction multiGetFunction = new MultiGetFunction();
-        //要获取key 的集合
-        Set keysForGet = new HashSet();
-        keysForGet.add("KEY_4");
-        keysForGet.add("KEY_9");
-        keysForGet.add("KEY_7");
-        Execution execution = FunctionService.onRegion(geodeService.getRegion(GeodeRegion.test99))
-                .withFilter(keysForGet)
-                .setArguments(Boolean.TRUE)
-                //这里可以定义自己的 收集器
-                //.withCollector(new MyArrayListResultCollector())
-                ;
-        ResultCollector rc = execution.execute(multiGetFunction);
-        //拿到返回结果
-        List result = (List)rc.getResult();
-        System.out.println("result = >>" + JSONObject.toJSONString(result));
-    }
+ @Test
+ public void testFunction() {
+     GeodeService geodeService = new GeodeService(str);
+     geodeService.init();
+     ClientCache clientCache = geodeService.geodeClient();
+     MultiGetFunction multiGetFunction = new MultiGetFunction();
+     //要获取key 的集合
+     Set keysForGet = new HashSet();
+     keysForGet.add("KEY_4");
+     keysForGet.add("KEY_9");
+     keysForGet.add("KEY_7");
+     Execution execution = FunctionService.onRegion(geodeService.getRegion(GeodeRegion.test99))
+             .withFilter(keysForGet)
+             .setArguments(Boolean.TRUE)
+             //这里可以定义自己的 收集器
+             //.withCollector(new MyArrayListResultCollector())
+             ;
+     ResultCollector rc = execution.execute(multiGetFunction);
+     //拿到返回结果
+     List result = (List)rc.getResult();
+     System.out.println("result = >>" + JSONObject.toJSONString(result));
+ }
 ```
 
 ### Geode 图形化与监控
@@ -1396,7 +1397,7 @@ server_33_15 | OK     | [7, 5]
 
 图形化我们通过 Geode 自带的 pulse 后台功能来访问，能看到实时的状态访问地址：
 
-```plaintext
+```shell
 http://192.168.33.15:7070/pulse
 ```
 
@@ -1482,10 +1483,11 @@ metricList.add(build);
 
 当计算机因关闭、断电、硬件故障或操作系统故障而崩溃时，其所有应用程序和缓存服务器及 其本地缓存都将丢失。其他计算机上的系统成员会收到通知，说明此计算机的成员已意外离开集群。
 
-**要从机器崩溃中恢复：** 1.  确定在此计算机上运行的进程。
-2\.  重新启动机器。
-3\.  如果 Geode 定位器在此处运行，请先启动它。注意：在启动任何应用程序或缓存服务器之前，必须至少运行一个定位器。
-4\.  按常规顺序启动应用程序和缓存服务器。
+**要从机器崩溃中恢复：**
+1. 确定在此计算机上运行的进程。 
+2. 重新启动机器。 
+3. 如果 Geode 定位器在此处运行，请先启动它。注意：在启动任何应用程序或缓存服务器之前，必须至少运行一个定位器。 
+4. 按常规顺序启动应用程序和缓存服务器。
 
 #### 防止和恢复磁盘完全错误
 
@@ -1495,19 +1497,19 @@ metricList.add(build);
 
 如果出现这样的错误，可以尝试更改 -Xss 参数：
 
-```java
+```shell
 OutOfMemoryError: unable to create new native thread
 ```
 
 #### 网络分区
 
-```plaintext
+```shell
 Membership coordinator id has declared that a network partition has  occurred.
 ```
 
 发生网络分区时会发出此警报，然后在单个成员上发出此警报：
 
-```plaintext
+```shell
 Exiting due to possible network partition event due to loss of {0} cache processes: {1}
 ```
 
@@ -1515,7 +1517,7 @@ Exiting due to possible network partition event due to loss of {0} cache process
 
 #### 成员太长时间没有回应
 
-```python
+```shell
 15 sec have elapsed while waiting for replies: <ReplyProcessor21 6
 waiting for 1 replies
 from [ent(27130):60333/36743]> on ent(27134):60330/45855 whose current
@@ -1549,7 +1551,7 @@ list is: [[ent(27134):60330/45855, ent(27130):60333/36743]]
 
 #### Geode 扩展功能 **memCache 适配器**
 
-```plaintext
+```shell
 gfsh>start server
 --name=\<server_name>
 --server-port=\<port_number>
@@ -1560,7 +1562,7 @@ gfsh>start server
 **HTTP 分布式 session** 之前接触的分布式 session 方案是 Redis-cluster + Tomcat 来做的， 其实道理是一样的， Geode 替换了 Redis 就成功 geode-session-Tomcat 了。
 Geode 使用了不小的篇幅来描述该扩展功能，[详见](https://geode.apache.org/docs/guide/110/tools_modules/http_session_mgmt/quick_start.html)。**Redis 适配器**
 
-```plaintext
+```shell
 gfsh> start server --name=server1 --redis-bind-address=localhost \
  --redis-port=11211 --J=-Dgemfireredis.regiontype=PARTITION_PERSISTENT
 ```

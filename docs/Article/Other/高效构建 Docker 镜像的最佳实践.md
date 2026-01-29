@@ -70,7 +70,7 @@ debian-image/
 
 ## manifest.json
 
-```json
+```shell
 /debian-image # cat manifest.json  | jq
 [
   {

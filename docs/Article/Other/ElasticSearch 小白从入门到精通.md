@@ -102,7 +102,7 @@ docker restart es
 
 空查询将会返回一个索引库中所有文档：
 
-```plaintext
+```bash
 curl -X GET "localhost:9200/_search?pretty" -H 'Content-Type: application/json' -d'
 {}
 '
@@ -110,14 +110,14 @@ curl -X GET "localhost:9200/_search?pretty" -H 'Content-Type: application/json' 
 
 在一个或者多个索引库或者所有的 _type 中查询：
 
-```plaintext
+```bash
 GET /index_2014*/type1,type2/_search
 {}
 ```
 
 使用分页：
 
-```plaintext
+```bash
 GET /_search
 {
   "from": 30,
@@ -129,7 +129,7 @@ GET /_search
 
 只需要在查询上，将语句传递给 queue 参数：
 
-```plaintext
+```bash
 GET /_search
 {
     "query": YOUR_QUERY_HERE
@@ -138,7 +138,7 @@ GET /_search
 
 ##### **查询语句的结构** 一个查询的典型结构
 
-```plaintext
+```bash
 {
     QUERY_NAME: {
         ARGUMENT: VALUE,
@@ -149,7 +149,7 @@ GET /_search
 
 针对某个字段：
 
-```plaintext
+```bash
 {
     QUERY_NAME: {
         FIELD_NAME: {
@@ -162,7 +162,7 @@ GET /_search
 
 如果想要使用 match 查询 tewwt 字段中包含 elasticsesh 的内容。
 
-```plaintext
+```bash
 curl -X GET "localhost:9200/_search?pretty" -H 'Content-Type: application/json' -d'
 {
     "query": {
@@ -178,7 +178,7 @@ curl -X GET "localhost:9200/_search?pretty" -H 'Content-Type: application/json' 
 
 例如下面语句：找出信件正文包含 business opportunity 的星标邮件，或者在邮件正文包含 business opportunity 的非垃圾邮件：
 
-```plaintext
+```bash
 {
     "bool": {
         "must": { "match":   { "email": "business opportunity" }},
@@ -198,19 +198,19 @@ curl -X GET "localhost:9200/_search?pretty" -H 'Content-Type: application/json' 
 
 ##### **match_all 查询** 该查询匹配所有文档
 
-```plaintext
+```bash
 { "match_all": {}}
 ```
 
 ##### **match 查询** 用于使用分词器进行查询
 
-```plaintext
+```bash
 { "match": { "tweet": "About Search" }}
 ```
 
 ##### **multi_match 查询** 用于在多个字段上执行相同更多 match 查询
 
-```plaintext
+```bash
 {
     "multi_match": {
         "query":    "full text search",
@@ -221,7 +221,7 @@ curl -X GET "localhost:9200/_search?pretty" -H 'Content-Type: application/json' 
 
 ##### **range 查询** 用于找出在指定区间内的数字或者时间
 
-```plaintext
+```bash
 {
     "range": {
         "age": {
@@ -234,7 +234,7 @@ curl -X GET "localhost:9200/_search?pretty" -H 'Content-Type: application/json' 
 
 ##### **term 查询** 用于进行精确匹配
 
-```plaintext
+```bash
 { "term": { "age":    26           }}
 { "term": { "date":   "2014-09-01" }}
 { "term": { "public": true         }}
@@ -243,7 +243,7 @@ curl -X GET "localhost:9200/_search?pretty" -H 'Content-Type: application/json' 
 
 ##### **terms 查询** 用于进行多值匹配
 
-```plaintext
+```bash
 { "terms": { "tag": [ "search", "full_text", "nosql" ] }}
 ```
 
@@ -251,7 +251,7 @@ curl -X GET "localhost:9200/_search?pretty" -H 'Content-Type: application/json' 
 
 用于查询在指定字段中有值或者无值的文档：
 
-```plaintext
+```bash
 {
     "exists":   {
         "field":    "title"
@@ -263,7 +263,7 @@ curl -X GET "localhost:9200/_search?pretty" -H 'Content-Type: application/json' 
 
 #### 创建一个索引
 
-```plaintext
+```bash
 PUT /my_index
 {
     "settings": { ... any settings ... },
@@ -279,7 +279,7 @@ PUT /my_index
 
 #### 删除一个索引
 
-```plaintext
+```bash
 DELETE /my_index
 ```
 
@@ -290,7 +290,7 @@ DELETE /my_index
 
 创建只有 一个主分片，没有副本的小索引：
 
-```plaintext
+```bash
 PUT /my_temp_index
 {
     "settings": {
@@ -311,7 +311,7 @@ standard 分析器是用于全文字段的默认分析器，包含以下部分�
 
 在下面的例子中，创建了一个新的分析器 es_std，并使用预定义的西班牙语停用词列表。
 
-```plaintext
+```bash
 PUT /spanish_docs
 {
     "settings": {
@@ -329,7 +329,7 @@ PUT /spanish_docs
 
 进行测试：
 
-```plaintext
+```bash
 curl -X GET "localhost:9200/spanish_docs/_analyze?analyzer=es_std&pretty" -H 'Content-Type: application/json' -d'
 El veloz zorro marrón
 '
@@ -337,7 +337,7 @@ El veloz zorro marrón
 
 通过结果进行查看：
 
-```plaintext
+```bash
 {
   "tokens" : [
     { "token" :    "veloz",   "position" : 2 },
@@ -351,7 +351,7 @@ El veloz zorro marrón
 
 在 analysis 下的相应位置设置字符过滤器，分词过滤器，词单元过滤器。
 
-```plaintext
+```bash
 PUT /my_index
 {
     "settings": {
@@ -367,7 +367,7 @@ PUT /my_index
 
 接着创建一个自定义分析器，用于清楚 html 部分，将 & 映射为 and：
 
-```javascript
+```bash
 "char_filter": {
     "&_to_and": {
         "type":       "mapping",
@@ -378,7 +378,7 @@ PUT /my_index
 
 使用标准分词器讽刺，小写词条使用小写过滤，使用自定义停止词过滤器移除自定义的停止词列表中包含的词。
 
-```plaintext
+```bash
 "filter": {
     "my_stopwords": {
         "type":        "stop",
@@ -389,7 +389,7 @@ PUT /my_index
 
 最后使用分析器，自定义组合过滤器和分词器。
 
-```plaintext
+```bash
 "analyzer": {
     "my_analyzer": {
         "type":           "custom",
@@ -402,7 +402,7 @@ PUT /my_index
 
 总和如下所示：
 
-```javascript
+```bash
 curl -X PUT "localhost:9200/my_index?pretty" -H 'Content-Type: application/json' -d'
 {
     "settings": {
@@ -430,7 +430,7 @@ curl -X PUT "localhost:9200/my_index?pretty" -H 'Content-Type: application/json'
 
 测试一下：
 
-```plaintext
+```bash
 curl -X GET "localhost:9200/my_index/_analyze?analyzer=my_analyzer&pretty" -H 'Content-Type: application/json' -d'
 The quick & brown fox
 '
@@ -438,7 +438,7 @@ The quick & brown fox
 
 可以看到结果如下所示：
 
-```plaintext
+```bash
 {
   "tokens" : [
       { "token" :   "quick",    "position" : 2 },
@@ -451,7 +451,7 @@ The quick & brown fox
 
 最后，把这个分词器用在 string 字段上：
 
-```plaintext
+```bash
 curl -X PUT "localhost:9200/my_index/_mapping/my_type?pretty" -H 'Content-Type: application/json' -d'
 {
     "properties": {
@@ -472,7 +472,7 @@ curl -X PUT "localhost:9200/my_index/_mapping/my_type?pretty" -H 'Content-Type: 
 
 例如在 User 类型中，name 字段会映射声明为 string 类型，并索引到 name 的倒排序中，需要使用 whitespace 分词器分析。
 
-```plaintext
+```bash
 "name": {
     "type":     "string",
     "analyzer": "whitespace"
@@ -483,7 +483,7 @@ curl -X PUT "localhost:9200/my_index/_mapping/my_type?pretty" -H 'Content-Type: 
 
 在 Lucene 中，一个特定的字段可以映射到 string 类型或者是 number 类型，但是不能两者兼具。因为 ES 添加的优于 lucene 的额外机制（以元数据 _type 字段的形式。）在 ES 中所有类型都最终共享相同的映射。
 
-```plaintext
+```bash
 {
    "data": {
       "mappings": {
@@ -515,7 +515,7 @@ curl -X PUT "localhost:9200/my_index/_mapping/my_type?pretty" -H 'Content-Type: 
 
 在上方中，`"name"/"address"` 和 `"timestamp"/"message"` 虽然是独立的，但是在 Lucene 中是一个映射。
 
-```plaintext
+```bash
 {
    "data": {
       "mappings": {
@@ -546,7 +546,7 @@ curl -X PUT "localhost:9200/my_index/_mapping/my_type?pretty" -H 'Content-Type: 
 
 添加依赖：
 
-```plaintext
+```bash
   <!-- TransportClient 依赖包-->
         <dependency>
             <groupId>org.elasticsearch.client</groupId>

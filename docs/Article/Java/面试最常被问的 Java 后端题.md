@@ -664,7 +664,7 @@ MyBatis 为我们提供了两种支持动态 SQL 的语法：`##{}` 以及 `${}`
 UserMapper.xml 中：
 
 ```xml
-<mapper namespace="com.tian.UserMapper">
+<mapper namespace="com.tian.UserMapper"/>
 ```
 
 反射生成 namespace 的对象：
