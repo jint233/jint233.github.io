@@ -10,7 +10,7 @@
 
 这里，我们以一个 Debian 系统的镜像为例。通过 `docker run --it debian` 可以启动一个 `debian` 的容器，终端会有如下输出：
 
-```bash
+```shell
 / # docker run -it debian
 Unable to find image 'debian:latest' locally
 latest: Pulling from library/debian
@@ -33,7 +33,7 @@ BUG_REPORT_URL="https://bugs.debian.org/"
 
 我们可以先退出此容器，来看看 Docker 镜像到底是什么。用 `docker image ls` 来查看已下载好的镜像：
 
-```bash
+```shell
 / # docker image ls
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
 debian              latest              8d31923452f8        4 days ago          101MB
@@ -41,7 +41,7 @@ debian              latest              8d31923452f8        4 days ago          
 
 用 `docker image save` 命令将镜像保存成一个 tar 文件：
 
-```bash
+```shell
 / # mkdir debian-image
 / # docker image save -o debian-image/debian.tar debian
 / # ls debian-image/
@@ -50,7 +50,7 @@ debian.tar
 
 将镜像文件进行解压：
 
-```bash
+```shell
 / # tar -C debian-image/ -xf debian-image/debian.tar 
 / # tree -I debian.tar debian-image/
 debian-image/
@@ -100,7 +100,7 @@ debian-image/
 
 `Config` 字段包含的内容是镜像的全局配置。我们来看看具体内容：
 
-```bash
+```shell
 /debian-image # cat 8d31923452f8b79ae91b01568d28c90e7d667a9eaff9734c6faeb017b0efa8d0.json  | jq
 {
   "architecture": "amd64",
@@ -189,7 +189,7 @@ debian-image/
 
 重点介绍下 `rootfs`：我们知道 `rootfs` 其实是指 `/` 下一系列文件目录的组织结构；虽然 Docker 容器与我们的主机（或者称之为宿主机）共享同一个 Linux 内核，但它也有自己完整的 `rootfs`; 我们继续回到一开始的实验环境中即我们刚才创建的这个容器内看看 `/` 下有什么：
 
-```bash
+```shell
 /# tree -L 1 /
 /
 |-- bin
@@ -218,7 +218,7 @@ debian-image/
 
 回到这个例子当中，我们来看看这段配置的具体含义。由于一开始在 `manifest.json` 中已经定义了 layer 的内容，我们来看看该 layer 的 `sha256sum` 值：
 
-```bash
+```shell
 /debian-image # ls b50334e3be68f82d0b94bb7d3cfe1789119c040c6c159759f57a19ad34547af3/
 VERSION    json       layer.tar
 /debian-image # 
@@ -228,7 +228,7 @@ f94641f1fe1f5c42c325652bf55f0513c881c86b620b912b15460e0bca07cc12  b50334e3be68f8
 
 可以看到与配置文件中相符，表示 `b50334e3be68f82d0b94bb7d3cfe1789119c040c6c159759f57a19ad34547af3/layer.tar` 便是 debian 镜像的 `rootfs` 我们将它进行解压，看看它的内容。
 
-```bash
+```shell
 /debian-image # mkdir b50334e3be68f82d0b94bb7d3cfe1789119c040c6c159759f57a19ad34547af3/layer
 /debian-image # tar -C b50334e3be68f82d0b94bb7d3cfe1789119c040c6c159759f57a19ad34547af3/layer -xf b50334e3be68f82
 d0b94bb7d3cfe1789119c040c6c159759f57a19ad34547af3/layer.tar 
@@ -255,7 +255,7 @@ boot   etc    lib    media  opt    root   sbin   sys    usr
 
 Docker 提供了一个命令可以更加直观的看到构建记录：
 
-```bash
+```shell
 /debian-image # docker image history  debian
 IMAGE               CREATED             CREATED BY                                      SIZE                COMMENT
 8d31923452f8        4 days ago          /bin/sh -c #(nop)  CMD ["bash"]                 0B                      
@@ -273,7 +273,7 @@ IMAGE               CREATED             CREATED BY                              
 
 从 Docker Hub 上我们也可以找到[此镜像的 `Dockerfile` 文件](https://github.com/debuerreotype/docker-debian-artifacts/blob/fd138cb56a6a6a4fd9cb30c2acce9e8d9cccd28a/stretch/Dockerfile)，看下具体内容：
 
-```bash
+```shell
 FROM scratch
 ADD rootfs.tar.xz /
 CMD ["bash"]
@@ -302,7 +302,7 @@ CMD ["bash"]
 
 Docker 由于不断增加新功能，为了方便，在后续版本中便对命令进行了分组。对镜像相关的命令都放到了 `docker image` 组内：
 
-```bash
+```shell
 / # docker image
 Usage:  docker image COMMAND
 Manage images
@@ -338,7 +338,7 @@ Run 'docker image COMMAND --help' for more information on a command.
 
 还是以 debian 镜像为例，使用官方的 debian 镜像，启动一个容器：
 
-```bash
+```shell
 / # docker run --rm -it debian
 [email protected]:/# toilet
 bash: toilet: command not found
@@ -348,7 +348,7 @@ bash: toilet: command not found
 
 看上面的输入，当前的 PATH 中并没有该命令。我们使用 `apt` 进行安装。
 
-```bash
+```shell
 [email protected]:/# apt update
 Get:1 http://security-cdn.debian.org/debian-security stretch/updates InRelease [94.3 kB]
 Ign:2 http://cdn-fastly.deb.debian.org/debian stretch InRelease
@@ -386,7 +386,7 @@ Processing triggers for libc-bin (2.24-11+deb9u4) ...
 
 可以看到，安装已经完成，我们在终端下输入 `toilet docker` 来查看下效果：
 
-```bash
+```shell
 [email protected]:/# toilet docker
      #                #                   
   mmm#   mmm    mmm   #   m   mmm    m mm 
@@ -400,7 +400,7 @@ Processing triggers for libc-bin (2.24-11+deb9u4) ...
 
 Docker 提供了一个命令 `docker container commit` 用于从容器创建一个镜像（当前也可以使用 `docker commit` ）。
 
-```bash
+```shell
 / # docker ps
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES          
 daccf1e9155b        debian              "bash"              19 minutes ago      Up 19 minutes                           kind_lamport
@@ -416,7 +416,7 @@ debian              latest              8d31923452f8        5 days ago          
 
 使用新的镜像来启动一个容器进行验证：
 
-```bash
+```shell
 / # docker run --rm -it local/debian:toilet 
 [email protected]:/# toilet debian
      #         #        "                 
@@ -432,7 +432,7 @@ debian              latest              8d31923452f8        5 days ago          
 
 Docker 提供了一种可根据配置文件构建镜像的方式，该配置文件通常命名为 `Dockerfile`。我们将刚才创建镜像的过程以 Dockerfile 进行描述。
 
-```bash
+```shell
 / # mkdir toilet       
 / # cd toilet/
 /toilet # vi Dockerfile
@@ -444,7 +444,7 @@ RUN apt install -y toilet
 
 Dockerfile 语法是固定的，但本篇不会对全部语法逐个解释，如有兴趣可查阅[官方文档](https://docs.docker.com/engine/reference/builder/#usage)。接下来使用该 Dockerfile 构建镜像。
 
-```bash
+```shell
 /toilet # docker image build -t local/debian:toilet-using-dockerfile .                                          
 Sending build context to Docker daemon   2.048kB       
 Step 1/3 : FROM debian                 
@@ -483,7 +483,7 @@ local/debian        toilet                    9ca72f9dcedb        26 minutes ago
 
 使用 `-t` 参数来指定新生成镜像的名称，并且我们也可以看到该镜像已经构建成功。同样的使用该镜像创建容器进行测试：
 
-```bash
+```shell
 /toilet # docker run --rm -it local/debian:toilet-using-dockerfile
 [email protected]:/# toilet debian
      #         #        "                 
@@ -507,7 +507,7 @@ local/debian        toilet                    9ca72f9dcedb        26 minutes ago
 
 ### 以一个 Spring Boot 的项目为例
 
-```bash
+```shell
 (MoeLove) ➜  spring-boot-hello-world git:(master) ✗ ls -l 
 总用量 20
 -rw-rw-r--. 1 tao tao    0 5月  15 06:52 Dockerfile
@@ -524,7 +524,7 @@ drwxrwxr-x. 9 tao tao 4096 5月  15 06:52 target
 
 ### 利用缓存
 
-```bash
+```shell
 FROM debian
 COPY . /app
 RUN apt update
@@ -542,7 +542,7 @@ CMD [ "java", "-jar", "/app/target/gs-spring-boot-0.1.0.jar" ]
 
 对此 `Dockerfile` 进行改进：
 
-```bash
+```shell
 FROM debian
 RUN apt update
 RUN apt install -y openjdk-8-jdk
@@ -558,7 +558,7 @@ CMD [ "java", "-jar", "/app/target/gs-spring-boot-0.1.0.jar" ]
 
 而对于我们要构建的镜像而言，那些文件是不必要的，所以我们可以将 `Dockerfile` 改成这样：
 
-```bash
+```shell
 FROM debian
 RUN apt update
 RUN apt install -y openjdk-8-jdk
@@ -576,7 +576,7 @@ CMD [ "java", "-jar", "/app/gs-spring-boot-0.1.0.jar" ]
 
 比如说，我想安装一个最新版的 `vim` 在镜像中，可以简单的修改第三行为 `RUN apt install -y openjdk-8-jdk vim` ，但由于 `RUN apt update` 是被缓存的，所以我无法安装到最新版本的 `vim` 。
 
-```bash
+```shell
 FROM debian
 RUN apt update && apt install -y openjdk-8-jdk
 COPY target/gs-spring-boot-0.1.0.jar /app/
@@ -591,7 +591,7 @@ CMD [ "java", "-jar", "/app/gs-spring-boot-0.1.0.jar" ]
 
 我们先来看下是否使用此选项的区别，我启动一个 `debian` 的容器进行测试：
 
-```bash
+```shell
 [email protected]:/# apt install  --no-install-recommends openjdk-8-jdk | grep 'additional disk space will be used'
 ...
 After this operation, 344 MB of additional disk space will be used.
@@ -606,7 +606,7 @@ After this operation, 548 MB of additional disk space will be used.
 
 所以 `Dockerfile` 可以修改为：
 
-```bash
+```shell
 FROM debian
 RUN apt update && apt install -y --no-install-recommends openjdk-8-jdk
 COPY target/gs-spring-boot-0.1.0.jar /app/
@@ -615,7 +615,7 @@ CMD [ "java", "-jar", "/app/gs-spring-boot-0.1.0.jar" ]
 
 此时构建镜像，我们来与之前的镜像做下对比：
 
-```bash
+```shell
 (MoeLove) ➜  docker image ls local/spring-boot
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
 local/spring-boot   4                   716523c83a26        3 minutes ago       497MB
@@ -628,7 +628,7 @@ local/spring-boot   2                   178dacdaf015        9 hours ago         
 
 启动一个新的容器验证下：
 
-```bash
+```shell
 (MoeLove) ➜  docker run --rm -it debian
 [email protected]:/# apt -qq  update 
 All packages are up to date.
@@ -639,7 +639,7 @@ All packages are up to date.
 
 可以看到有 16M 左右的大小，我们修改 `Dockerfile` 增加删除操作：
 
-```bash
+```shell
 FROM debian
 RUN apt update && apt install -y --no-install-recommends openjdk-8-jdk \
         && rm -rf /var/lib/apt/lists/*  
@@ -649,7 +649,7 @@ CMD [ "java", "-jar", "/app/gs-spring-boot-0.1.0.jar" ]
 
 对比使用这个 `Dockerfile` 构建镜像的镜像大小
 
-```bash
+```shell
 (MoeLove) ➜  docker image ls local/spring-boot                    
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE                     
 local/spring-boot   4-2                 ac272f3dcac2        24 seconds ago      481MB                    
@@ -669,7 +669,7 @@ Docker Hub 上提供了很多 [官方镜像](https://hub.docker.com/search/?q=&t
 
 我们选择 Docker 官方 `openjdk` 镜像来作为基础镜像，`Dockerfile` 可以改写为：
 
-```bash
+```shell
 FROM openjdk:8-jdk-stretch
 COPY target/gs-spring-boot-0.1.0.jar /app/
 CMD [ "java", "-jar", "/app/gs-spring-boot-0.1.0.jar" ]
@@ -679,7 +679,7 @@ CMD [ "java", "-jar", "/app/gs-spring-boot-0.1.0.jar" ]
 
 我们其实只想要一个 Java 的运行环境，所以选择一个基于 [Alpine Linux](https://alpinelinux.org/) 的超小的镜像 `openjdk:8-jre-alpine` 这样 `Dockerfile` 可以改写为:
 
-```bash
+```shell
 FROM openjdk:8-jre-alpine
 COPY target/gs-spring-boot-0.1.0.jar /app/
 CMD [ "java", "-jar", "/app/gs-spring-boot-0.1.0.jar" ]
@@ -687,7 +687,7 @@ CMD [ "java", "-jar", "/app/gs-spring-boot-0.1.0.jar" ]
 
 分别用上面的 `Dockerfile` 构建镜像，可以看到镜像大小
 
-```bash
+```shell
 (MoeLove) ➜  docker image ls local/spring-boot                           
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
 local/spring-boot   5-1                 b423dfc8d995        23 minutes ago      103MB
@@ -705,7 +705,7 @@ local/spring-boot   2                   178dacdaf015        14 hours ago        
 
 在前面的实践中，我们都是先本地构建好之后，才 `COPY` 进去的，这容易导致不同用户构建出的镜像可能不同。所以我们将构建过程写入到 `Dockerfile`:
 
-```bash
+```shell
 FROM maven:3.6.1-jdk-8-alpine
 WORKDIR /app
 COPY pom.xml /app/
@@ -718,7 +718,7 @@ CMD [ "java", "-jar", "/app/target/gs-spring-boot-0.1.0.jar" ]
 
 但我们也会发现一个问题，在 `mvn -e -B package` 这一步耗费的时间特别长，因为它需要先拉取依赖才能进行构建。而对于项目开发而言，代码变更比依赖变更更加频繁，为了能加快构建速度，有效的利用缓存，我们将解决依赖与构建分成两步。
 
-```bash
+```shell
 FROM maven:3.6.1-jdk-8-alpine
 WORKDIR /app
 COPY pom.xml /app/
@@ -732,7 +732,7 @@ CMD [ "java", "-jar", "/app/target/gs-spring-boot-0.1.0.jar" ]
 
 当然，现在我们构建的镜像中，还是包含着项目的源代码，这其实并非我们所需要的。那么我们可以使用 **多阶段构建** 来解决这个问题。`Dockerfile` 可以修改为：
 
-```bash
+```shell
 FROM maven:3.6.1-jdk-8-alpine AS builder
 WORKDIR /app
 COPY pom.xml /app/
@@ -748,7 +748,7 @@ CMD [ "java", "-jar", "/gs-spring-boot-0.1.0.jar" ]
 
 `Dockerfile` 可以修改为：
 
-```bash
+```shell
 FROM maven:3.6.1-jdk-8-alpine AS builder
 WORKDIR /app
 COPY pom.xml /app/
@@ -764,7 +764,7 @@ CMD [ "java", "-jar", "/gs-spring-boot-0.1.0.jar" ]
 
 我们可以使用如下的命令来构建不同阶段的镜像；
 
-```bash
+```shell
 # 构建用于开发的镜像
 (MoeLove) ➜  docker build --target dev -t local/spring-boot:6-4-dev .    
 # 构建用于生产部署的镜像
@@ -773,7 +773,7 @@ CMD [ "java", "-jar", "/gs-spring-boot-0.1.0.jar" ]
 
 我们来看看在这个过程中镜像大小的变化：
 
-```bash
+```shell
 (MoeLove) ➜  docker image ls local/spring-boot                           
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
 local/spring-boot   6-4-dev             f47a322c9de3        6 seconds ago       250MB
@@ -791,7 +791,7 @@ local/spring-boot   6                   f96bea38825f        2 hours ago         
 
 通过添加环境变量 `DOCKER_BUILDKIT=1` 或者在 Docker 的配置文件 `/etc/docker/daemon.json` 中添加如下配置：
 
-```bash
+```shell
 "features": {
     "buildkit": true
 }

@@ -1148,7 +1148,7 @@ rm -rf apache-geode-1.9.2.tgz
 
 停止主 locator 要特别注意，经常停止不了，要用 ps 来查看 `ps -ef | grep geode`，如果不能正常停止就用 `kill -9 {locator的PID}` 来强行停止。
 
-```bash
+```shell
  gfsh>connect --jmx-manager=192.168.33.15
  Connecting to Manager at [host=192.168.33.15, port=1099] ..
  Successfully connected to: [host=192.168.33.15, port=1099]

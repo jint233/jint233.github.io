@@ -30,7 +30,7 @@ java.lang.Object
 
 此时该线程就可以被调度了，如果是被中断的话就抛出一个 InterruptedException 异常。**notify 方法** 配合 synchronized 使用，该方法唤醒在该对象上 **等待队列** 中的某个线程（同步队列中的线程是给抢占 CPU 的线程，等待队列中的线程指的是等待唤醒的线程）。**notifyAll 方法** 配合 synchronized 使用，该方法唤醒在该对象上等待队列中的所有线程。**总结** 只要把上面几个方法熟悉就可以了，toString 和 getClass 方法可以不用去讨论它们。该题目考察的是对 Object 的熟悉程度，平时用的很多方法并没看其定义但是也在用，比如说：wait () 方法，equals () 方法等。
 
-```bash
+```shell
 Class Object is the root of the class hierarchy.Every class has Object as a superclass. All objects, including arrays, implement the methods of this class.
 ```
 
@@ -80,7 +80,7 @@ Class<?> clazz=User.class;
 
 - 第三种：通过 Class 类的静态方法 forName () 方法获取。
 
-```bash
+```shell
 Class<?> clazz = Class.forName("com.tian.User");    
 ```
 
@@ -154,7 +154,7 @@ fail-fast 机制是 Java 集合（Collection）中的一种错误机制。当多
 
 另外在 Hashtable 源码注释中有这么一句话：
 
-```bash
+```shell
 Hashtable is synchronized.  If a thread-safe implementation is not needed, it is recommended to use HashMap in place of Hashtable . If a thread-safe highly-concurrent implementation is desired, then it is recommended to use ConcurrentHashMap in place of Hashtable.
 ```
 

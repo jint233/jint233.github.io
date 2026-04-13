@@ -82,7 +82,7 @@ Query OK, 0 rows affected (15.48 sec)
 
 再测试值为 2 的时候，即每次提交都刷新到 os buffer，但每秒才刷入磁盘中。
 
-```bash
+```shell
 mysql> set @@global.innodb_flush_log_at_trx_commit=2;    
 mysql> truncate test_flush_log;
 mysql> call proc(100000);
@@ -93,7 +93,7 @@ Query OK, 0 rows affected (3.41 sec)
 
 最后测试值为 0 的时候，即每秒才刷到 os buffer 和磁盘。
 
-```bash
+```shell
 mysql> set @@global.innodb_flush_log_at_trx_commit=0;
 mysql> truncate test_flush_log;
 mysql> call proc(100000);
@@ -127,7 +127,7 @@ delimiter ;
 
 测试值为 1 时的情况。
 
-```bash
+```shell
 mysql> set @@global.innodb_flush_log_at_trx_commit=1;
 mysql> truncate test_flush_log;
 mysql> call proc(1000000);

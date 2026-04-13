@@ -49,7 +49,7 @@ System.out.println ("数字 Empty:"+threadLocal99.get ());
 
 运行结果：
 
-```bash
+```shell
 数字：3
 数字 Empty:null
 ```
@@ -204,7 +204,7 @@ private Entry getEntryAfterMiss(ThreadLocal<?> key, int i, Entry e) {
 
 运行结果：
 
-```bash
+```shell
 现在获取的变量是 = 主线程变量
 ```
 

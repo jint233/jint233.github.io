@@ -389,19 +389,19 @@ libcgroup 使用流程：
 
 安装
 
-```bash
+```shell
   yum install libcgroup
 ```
 
 启动服务
 
-```bash
+```shell
   service cgconfig start
 ```
 
 配置文件模板（以 memory 为例）：
 
-```bash
+```shell
     cat /etc/cgconfig.conf
 ```
 
@@ -409,7 +409,7 @@ libcgroup 使用流程：
 
 看到 memory 子系统是挂载在目录/sys/fs/cgroup/memory 下，进入这个目录创建一个文件夹，就创建了一个 control group 了。
 
-```bash
+```shell
     mkdir test
     echo "服务进程号">>  tasks(tasks是test目录下的一个文件)
 ```

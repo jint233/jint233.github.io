@@ -125,7 +125,7 @@ public class SpiService {
 
 执行结果：
 
-```bash
+```shell
 我是 SpiTwoService: 参数
 我是 SpiOneService: 参数
 ```

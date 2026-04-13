@@ -13,14 +13,14 @@
 
 ### 环境安装
 
-```bash
+```shell
 pip install mkdocs-material
 pip install mkdocs-glightbox
 ```
 
 ### 本地启动
 
-```bash
+```shell
 mkdocs serve
 ```
 

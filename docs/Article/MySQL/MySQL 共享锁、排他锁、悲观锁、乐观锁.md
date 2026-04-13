@@ -22,7 +22,7 @@
 
 Mysql 在 5.5 之前默认使用 MyISAM 存储引擎，之后使用 InnoDB 。查看当前存储引擎：
 
-```bash
+```shell
 show variables like '%storage_engine%';
 ```
 

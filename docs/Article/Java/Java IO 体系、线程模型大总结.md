@@ -625,7 +625,7 @@ class ServerHandler implements Runnable {
 
 客户端连上服务端后先发送登录消息，再发送聊天消息，控制台输入示例如下：
 
-```bash
+```shell
 请输入消息:
 login:zhou
 收到来自服务端的消息：用户【zhou】登录成功！

@@ -215,7 +215,7 @@ public class Main {
 
 执行结果为：
 
-```bash
+```shell
 thread name : test1
 thread name : test6
 thread name : test7
@@ -425,7 +425,7 @@ public class Main {
 
 运行结果：
 
-```bash
+```shell
 thread name : core_test1
 thread name : core_test2
 thread name : test3
