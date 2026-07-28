@@ -1,12 +1,12 @@
 # Docker 镜像构建原理及源码分析
 
-### Docker 架构
+## Docker 架构
 
 这里我们先从宏观上对 `Docker` 有个大概的认识，就像我之前提到的它整体上是个 C/S 架构；我们平时使用的 `docker` 命令就是它的 CLI 客户端，而它的服务端是 `dockerd` 在 Linux 系统中，通常我们是使用 `systemd` 进行管理，所以我们可以使用 `systemctl start docker` 来启动服务。（但是请注意，`dockerd` 是否能运行与 `systemd` 并无任何关系，你可以像平时执行一个普通的二进制程序一样，直接通过 `dockerd` 来启动服务，注意需要 root 权限）
 
 实际上也就是
 
-![Docker 架构](../assets/engine-components-flow.png)
+![Docker 架构](../assets/Docker%20%E9%95%9C%E5%83%8F%E6%9E%84%E5%BB%BA%E5%8E%9F%E7%90%86%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-1.png)
 
 (图片来源：docker overview)
 
@@ -250,6 +250,7 @@ invalid argument: can't use stdin for both build context and dockerfile
 或者可以指定一个 `git` 仓库的地址，CLI 会调用 `git` 命令将仓库 `clone` 至一个临时目录，进行使用；
 最后一种是，给定一个 `URL` 地址，该地址可以是 **一个具体的 Dockerfile 文件地址** 或者是 **一个 tar 归档文件的下载地址**。
 这几种基本就是字面上的区别，至于 CLI 的行为差异，主要是最后一种，当 `URL` 地址是一个具体的 `Dockerfile` 文件地址，在这种情况下 `build context` 相当于只有 `Dockerfile` 自身，所以并不能使用 `COPY` 之类的指定，至于 `ADD` 也只能使用可访问的外部地址。
+
 - **可使用 .dockerignore 忽略不需要的文件** 我在之前的 Chat [高效构建 Docker 镜像的最佳实践] 中有分享过相关的内容。这里我们看看它的实现逻辑。
 
 ```go
@@ -294,7 +295,7 @@ defer response.Body.Close()
 #### 小结
 
 整个过程大致如下图：
-![docker builder 处理流程](../assets/6a69dde0-933a-11e9-8825-e7da71af5ddb.jpg)
+![docker builder 处理流程](../assets/Docker%20%E9%95%9C%E5%83%8F%E6%9E%84%E5%BB%BA%E5%8E%9F%E7%90%86%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-2.jpg)
 从入口函数 `runBuild` 开始，经过判断是否支持 `buildkit` ，如果不支持 `buildkit` 则继续使用 v1 的 `builder`。接下来读取各类参数，按照不同的参数执行各类不同的处理逻辑。这里需要注意的就是 `Dockerfile` 及 `build context` 都可支持从文件或者 `stdin` 等读入，具体使用时，需要注意。
 另外 `.dockerignore` 文件可过滤掉 `build context` 中的一些文件，在使用时，可通过此方法进行构建效率的优化，当然也需要注意，在通过 URL 获取 `Dockerfile` 的时候，是不存在 `build context` 的，所以类似 `COPY` 这样的命令也就无法使用了。
 当所有的 `build context` 和参数都准备就绪后，接下来调用封装好的客户端，将这些请求按照本文开始之初介绍的 API 发送给 `dockerd` ，由其进行真正的构建逻辑。

@@ -2,7 +2,7 @@
 
 网上关于 Spring 循环依赖的博客太多了，有很多都分析的很深入，写的很用心，甚至还画了时序图、流程图帮助读者理解，我看了后，感觉自己是懂了，但是闭上眼睛，总觉得还没有完全理解，总觉得还有一两个坎过不去，对我这种有点笨的人来说，真的好难。当时，我就在想，如果哪一天，我理解了 Spring 循环依赖，一定要用自己的方式写篇博客，帮助大家更好的理解，等我理解后，一直在构思，到底怎么应该写，才能更通俗易懂，就在前几天，我想通了，这么写应该更通俗易懂。在写本篇博客之前，我翻阅了好多关于 Spring 循环依赖的博客，网上应该还没有像我这样讲解的，现在就让我们开始把。
 
-### 什么是循环依赖
+## 什么是循环依赖
 
 一言以蔽之：两者相互依赖。
 
@@ -39,8 +39,8 @@ public class Main {
 运行结果：
 
 ```plaintext
-[email protected]
-[email protected]
+com.example.AuthorService@1a2b3c4d
+com.example.BookService@5e6f7a8b
 ```
 
 可以看到 BookService 中需要 AuthorService，AuthorService 中需要 BookService，类似于这样的就叫循环依赖，但是神奇的是竟然一点问题没有。
@@ -68,7 +68,7 @@ public class AuthorService {
 }
 ```
 
-启动后，令人恐惧的红色字体在控制台出现了： ![image.png](../assets/15100432-9dd42da442010f30.png)
+启动后，令人恐惧的红色字体在控制台出现了： ![image.png](../assets/Spring%20%E5%B8%AE%E5%8A%A9%E4%BD%A0%E6%9B%B4%E5%A5%BD%E7%9A%84%E7%90%86%E8%A7%A3%20Spring%20%E7%8E%AF%E4%BE%9D%E8%B5%96-1.png)
 
 如果是构造参数注入的循环依赖，Spring 无法解决：
 
@@ -89,7 +89,7 @@ public class BookService {
 }
 ```
 
-还是讨厌的红色字体： ![image.png](../assets/15100432-d0b71854edfbcd9f.png)
+还是讨厌的红色字体： ![image.png](../assets/Spring%20%E5%B8%AE%E5%8A%A9%E4%BD%A0%E6%9B%B4%E5%A5%BD%E7%9A%84%E7%90%86%E8%A7%A3%20Spring%20%E7%8E%AF%E4%BE%9D%E8%B5%96-2.png)
 
 ### 循环依赖可以关闭吗
 
@@ -106,7 +106,7 @@ public class Main {
 }
 ```
 
-再次运行，就报错了： ![image.png](../assets/15100432-2ecaf84436018d26.png)
+再次运行，就报错了： ![image.png](../assets/Spring%20%E5%B8%AE%E5%8A%A9%E4%BD%A0%E6%9B%B4%E5%A5%BD%E7%9A%84%E7%90%86%E8%A7%A3%20Spring%20%E7%8E%AF%E4%BE%9D%E8%B5%96-3.png)
 
 需要注意的是，我们不能这么写：
 
@@ -249,8 +249,8 @@ public class Main {
 运行结果：
 
 ```plaintext
-[email protected]
-[email protected]
+com.example.OrderService@1a2b3c4d
+com.example.UserService@5e6f7a8b
 ```
 
 懒加载调用：
@@ -270,8 +270,8 @@ public class Main {
 运行结果：
 
 ```plaintext
-[email protected]
-[email protected]
+com.example.OrderService@1a2b3c4d
+com.example.UserService@5e6f7a8b
 ```
 
 ### 为什么无法解决原型、构造方法注入的循环依赖
@@ -409,8 +409,8 @@ public class Cycle {
 运行结果：
 
 ```plaintext
-[email protected]
-[email protected]
+com.example.OrderService@1a2b3c4d
+com.example.UserService@5e6f7a8b
 ```
 
 ### 二级缓存能不能解决循环依赖，三级循环到底有什么用？

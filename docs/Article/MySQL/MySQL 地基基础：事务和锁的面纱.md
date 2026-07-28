@@ -35,6 +35,7 @@ update account set balance=balance-1000 where username='A';
 select balance from account where username='B';
 在 B 账户里加 1000 元
 update account set balance=balance+1000 where username='B';
+
 ```
 
 好了，一个简单事务基本就这样，我们开始分析分析这个事务是如何保证事务的 ACID 的。
@@ -110,12 +111,12 @@ T1 先获取了表中这一行数据，执行了 update，未提交；T2 获取�
 
 事务隔离级别，拆分来看，事务、隔离、级别，故是三个概念的集合，是保证事务之间相互隔离互不影响的，有多个级别。事务在执行过程中可能会出现脏读、不可重复读、幻读，那么 MySQL 的事务隔离级别到底有怎样的表现呢？
 
-| 事务隔离级别                 | 脏读  | 不可重复读 | 幻读  |
-|------------------------|-----|-------|-----|
-| 读未提交(Read-Uncommited)  | 可能  | 可能    | 可能  |
-| 读提交(Read-Commited)     | 不可能 | 可能    | 可能  |
-| 可重复读交(Repeatable-Read) | 不可能 | 不可能   | 可能  |
-| 序列化(Serializable)      | 不可能 | 不可能   | 不可能 |
+| 事务隔离级别                | 脏读   | 不可重复读 | 幻读   |
+|-----------------------------|--------|------------|--------|
+| 读未提交(Read-Uncommited)   | 可能   | 可能       | 可能   |
+| 读提交(Read-Commited)       | 不可能 | 可能       | 可能   |
+| 可重复读交(Repeatable-Read) | 不可能 | 不可能     | 可能   |
+| 序列化(Serializable)        | 不可能 | 不可能     | 不可能 |
 
 那么到底什么是脏读、不可重复读、幻读呢？
 
@@ -157,9 +158,9 @@ mysql>  SELECT @@tx_isolation;
 
 环境：用户 A 有 100 元钱，给用户 A 增加 100 元，然后用户 A 转账给用户 B。
 
-| 事务 1                                                                     | 事务 2   |
-|--------------------------------------------------------------------------|--------|
-| begin;                                                                   | begin; |
+| 事务 1                                                                         | 事务 2 |
+|--------------------------------------------------------------------------------|--------|
+| begin;                                                                         | begin; |
 | update t_account set balance=balance+100 where name='A'; #给用户 A 增加 100 元 |        |
 
 select balance from t_account where name='A'; #转账前查询用户 A 余额为 200 元
@@ -407,7 +408,7 @@ select \* from t_account where name='A'; #用户 A 余额 200
 
 锁是可以协调并发连接访问 MySQL 数据库资源的一种技术，可以保证数据的一致性。锁有两个阶段：加锁和解锁，InnoDB 引擎的锁主要有两类。
 
-**共享锁（S）**
+### 共享锁（S）
 
 允许一个事务读取数据，阻塞其他事务想要获取相同数据。共享锁之间不互斥，读和读操作可以并行。代码展示：
 
@@ -415,7 +416,7 @@ select \* from t_account where name='A'; #用户 A 余额 200
 select * from table where ... lock in share mode
 ```
 
-**排它锁（X）**
+### 排它锁（X）
 
 持有排他锁的事务可以更新数据，阻塞其他事务获取数据的排他锁和共享锁。排它锁之间互斥，读和写、写和写操作不可以并行。代码展示：
 
@@ -425,7 +426,7 @@ select * from table where ... for update;
 
 从 MySQL 数据库的内外区分锁，有两种锁。
 
-**内部锁**
+### 内部锁
 
 MySQL 在数据库内部自动管理，协调并发连接的资源争用。内部锁再具体来看分为：
 
@@ -665,7 +666,7 @@ mysql> update t_account set balance=balance-100 where name='A';
 mysql> update t_account set balance=balance+100 where name='B';
 ```
 
-**设置事务保存点**
+### 设置事务保存点
 
 ```plaintext
 mysql> savepoint T_A_TO_B;
@@ -787,5 +788,3 @@ Record lock, heap no 2 PHYSICAL RECORD: n_fields 2; compact format; info bits 0
 **合理的在线、离线数据库** 比如我们的系统数据量日益增加，还有一些业务需要查询大量的数据，我们可以改造系统为在线、离线数据库，在线表提供高效事务能力，离线表提供数据查询服务，互不影响。**提高 delete 操作效率的思考**
 
 如果你对表有大量数据的 delete 操作，比如定期的按日、月、年删除数据，可以设计表为日表、月表、年表亦或是相对应的分区表，这样清理数据会由大事务降低为小事务。
-
-```

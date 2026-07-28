@@ -26,7 +26,7 @@ Docker 构建系统中，默认情况下为了加快构建的速度，会将构�
 
 builder 就是上面提到的特定模块，也就是说构建内容 context 是由 Docker CLI 发送给 dockerd；并最终由 builder 完成构建。
 
-![enter image description here](../assets/7141ec30-830d-11e9-8eb9-49b38b06f9d6.jpg)
+![enter image description here](../assets/%E8%BF%9B%E9%98%B6%EF%BC%9ADockerfile%20%E9%AB%98%E9%98%B6%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97%E5%8F%8A%E9%95%9C%E5%83%8F%E4%BC%98%E5%8C%96-1.jpg)
 
 在 `docker` 的顶级命令中，我们可以看到有一个 `builder` 的命令组。它有一个子命令 `prune` 用于清理所有构建过程中的缓存。
 
@@ -106,10 +106,10 @@ BuildKit 在 Docker v18.06 版本之后可通过 `export DOCKER_BUILDKIT=1` 环�
  => [internal] load git source https://github.com/tao12345666333/spring-boot-hello-world.git                6.4s 
  => [internal] load metadata for docker.io/library/openjdk:8-jre-alpine                                     3.6s
  => [internal] load metadata for docker.io/library/maven:3.6.1-jdk-8-alpine                                 3.3s 
- => CACHED [stage-2 1/2] FROM docker.io/library/openjdk:[email protected]:f362b165b870ef129cbe730f29065f  0.0s
- => => resolve docker.io/library/openjdk:[email protected]:f362b165b870ef129cbe730f29065ff37399c0aa8bcab  0.0s
- => [builder 1/6] FROM docker.io/library/maven:[email protected]:16691dc7e18e5311ee7ae38b40dcf98e  14.3s
- => => resolve docker.io/library/maven:[email protected]:16691dc7e18e5311ee7ae38b40dcf98ee1cfe4a48  0.0s
+ => CACHED [stage-2 1/2] FROM docker.io/library/openjdk@sha256:f362b165b870ef129cbe730f29065f  0.0s
+ => => resolve docker.io/library/openjdk@sha256:f362b165b870ef129cbe730f29065ff37399c0aa8bcab  0.0s
+ => [builder 1/6] FROM docker.io/library/maven@sha256:16691dc7e18e5311ee7ae38b40dcf98e  14.3s
+ => => resolve docker.io/library/maven@sha256:16691dc7e18e5311ee7ae38b40dcf98ee1cfe4a48  0.0s
  => => sha256:e4ef40f7698347c89ee64b2e5c237d214cae777f33735c52039824eb44feb796 2.18MB / 2.18MB              2.7s
 ...
  => => extracting sha256:c2274a1a0e2786ee9101b08f76111f9ab8019e368dce1e325d3c284a0ca33397                   0.7s
@@ -269,7 +269,7 @@ RUN apk add --no-cache git openssh-client
 # 当然也可以给 .ssh/config 写配置文件来跳过验证，但容易带来安全问题，不推荐
 RUN mkdir -p -m 0700 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
 # clone 私有项目仓库，并创建分支
-RUN --mount=type=ssh,required git clone [email protected]:tao12345666333/moe.git \
+RUN --mount=type=ssh,required git clone git@github.com:tao12345666333/moe.git \
         && cd moe \
         && git checkout -b release
 ```
@@ -296,7 +296,7 @@ Identity added: /home/tao/.ssh/id_rsa (/home/tao/.ssh/id_rsa)
 => [1/4] FROM docker.io/library/alpine                                                              0.0s
 => CACHED [2/4] RUN apk add --no-cache git openssh-client                                           0.0s
 => CACHED [3/4] RUN mkdir -p -m 0700 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts         0.0s
-=> CACHED [4/4] RUN --mount=type=ssh,required git clone [email protected]:tao12345666333/moe.git       0.0s
+=> CACHED [4/4] RUN --mount=type=ssh,required git clone git@github.com:tao12345666333/moe.git       0.0s
 => exporting to image                                                                               0.0s
 => => exporting layers                                                                              0.0s
 => => writing image sha256:35d3ded5595a48de50054121feed13ebadf9b5e73b6cefeeba4215e1a20a20fd         0.0s
@@ -318,7 +318,7 @@ Identity added: /home/tao/.ssh/id_rsa (/home/tao/.ssh/id_rsa)
 ```shell
 (MoeLove) ➜  d docker history local/ssh
 IMAGE               CREATED             CREATED BY                                      SIZE                COMMENT
-35d3ded5595a        35 minutes ago      RUN /bin/sh -c git clone [email protected]:tao1…   16.9kB              buildkit.dockerfile.v0
+35d3ded5595a        35 minutes ago      RUN /bin/sh -c git clone git@github.com:tao1…   16.9kB              buildkit.dockerfile.v0
 <missing>           35 minutes ago      RUN /bin/sh -c mkdir -p -m 0700 ~/.ssh && ss…   392B                buildkit.dockerfile.v0
 <missing>           36 minutes ago      RUN /bin/sh -c apk add --no-cache git openss…   20.8MB              buildkit.dockerfile.v0
 <missing>           2 weeks ago         /bin/sh -c #(nop)  CMD ["/bin/sh"]              0B
@@ -330,15 +330,15 @@ IMAGE               CREATED             CREATED BY                              
 如果没有运行 `ssh-agent` 或者是密钥没有 ssh-add 添加进去， 你就会看到类似下面的问题：
 
 ```shell
-## (MoeLove) ➜  d docker build --no-cache --ssh=default -t local/ssh . [+] Building 11.9s (9/9) FINISHED => [internal] load .dockerignore                                                                    0.1s => => transferring context: 2B                                                                      0.0s => [internal] load build definition from Dockerfile                                                 0.1s => => transferring dockerfile: 96B                                                                  0.0s => resolve image config for docker.io/docker/dockerfile:experimental                                0.0s => CACHED docker-image://docker.io/docker/dockerfile:experimental                                   0.0s => [internal] load metadata for docker.io/library/alpine:latest                                     0.0s => CACHED [1/4] FROM docker.io/library/alpine                                                       0.0s => [2/4] RUN apk add --no-cache git openssh-client                                                  5.5s => [3/4] RUN mkdir -p -m 0700 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts                3.0s => ERROR [4/4] RUN --mount=type=ssh,required git clone [email protected]:tao12345666333/moe.git        2.9s
+## (MoeLove) ➜  d docker build --no-cache --ssh=default -t local/ssh . [+] Building 11.9s (9/9) FINISHED => [internal] load .dockerignore                                                                    0.1s => => transferring context: 2B                                                                      0.0s => [internal] load build definition from Dockerfile                                                 0.1s => => transferring dockerfile: 96B                                                                  0.0s => resolve image config for docker.io/docker/dockerfile:experimental                                0.0s => CACHED docker-image://docker.io/docker/dockerfile:experimental                                   0.0s => [internal] load metadata for docker.io/library/alpine:latest                                     0.0s => CACHED [1/4] FROM docker.io/library/alpine                                                       0.0s => [2/4] RUN apk add --no-cache git openssh-client                                                  5.5s => [3/4] RUN mkdir -p -m 0700 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts                3.0s => ERROR [4/4] RUN --mount=type=ssh,required git clone git@github.com:tao12345666333/moe.git        2.9s
 
-> [4/4] RUN --mount=type=ssh,required git clone [email protected]:tao12345666333/moe.git         && cd moe         && git checkout -b release:
+> [4/4] RUN --mount=type=ssh,required git clone git@github.com:tao12345666333/moe.git         && cd moe         && git checkout -b release:
 
 # 9 0.691 Cloning into 'moe'
 
 # 9 1.923 Warning: Permanently added the RSA host key for IP address '192.30.253.112' to the list of known hosts
 
-# 9 2.842 [email protected]: Permission denied (publickey)
+# 9 2.842 git@github.com: Permission denied (publickey)
 
 # 9 2.843 fatal: Could not read from remote repository
 
@@ -350,7 +350,7 @@ IMAGE               CREATED             CREATED BY                              
 
 ______________________________________________________________________
 
-rpc error: code = Unknown desc = executor failed running [/bin/sh -c git clone [email protected]:tao12345666333/moe.git         && cd moe         && git checkout -b release]: exit code: 128
+rpc error: code = Unknown desc = executor failed running [/bin/sh -c git clone git@github.com:tao12345666333/moe.git         && cd moe         && git checkout -b release]: exit code: 128
 ```
 
 ### 小结
@@ -476,7 +476,7 @@ default default               running  linux/amd64
 => [internal] booting buildkit                                                                            21.2s
 => => pulling image moby/buildkit:master                                                                  20.7s
 => => creating container buildx_buildkit_d18090                                                            0.5s
-=> => unpacking docker.io/library/openjdk:[email protected]:f362b165b870ef129cbe730f29065ff37399c0aa8bc  2.2s
+=> => unpacking docker.io/library/openjdk@sha256:f362b165b870ef129cbe730f29065ff37399c0aa8bc  2.2s
 => [builder 2/6] WORKDIR /app                                                                              0.0s
 => [builder 3/6] COPY pom.xml /app/                                                                        0.1s
 => [builder 4/6] RUN mvn dependency:go-offline                                                           596.4s
@@ -539,7 +539,7 @@ buildx 是 Docker 的一个 CLI 插件，默认安装完 19.03 后将会同时�
 
 关于 dive 这里不做过多介绍了，该项目的文档中介绍还是比较详细的，我们可以用它来分析下刚才我们构建成功的镜像：
 
-![enter image description here](../assets/2f5601d0-830d-11e9-a8d7-c164a8393e9a.jpg)
+![enter image description here](../assets/%E8%BF%9B%E9%98%B6%EF%BC%9ADockerfile%20%E9%AB%98%E9%98%B6%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97%E5%8F%8A%E9%95%9C%E5%83%8F%E4%BC%98%E5%8C%96-2.jpg)
 
 第二种方法，则是比较一般的，通过之前介绍的 `docker image history` 来查看构建记录和每层的大小，以此来观察是否有非必要的操作之类的。
 

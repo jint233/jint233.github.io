@@ -2,7 +2,7 @@
 
 ## ① 什么是 Cache? Cache 的目标?
 
-- 在说这个之前我们先看下典型 Web 2.0 的一些架构演变(这里不用”演进”). 从简单的到复杂的通用架构.![Arch1](../assets/Cache-001-1.jpeg)![Arch2](../assets/Cache-002-2.jpeg)![Arch3](../assets/Cache-003-1.jpeg)![Arch4](../assets/Cache-004-2.jpeg)
+- 在说这个之前我们先看下典型 Web 2.0 的一些架构演变(这里不用”演进”). 从简单的到复杂的通用架构.![Arch1](../assets/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA%20Cache-1.jpeg)![Arch2](../assets/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA%20Cache-2.jpeg)![Arch3](../assets/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA%20Cache-3.jpeg)![Arch4](../assets/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA%20Cache-4.jpeg)
 - 首先, 诚然说 Cache 在互联网公司里,是一个好东西. Cache 化,可以显著地提高应用程序的性能和便于提供应用程序的伸缩性(可以消除不必要请求落到外在的不频繁改变数据的 DataSource 上). 那么 Cache 化目的非常明显, 就是有且只有一个: 提高应用程序的性能.
 - 再者, Cache 化, 以 in-memory 为组织形式, 作为外部的持久化系统的数据的副本(可能数据结构不同), 仅仅为了提高性能. 那么 Cache 化的数据应当是短暂停留在 Distributed Cache 中 — 它们可能(可以)随时的消失(即使断电不保证立马就有数据-这一点类似 CPU 的 L1/L2 Cache), 那么应用在用到 Cache 时候仅当 Cache 系统可用时候使用不应当完全依赖于 Cache 数据 — 就是说在 Distributed Cache 中个别的 Cache 实例失效,那么 DataSource(持久化)可以临时性完成数据被访问的工作.
 - 最后, 我们可以假定如果各种 DataSource 自有的系统性能非常高, 那么 Cache 所能解决的领域就变得非常的少.
@@ -59,7 +59,7 @@
         }
 ```
 
-##### 好处和坏处
+#### 好处和坏处
 
 - 不太好的是: 大多数的数据可能不再被高频度访问. 如果第一次访问不命中就有另外多余的副作用.
 - 比较好的是: 保证数据在 Cache 里. 适用于大多数的场景.
@@ -131,7 +131,7 @@ cache.setex(String.valueOf(user.getId()), 300, user.toString()); // TTL, 可以�
 - 第一种 Hashing 方式, 一旦需要扩容一个或者下线一个, 那么会导致大量的 keys 重分配: = ( old_node_count/new_node_count ), 就是说 3 台 server 扩充到 4 台 server 时候, 3/4 = 75%的 keys 都受到影响.
 - 第二种 Consistent Hashing 方式, 一旦需要扩容一个或者下线一个, 那么仅有将近( 1 - (old_node_count/new_node_count) ) 比例的 keys 受到影响, 就是说 3 台 server 扩充到 4 台 server 时候, (1 - 3/4) = 25%的 keys 都受到影响. 这样相比上一种受到的影响降低了 50%. 这将是更好的方式.
 
-##### Consistent Hashing 简化算法流程的描述
+#### Consistent Hashing 简化算法流程的描述
 
 1. 将 keys 和 servers 都进行看成一个 ring(常被称为 continuum)
 2. 将 keys 和 servers 的 hash 值分隔成多个的 slots

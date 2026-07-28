@@ -1,6 +1,6 @@
 # MySQL 地基基础：数据字典
 
-### 数据字典是什么
+## 数据字典是什么
 
 MySQL 数据字典的发展史：
 
@@ -8,7 +8,7 @@ MySQL 数据字典的发展史：
 - MySQL 5.5 提供了 performa nce_schema 性能引擎，可以查看 MySQL 性能问题，但是这个有一定难度。
 - MySQL 5.7 提供了 sys 系统数据库，其包含的表、视图、函数、存储过程、触发器可以帮我们快速了解数据库的情况。
 
-**数据字典的作用**
+### 数据字典的作用
 
 数据字典我们用一句话来概括，就是数据的数据，用于查询数据库中数据的信息内容。
 
@@ -149,7 +149,7 @@ mysql> show tables like '%setup%';
 5 rows in set (0.00 sec)
 ```
 
-**setup_actors**
+### `setup_actors`
 
 作用：配置用户维度的监控，默认监控所有用户。
 
@@ -165,7 +165,7 @@ mysql> select * from setup_actors;
 
 `%` 表示默认是对所有的用户监控。
 
-**setup_consumers**
+### `setup_consumers`
 
 作用：配置事件的消费者类型，管理将收集的监控内容保存在哪些表中。
 
@@ -214,7 +214,7 @@ mysql> select * from setup_consumers;
 - 第三级：events_waits_current、events_stages_current、events_statements_current，分别是事件的 wait、stage、statement 的统计。
 - 第四级：分别是对应的历史统计内容了。
 
-**setup_instruments**
+### `setup_instruments`
 
 作用：配置仪器，这个表中内容非常丰富，包含了统计 SQL 执行阶段情况、统计等待事件情况、IO 情况、内存情况、锁情况等。
 
@@ -263,7 +263,7 @@ mysql> set @@session.sql_mode ='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE
 - transaction：表示事务的统计
 - wait：表示各种等待的统计
 
-**setup_objects**
+### `setup_objects`
 
 作用：配置监控对象。
 
@@ -303,7 +303,7 @@ mysql> select * from setup_objects;
 - information_schema 都不监控
 - 其余库都监控
 
-**setup_timers**
+### `setup_timers`
 
 作用：配置每种类型统计的时间单位。
 
@@ -578,14 +578,14 @@ mysql> select * from schema_object_overview where db='sys';
 
 结果显示：
 
-| 类型   | 数量  |
-|------|-----|
-| 函数   | 22  |
-| 存储过程 | 26  |
-| 视图   | 100 |
-| 表    | 1   |
-| 索引   | 1   |
-| 触发器  | 2   |
+| 类型     | 数量 |
+|----------|------|
+| 函数     | 22   |
+| 存储过程 | 26   |
+| 视图     | 100  |
+| 表       | 1    |
+| 索引     | 1    |
+| 触发器   | 2    |
 
 这些内容可以帮我们做什么呢？
 
@@ -675,7 +675,7 @@ mysql> select format_statement(@stmt);
 
 上面这 6 行配置时默认自带的，sys_config 中还有一个 sys.debug 参数，这个参数默认没有，我们可以手工插入。
 
-**debug**
+### `debug`
 
 默认是 NULL，调用 diagnostics() 和 execute_prepared_stmt() 存储过程，执行检查。这个参数默认不存在，是临时使用的。
 
@@ -707,7 +707,7 @@ mysql> update sys_config set value = 'OFF' where variable = 'debug';
 
 在 MySQL 5.7 开始提供了一个新的用户 mysql.sys，这个用户可避免修改或删除 root 用户时发生的问题，但是该用户被锁定是无法连接客户端的。
 
-接下来说的两个触发器，在定义时使用了 `[[email protected]](/cdn-cgi/l/email-protection)`，就是说只能用 mysql.sys 调用触发器，从而对表
+接下来说的两个触发器，在定义时使用了 `DEFINER = 'mysql.sys'@'localhost'`，就是说只能用 mysql.sys 调用触发器，从而对表
 sys_config 的内容做修改，如果 mysql.sys 用户不存在会报错
 
 ```shell

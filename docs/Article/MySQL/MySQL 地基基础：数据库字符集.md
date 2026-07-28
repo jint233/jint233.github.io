@@ -1,6 +1,6 @@
 # MySQL 地基基础：数据库字符集
 
-### 字符集简介
+## 字符集简介
 
 字符是各种文字和符号的总称，而字符集是多个字符的集合。
 
@@ -8,7 +8,7 @@
 
 字符包含有国家文字、标点符号、图形符号、数字等内容，字符集是多个字符的集合，字符集种类非常多，每种字符集包含的字符个数是不相同的。比如说，国家文字不同，就会使用各自国家通用字符集，这样是不是好理解一些。
 
-**常见字符集分类**
+### 常见字符集分类
 
 - ASCII（American Standard Code for Information Interchange，美国信息互换标准编码）：是基于罗马字母表的一套电脑编码系统，一个字节表示一个字符。
 - LATIN1：ASCII 字符集的扩充，仍然使用一个字节表示一个字符。
@@ -18,7 +18,7 @@
 
 字符集有很多，这里不一一列举。想要获取全部支持字符集，可以在库中查看，详见下文。
 
-**字符集特点**
+### 字符集特点
 
 - 不同的编码方式，最终解释为不同的机器语言（二进制）
 - 不同的表示方式，使用 1 个或者多个字节表示一个字符
@@ -75,7 +75,7 @@ mysql> select * from information_schema.collations;
 mysql> show variables like 'character%';
 ```
 
-![img](../assets/8d9f1a10-436e-11eb-8894-3bfce9c9c7d8.png)
+![img](../assets/MySQL%20%E5%9C%B0%E5%9F%BA%E5%9F%BA%E7%A1%80%EF%BC%9A%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AD%97%E7%AC%A6%E9%9B%86-1.png)
 
 参数解释：
 
@@ -104,7 +104,7 @@ DML 字符集选择：
 mysql> show variables like 'collation%';
 ```
 
-![img](../assets/0404e580-4370-11eb-b1e3-0b8acb9b8f06.png)
+![img](../assets/MySQL%20%E5%9C%B0%E5%9F%BA%E5%9F%BA%E7%A1%80%EF%BC%9A%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AD%97%E7%AC%A6%E9%9B%86-2.png)
 
 参数说明：
 
@@ -118,7 +118,7 @@ mysql> show variables like 'collation%';
 - 每个字符集有一个默认的校对规则
 - 每个校对规则只能属于一个字符集
 
-**校对规则命名**
+### 校对规则命名
 
 字符集名称_语言_后缀，其中后缀有三种写法：
 
@@ -172,7 +172,7 @@ default-character-set=gbk
 mysqld --default-character-set=gbk
 ```
 
-**方式三**
+#### 方式三
 
 在源码编译时指定，如果未指定，默认使用 latin1：
 
@@ -205,7 +205,7 @@ mysqld --default-character-set=gbk
 
 首先我们先实例说一下如何设置字符集。
 
-**1. 为数据库设置字符集和校对规则**
+### 1. 为数据库设置字符集和校对规则
 
 设置数据库字符集：
 
@@ -225,7 +225,7 @@ create database db1 default character set utf8 collate utf8_bin;
 - 如果指定了字符集未指定校对规则，则使用指定字符集和默认校对规则
 - 如果未指定字符集和校对规则，则使用服务器字符集和校对规则
 
-**2. 为表设置字符集和校对规则**
+### 2. 为表设置字符集和校对规则
 
 设置表字符集：
 
@@ -245,7 +245,7 @@ create table tab1(column1 varchar(5)) default character set utf8 collate utf8_bi
 - 如果指定了字符集未指定校对规则，则使用指定字符集和默认校对规则
 - 如果未指定字符集和校对规则，则使用数据库字符集和校对规则
 
-**3. 为列设置字符集和校对规则**
+### 3. 为列设置字符集和校对规则
 
 设置列字符集：
 
@@ -283,16 +283,14 @@ mysqldump -uroot -p --quick --no-create-info --extended-insert --default-charact
 create database db1 default charset gbk;
 ```
 
-**第六步：创建表**
+#### 第六步：创建表
 
 ```plaintext
 mysql -uroot -p db1 < createtab.sql
 ```
 
-**第七步：导入数据**
+#### 第七步：导入数据
 
 ```plaintext
 mysql -uroot -p db1 \< data.sql
-```
-
 ```

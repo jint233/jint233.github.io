@@ -1,6 +1,6 @@
 # Spring Boot 2.x 结合 k8s 实现分布式微服务架构
 
-### Spring Boot 1.x 与 2.x 的区别
+## Spring Boot 1.x 与 2.x 的区别
 
 在《[微服务 Spring Cloud 架构设计](https://gitbook.cn/gitchat/activity/5e8ada3452383e517ff2b5f8)》一文中，笔者讲过 Spring Cloud 的架构设计。其实 Spring Boot 在一开始时，运用到的基本就是 Eureka、Config、Zuul、Ribbon、Feign、Hystrix 等。到了 Spring Boot 2.x 的时候，大量的组件开始风云崛起。下面简单列下这两个版本之间的区别如下。
 
@@ -42,7 +42,7 @@ ConfigMap，看到这个名字可以理解：它是用于保存配置信息的�
 
 创建一个 ConfigMap 有多种方式如下。
 
-**1.key-value 字符串创建**
+#### 1. key-value 字符串创建
 
 ```shell
 kubectl create configmap test-config --from-literal=baseDir=/usr
@@ -50,7 +50,7 @@ kubectl create configmap test-config --from-literal=baseDir=/usr
 
 上面的命令创建了一个名为 test-config，拥有一条 key 为 baseDir，value 为 "/usr" 的键值对数据。
 
-**2. 根据 yml 描述文件创建**
+#### 2. 根据 YAML 描述文件创建
 
 ```yaml
 apiVersion: v1
@@ -91,9 +91,13 @@ data:
 
 1. ConfigMap 必须在 Pod 使用其之前创建。
 2. Pod 只能使用同一个命名空间的 ConfigMap。
+
 当然，还有其他更多用途，具体可以参考官网。
+
 Service，顾名思义是一个服务，什么样的服务呢？它是定义了一个服务的多种 pod 的逻辑合集以及一种访问 pod 的策略。
+
 service 的类型有四种：
+
 - ExternalName：创建一个 DNS 别名指向 service name，这样可以防止 service name 发生变化，但需要配合 DNS 插件使用。
 - ClusterIP：默认的类型，用于为集群内 Pod 访问时，提供的固定访问地址,默认是自动分配地址,可使用 ClusterIP 关键字指定固定 IP。
 - NodePort：基于 ClusterIp，用于为集群外部访问 Service 后面 Pod 提供访问接入端口。
@@ -104,6 +108,7 @@ service 的类型有四种：
 从上面讲的 Service，我们可以看到一种场景：所有的微服务在一个局域网内，或者说在一个 K8s 集群下，那么可以通过 Service 用于集群内 Pod 的访问，这就是 Service 默认的一种类型 ClusterIP，ClusterIP 这种的默认会自动分配地址。
 那么问题来了，既然可以通过上面的 ClusterIp 来实现集群内部的服务访问，那么如何注册服务呢？其实 K8s 并没有引入任何的注册中心，使用的就是 K8s 的 kube-dns 组件。然后 K8s 将 Service 的名称当做域名注册到 kube-dns 中，通过 Service 的名称就可以访问其提供的服务。那么问题又来了，如果一个服务的 pod 对应有多个，那么如何实现 LB？其实，最终通过 kube-proxy，实现负载均衡。
 说到这，我们来看下 Service 的服务发现与负载均衡的策略，Service 负载分发策略有两种：
+
 - RoundRobin：轮询模式，即轮询将请求转发到后端的各个 pod 上，其为默认模式。
 - SessionAffinity：基于客户端 IP 地址进行会话保持的模式，类似 IP Hash 的方式，来实现服务的负载均衡。
 其实，K8s 利用其 Service 实现服务的发现，其实说白了，就是通过域名进行层层解析，最后解析到容器内部的 ip 和 port 来找到对应的服务，以完成请求。
@@ -137,6 +142,7 @@ cloud-admin-service-service   ClusterIP   10.16.25.178    <none>        1001/TCP
 这样，我们可以看到默认的类型是 ClusterIP，用于为集群内 Pod 访问时，可以先通过域名来解析到多个服务地址信息，然后再通过 LB 策略来选择其中一个作为请求的对象。
 
 ### K8s 如何来处理微服务中常用的配置
+
 在上面，我们讲过了几种创建 ConfigMap 的方式，其中有一种在 Java 中常常用到：通过创建 yml 文件来实现配置管理。
 比如：
 
@@ -217,7 +223,6 @@ spec:
 在第一节中，我们就讲到 1.x 与 2.x 的区别，其中最为凸显的是，Spring Boot 2.x 结合了 K8s 来实现微服务的架构设计。其实，在 K8s 中，更新 ConfigMap 后，pod 是不会自动刷新 configMap 中的变更，如果想要获取 ConfigMap 中最新的信息，需要重启 pod。
 但 2.x 提供了自动刷新的功能：
 
-
 ```yaml
 spring:
   application:
@@ -251,6 +256,7 @@ spring:
 </dependency>
 
 ```
+
 开启服务发现功能：
 
 ```yaml
@@ -548,7 +554,9 @@ public class EnvConfig {
 ```
 
 这就是配置 ConfigMap 中的属性的类。剩下的可以自己定义一个接口类，来实现服务生产者。
-最后，我们需要在 K8s 下部署的话，需要准备几个脚本。**1. 创建 ConfigMap** 
+最后，我们需要在 K8s 下部署的话，需要准备几个脚本。
+
+#### 1. 创建 ConfigMap
 
 ```yaml
 kind: ConfigMap
@@ -648,6 +656,7 @@ spec:
   selector:
     app: cas-server
 ```
+
 注意，这里的 namespace 需要与服务部署的 namespace 一致，这里默认的是 default。
 
 看看服务的消费者，同样，先看引入常用的依赖：
@@ -861,7 +870,6 @@ hystrix:
       coreSize: 5
 ```
 
-
 引入了负载均衡的机制以及策略（可以自定义策略）。
 
 接下来看启动类：
@@ -932,9 +940,10 @@ public Response<Object> getUserInfo(HttpServletRequest req, HttpServletResponse 
     }
 }
 ```
+
 其中发生熔断时，回调方法：
 
-```
+```java
 private Response<Object> admin_service_fallBack(HttpServletRequest req, HttpServletResponse res) {
     String token = StrUtil.subAfter(req.getHeader("Authorization"), "bearer ", false);
     logger.info("admin_service_fallBack token: {}", token);

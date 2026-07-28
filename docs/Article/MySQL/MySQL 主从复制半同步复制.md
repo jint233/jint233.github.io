@@ -1,6 +1,6 @@
 # MySQL 主从复制 半同步复制
 
-# 1.半同步复制
+## 1. 半同步复制
 
 半同步复制官方手册：[https://dev.mysql.com/doc/refman/5.7/en/replication-semisync.html](https://dev.mysql.com/doc/refman/5.7/en/replication-semisync.html)
 
@@ -8,13 +8,13 @@
 
 半同步复制(semi-synchronous replication)是指 master 在将新生成的 binlog 发送给各 slave 时，只需等待一个(默认)slave 返回的 ack 信息就返回成功。
 
-![img](../assets/733013-20180524205148967-868029789-1623083552625.png)
+![img](../assets/MySQL%20%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%8D%8A%E5%90%8C%E6%AD%A5%E5%A4%8D%E5%88%B6-1.png)
 
 MySQL 5.7 对半同步复制作了大改进，新增了一个 master 线程。在 MySQL 5.7 以前，master 上的 binlog dump 线程负责两件事：dump 日志给 slave 的 io_thread；接收来自 slave 的 ack 消息。它们是串行方式工作的。在 MySQL 5.7 中，新增了一个专门负责接受 ack 消息的线程 ack collector thread。这样 master 上有两个线程独立工作，可以同时发送 binlog 到 slave 和接收 slave 的 ack。
 
 还新增了几个变量，其中最重要的是 _rpl_semi_sync_master_wait_point_ ，它使得 MySQL 半同步复制有两种工作模型。解释如下。
 
-# 2.半同步复制的两种类型
+## 2. 半同步复制的两种类型
 
 从 MySQL 5.7.2 开始，MySQL 支持两种类型的半同步复制。这两种类型由变量 _rpl_semi_sync_master_wait_point_ (MySQL 5.7.2 之前没有该变量)控制，它有两种值：AFTER_SYNC 和 AFTER_COMMIT。在 MySQL 5.7.2 之后，默认值为 AFTER_SYNC，在此版本之前，等价的类型为 AFTER_COMMIT。
 
@@ -25,9 +25,9 @@ MySQL 5.7 对半同步复制作了大改进，新增了一个 master 线程。�
 
 画图理解就很清晰。(前提：已经设置了`sync_binlog=1`，否则 binlog 刷盘时间由操作系统决定)
 
-![img](../assets/733013-20180610220640867-571552886.png)
+![img](../assets/MySQL%20%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%8D%8A%E5%90%8C%E6%AD%A5%E5%A4%8D%E5%88%B6-2.png)
 
-![img](../assets/733013-20180610220716676-859240378.png)
+![img](../assets/MySQL%20%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%8D%8A%E5%90%8C%E6%AD%A5%E5%A4%8D%E5%88%B6-3.png)
 
 再来分析下这两种模式的优缺点。
 
@@ -40,14 +40,14 @@ MySQL 5.7 对半同步复制作了大改进，新增了一个 master 线程。�
 
 在 MySQL 5.7.2 之前，等价的模式是 _AFTER_COMMIT_ ，在此版本之后，默认的模式为 _AFTER_SYNC_ ，该模式能最大程度地保证数据安全性，且性能上并不比 _AFTER_COMMIT_ 差。
 
-# 3.半同步复制插件介绍
+## 3. 半同步复制插件介绍
 
 MySQL 的半同步是通过加载 google 为 MySQL 提供的半同步插件 _semisync_master.so_ 和 _semisync_slave.so_ 来实现的。其中前者是 master 上需要安装的插件，后者是 slave 上需要安装的插件。
 
 MySQL 的插件位置默认存放在`$basedir/lib/plugin`目录下。例如，yum 安装的 mysql-server，插件目录为/usr/lib64/mysql/plugin。
 
-```plaintext
-[[email protected] ~]# find / -type f -name "semisync*" 
+```bash
+[root@localhost ~]# find / -type f -name "semisync*"
 /usr/lib64/mysql/plugin/debug/semisync_master.so
 /usr/lib64/mysql/plugin/debug/semisync_slave.so
 /usr/lib64/mysql/plugin/semisync_master.so
@@ -71,7 +71,7 @@ mysql> select @@global.have_dynamic_loading;
 
 INSTALL 安装插件的语法为：
 
-```plaintext
+```sql
 Syntax:
 INSTALL PLUGIN plugin_name SONAME 'shared_library_name'
 UNINSTALL PLUGIN plugin_name
@@ -85,21 +85,21 @@ mysql> install plugin rpl_semi_sync_master soname 'semisync_master.so';
 
 配置文件中加载插件的方式为：
 
-```plaintext
+```ini
 [mysqld]
 plugin-load='plugin_name=shared_library_name'
 ```
 
 例如，配置文件中加载`semisync_master.so`插件。
 
-```plaintext
+```ini
 [mysqld]
 plugin-load="rpl_semi_sync_master=sermisync_master.so"
 ```
 
 如果需要加载多个插件，则插件之间使用分号分隔。例如，在本节的 slave1 既是 slave，又是 master，需要同时安装两个半同步插件。
 
-```plaintext
+```ini
 [mysqld]
 plugin-load="rpl_semi_sync_master=semisync_master.so;rpl_sync_slave=semisync_slave.so"
 ```
@@ -136,7 +136,7 @@ PLUGIN_LIBRARY_VERSION: 1.7
 
 插件装载完成后，半同步功能还未开启，需要手动设置它们启动，或者写入配置文件永久生效。
 
-```plaintext
+```sql
 # 开启master的半同步
 mysql> set @@global.rpl_semi_sync_master_enabled=1;
 # 开启slave半同步
@@ -145,7 +145,7 @@ mysql> set @@globale.rpl_semi_sync_slave_enabled=1;
 
 或者配合插件加载选项一起写进配置文件永久开启半同步功能。
 
-```plaintext
+```ini
 [mysqld]
 rpl_semi_sync_master_enabled=1
 [mysqld]
@@ -156,7 +156,7 @@ rpl_semi_sync_slave_enabled=1
 
 安装了 _semisync_master.so_ 和 _semisync_slave.so_ 后，这两个插件分别提供了几个变量。
 
-```plaintext
+```sql
 mysql> show global variables like "%semi%";
 +-------------------------------------------+------------+
 | Variable_name                             | Value      |
@@ -201,7 +201,7 @@ mysql> show global variables like "%semi%";
    - ①.`rpl_semi_sync_slave_enabled`：slave 是否开启半同步复制。
    - ②.`rpl_semi_sync_slave_trace_level`：slave 的调试级别。
 
-# 4.配置半同步复制
+## 4. 配置半同步复制
 
 需要注意的是，"半同步"是同步/异步类型的一种情况，**既可以实现半同步的传统复制，也可以实现半同步的 GTID 复制**。其实半同步复制是基于异步复制的，它是在异步复制的基础上通过加载半同步插件的形式来实现半同步性的。
 
@@ -209,7 +209,7 @@ mysql> show global variables like "%semi%";
 
 本文实现如下拓扑图所示的半同步传统复制。如果要实现半同步 GTID 复制，也只是在 gtid 复制的基础上改改配置文件而已。
 
-![img](../assets/733013-20180611095458324-817021379.png)
+![img](../assets/MySQL%20%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%8D%8A%E5%90%8C%E6%AD%A5%E5%A4%8D%E5%88%B6-4.png)
 
 具体环境：
 
@@ -281,7 +281,7 @@ semi_slave for slave1
 
 以下是 master 的配置文件。
 
-```plaintext
+```ini
 [mysqld]
 datadir=/data
 socket=/data/mysql.sock
@@ -296,7 +296,7 @@ rpl_semi_sync_master_enabled=1
 
 以下是 slave1 的配置文件，注意 slave1 同时还充当着 slave2 和 slave3 的 master 的角色。
 
-```plaintext
+```ini
 [mysqld]
 datadir=/data
 socket=/data/mysql.sock
@@ -314,7 +314,7 @@ rpl_semi_sync_master_enabled=1
 
 以下是 slave2 和 slave3 的配置文件，它们配置文件除了_server-id_外都一致。
 
-```plaintext
+```ini
 [mysqld]
 datadir=/data
 socket=/data/mysql.sock
@@ -331,52 +331,52 @@ read-only=on
 
 现在 master 上创建一个专门用于复制的用户。
 
-```plaintext
-mysql> create user [email protected]'192.168.100.%' identified by '[email protected]!';
-mysql> grant replication slave on *.* to [email protected]'192.168.100.%';
+```sql
+mysql> create user 'repl'@'192.168.100.%' identified by 'repl_password';
+mysql> grant replication slave on *.* to 'repl'@'192.168.100.%';
 ```
 
 因为 master 和所有的 slave 都是全新的实例，所以 slave 上指定的 binlog 坐标可以从任意位置开始。不过刚才 master 上创建了一个用户，也会写 binlog，所以建议还是从 master 的第一个 binlog 的 position=4 开始。
 
 以下是 slave1 上的`change master to`参数：
 
-```plaintext
+```sql
 mysql> change master to 
             master_host='192.168.100.21',
             master_port=3306,
             master_user='repl',
-            master_password='[email protected]!',
+            master_password='repl_password',
             master_log_file='master-bin.000001',
             master_log_pos=4;
 ```
 
 以下是 slave2 和 slave3 的`change master to`参数：
 
-```plaintext
+```sql
 mysql> change master to 
             master_host='192.168.100.22',
             master_port=3306,
             master_user='repl',
-            master_password='[email protected]!',
+            master_password='repl_password',
             master_log_file='master-bin.000001',
             master_log_pos=4;
 ```
 
 启动各 slave 上的两个 SQL 线程。
 
-```plaintext
+```sql
 mysql> start slave;
 ```
 
 一切就绪后，剩下的事情就是测试。在 master 上对数据做一番修改，然后查看是否会同步到 slave1、slave2、slave3 上。
 
-# 5.半同步复制的状态信息
+## 5. 半同步复制的状态信息
 
 首先是 semisync 相关的可修改变量，这几个变量在[前文](https://www.cnblogs.com/f-ck-need-u/p/9166452.html#blog3.2)已经解释过了。
 
 例如以下是开启了半同步复制后的 master 上的 semisync 相关变量。
 
-```plaintext
+```sql
 mysql> show global variables like "%semi%";
 +-------------------------------------------+------------+
 | Variable_name                             | Value      |
@@ -394,7 +394,7 @@ mysql> show global variables like "%semi%";
 
 例如，以下是 master 上关于 semi_sync 的状态变量信息。
 
-```plaintext
+```sql
 mysql> show status like "%semi%";
 +--------------------------------------------+-------+
 | Variable_name                              | Value |
@@ -424,7 +424,7 @@ mysql> show status like "%semi%";
 
 以下是 slave1 上关于 semi_sync 的状态变量信息。
 
-```plaintext
+```sql
 mysql>  show status like "%semi%";
 +--------------------------------------------+-------+
 | Variable_name                              | Value |
@@ -449,7 +449,7 @@ mysql>  show status like "%semi%";
 
 此外，从 MySQL 的错误日志、`show slave status`也能获取到一些半同步复制的状态信息。下一节测试半同步复制再说明。
 
-# 6.测试半同步复制(等待、降级问题)
+## 6. 测试半同步复制（等待、降级问题）
 
 前面已经搭建好了下面的半同步复制结构。
 
@@ -467,7 +467,7 @@ mysql>  show status like "%semi%";
 
 在 slave2 和 slave3 上执行：
 
-```plaintext
+```sql
 mysql> stop slave io_thread;
 ```
 
@@ -481,7 +481,7 @@ insert into test1.t values(33);
 
 在 slave1 上查看(在上面的步骤之后的 10 秒内查看)：
 
-```plaintext
+```sql
 mysql> show status like "%semi%";
 +--------------------------------------------+-------+
 | Variable_name                              | Value |
@@ -529,7 +529,7 @@ mysql> show slave status \G ****  ****  ****  ****  ****  ****  ***1. row**  ***
 
 但 10 秒之后再查看。
 
-```plaintext
+```sql
 mysql> show status like "%semi%";
 +--------------------------------------------+-------+
 | Variable_name                              | Value |

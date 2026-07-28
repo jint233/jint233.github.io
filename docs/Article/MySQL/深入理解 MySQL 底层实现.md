@@ -1,8 +1,8 @@
 # 深入理解 MySQL 底层实现
 
-1. ### MySQL 的常用引擎
+## 1. MySQL 的常用引擎
 
-#### 1. InnoDB
+## 1. InnoDB
 
 ```plaintext
 InnoDB的存储文件有两个，后缀名分别是.frm和.idb，其中.frm是表的定义文件，而idb是数据文件。
@@ -10,7 +10,7 @@ InnoDB中存在表锁和行锁，不过行锁是在命中索引的情况下才�
 InnoDB支持事务，且支持四种隔离级别（读未提交、读已提交、可重复读、串行化），默认的为可重复读；而在Oracle数据库中，只支持串行化级别和读已提交这两种级别，其中默认的为读已提交级别。
 ```
 
-#### 2. Myisam
+### 2. MyISAM
 
 ```plaintext
 Myisam的存储文件有三个，后缀名分别是.frm、.MYD、MYI，其中.frm是表的定义文件，.MYD是数据文件，.MYI是索引文件。
@@ -121,7 +121,7 @@ B-Tree结构的数据可以让系统高效的找到数据所在的磁盘块。
 11. 如果某个指针在节点node最右边且不为null，则其指向节点的所有key大于v(keym)，其中v(keym)为node的最后一个key的值。
 12. 如果某个指针在节点node的左右相邻key分别是keyi和keyi+1且不为null，则其指向节点的所有key小于v(keyi+1)且大于v(keyi)。
 B-Tree中的每个节点根据实际情况可以包含大量的关键字信息和分支，例：
-![enter image description here](../assets/90dffd20-d70b-11e7-8164-fd1fda6a5e9f.jpg)
+![enter image description here](../assets/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%20MySQL%20%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0-1.jpg)
 每个节点占用一个盘块的磁盘空间，一个节点上有两个升序排序的关键字和三个指向子树根节点的指针，指针存储的是子节点所在磁盘块的地址。两个关键词划分成的三个范围域对应三个指针指向的子树的数据的范围域。以根节点为例，关键字为17和35，P1指针指向的子树的数据范围为小于17，P2指针指向的子树的数据范围为17~35，P3指针指向的子树的数据范围为大于35。
 模拟查找关键字29的过程：
 1. 根据根节点找到磁盘块1，读入内存。【磁盘I/O操作第1次】
@@ -138,7 +138,7 @@ B+Tree在B-Tree的基础上有两点变化：
 1. 数据是存在叶子节点中的
 2. 数据节点之间是有指针指向的
 由于B+Tree的非叶子节点只存储键值信息，假设每个磁盘块能存储4个键值及指针信息，则变成B+Tree后其结构如下图所示：
-![enter image description here](../assets/a446b980-d70b-11e7-b220-5560d16c6b7b.jpg)
+![enter image description here](../assets/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%20MySQL%20%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0-2.jpg)
 通常在B+Tree上有两个头指针，一个指向根节点，另一个指向关键字最小的叶子节点，而且所有叶子节点（即数据节点）之间是一种链式环结构。因此可以对B+Tree进行两种查找运算：一种是对于主键的范围查找和分页查找，另一种是从根节点开始，进行随机查找。
 ```
 
@@ -147,7 +147,7 @@ B+Tree在B-Tree的基础上有两点变化：
 ```plaintext
 Myisam引擎也是采用的B+Tree结构来作为索引结构。
 由于Myisam中的索引和数据分别存放在不同的文件，所以在索引树中的叶子节点中存的数据是该索引对应的数据记录的地址，由于数据与索引不在一起，所以Myisam是非聚簇索引。
-![enter image description here](../assets/ceb83400-d70b-11e7-8164-fd1fda6a5e9f.jpg)
+![enter image description here](../assets/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%20MySQL%20%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0-3.jpg)
 ```
 
 #### 9. InnoDB 中的 B+Tree
@@ -156,7 +156,7 @@ Myisam引擎也是采用的B+Tree结构来作为索引结构。
 InnoDB是以ID为索引的数据存储。
 采用InnoDB引擎的数据存储文件有两个，一个定义文件，一个是数据文件。
 InnoDB通过B+Tree结构对ID建索引，然后在叶子节点中存储记录。
-![enter image description here](../assets/f6c3f920-d70b-11e7-8164-fd1fda6a5e9f.jpg)
+![enter image description here](../assets/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%20MySQL%20%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0-4.jpg)
 若建索引的字段不是主键ID，则对该字段建索引，然后在叶子节点中存储的是该记录的主键，然后通过主键索引找到对应的记录。
 ```
 

@@ -1,8 +1,8 @@
 # 铁总在用的高性能分布式缓存计算框架 Geode
 
-### 什么是 Geode，有哪些特性
+## 什么是 Geode，有哪些特性
 
-#### 官网定义
+### 官网定义
 
 Apache Geode 是一个数据管理平台，可在广泛分布的云架构中提供对数据密集型应用程序的实时、一致的访问。Geode 跨多个进程汇集内存、CPU、网络资源和可选的本地磁盘，以管理应用程序对象和行为。它使用动态复制和数据分区技术来实现高可用性、改进的性能、可伸缩性和容错性。除了作为分布式数据容器之外，Geode 还是一个内存数据管理系统，可提供可靠的异步事件通知和有保证的消息传递。
 
@@ -86,7 +86,7 @@ sysctl -p 重载
 
 一般我们选择第一个 tgz 的包 ，版本我这里先选用 1.8 的，为了后续测试滚动升级使用。
 
-![img](../assets/dc4cd400-1687-11ea-a278-bf8e3f1326ea.png)
+![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-1.png)
 
 #### 上传，解压，配置 /etc/profile
 
@@ -226,7 +226,7 @@ http://192.168.33.15:7070/pulse
 
 先看个效果图：
 
-![img](../assets/12c00980-1688-11ea-a278-bf8e3f1326ea.png)
+![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-2.png)
 
 ### gfsh 常用命令介绍
 
@@ -256,7 +256,11 @@ Monitor and Manage Apache Geode
 
 **注意：命令行可以 tab 键自动补全，及其方便操作。** #### connect
 
-要管理 Goode 集群我们需要连接到主 locator 上， 有两种方式。**1. 直接使用 JMX 进行连接** 当我们知道哪个是主的时候，就直接使用 JMX 进行连接即可。
+要管理 Goode 集群我们需要连接到主 locator 上，有两种方式。
+
+#### 1. 直接使用 JMX 进行连接
+
+当我们知道哪个是主的时候，就直接使用 JMX 进行连接即可。
 
 ```shell
 gfsh>connect --jmx-manager=192.168.33.15
@@ -265,7 +269,7 @@ Successfully connected to: [host=192.168.33.15, port=1099]
 Cluster-254 gfsh>
 ```
 
-**2. 连接任意一个 locator**
+#### 2. 连接任意一个 locator
 
 指定 locator 的 ip [端口] 就可以了。
 
@@ -720,13 +724,13 @@ id=1574827945765
 
 与 Spring 结合有两种方式。
 
-**1. 使用 spring-data-geode**
+#### 1. 使用 spring-data-geode
 
 spring-data-geode 符合 data 系列的一贯作风，提供 template 和 repository 对象化操作。我们以 Spring Boot 为例。
 
 POM 文件：
 
-```shell
+```xml
 <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -836,7 +840,7 @@ public class UserService {
 }
 ```
 
-**2. 只用原生包**
+#### 2. 只用原生包
 
 ```java
 public enum GeodeRegion {
@@ -1048,11 +1052,11 @@ Geode 非常贴心地为我们继承了 Swagger 插件：
 <http://192.168.33.15:8888/geode/swagger-ui.html#/> 
 ```
 
-![img](../assets/46f3fd60-1688-11ea-988c-fdda706d8b74.png)
+![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-3.png)
 
-![img](../assets/6a96c310-1688-11ea-a278-bf8e3f1326ea.png)
+![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-4.png)
 
-![img](../assets/747d6640-1688-11ea-b942-d94b94287f55.png)
+![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-5.png)
 
 具体 API 可参考官方网页：
 
@@ -1064,19 +1068,19 @@ Geode 非常贴心地为我们继承了 Swagger 插件：
 
 点对点的方式也叫对等方式，就是我们没有专门的 Geode 集群，服务是迁入到我们应用程序中的。
 
-![img](../assets/8c5b52e0-1688-11ea-94bc-f516225b4bcb.png)
+![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-6.png)
 
 #### C/S
 
 该模式就是我们常用的集群模式，有一个 Geode 的中心集群，应用程序通过客户端去调用， 这个模式跟 ES 的集群， Redis 的集群非常相似。
 
-![img](../assets/9ef437f0-1688-11ea-981f-cdaafe390fdd.png)
+![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-7.png)
 
 #### 多站点
 
 所谓的多站点，就是跨机房，跨地域进行数据同步，非常适合做备份之类的部署， Geode 能够保证数据的最终一致性。目前我们的生产环境通过多站点引入备份集群，以备容灾和其他非主要业务的访问。
 
-![img](../assets/consistent_multisite.png)
+![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-8.png)
 
 ### Geode 滚动升级
 
@@ -1115,9 +1119,9 @@ File saved to /opt/./cluster-config-back.zip
 
 2. 第二个导出配置文件，是一些常规配置，以前修改过的，关于 region 等的一些配置。
 
-![img](../assets/c46bbda0-1688-11ea-981f-cdaafe390fdd.png)
+![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-9.png)
 
-![img](../assets/caf79d10-1688-11ea-8478-cb869aae9121.png)
+![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-10.png)
 
 #### 拷贝新版本
 
@@ -1276,11 +1280,11 @@ rm -rf apache-geode-1.9.2.tgz
 
 原因解读：
 
-![img](../assets/ead82aa0-1688-11ea-8c8a-f5a12e386854.png)
+![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-11.png)
 
 新的 1.8 的 client 包引入了新的类，这个新的类有 Java 9 的模块化信息，然后这个版本的 Tomcat 是无法扫描模块化 jar 包的。
 
-![img](../assets/f411ec00-1688-11ea-a6a9-8f5c13f0663b.png)
+![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-12.png)
 
 看 Tomcat 官网发现，在 7.0.83 的时候才支持了这个问题。使用了 7.0.91 测试就不报哪个异常了。
 
@@ -1300,7 +1304,7 @@ Geode 对外宣称自己是一个内存计算框架，我们一直都是使用�
 
 下边我们开发一个 region 函数，一次获取多个键值类似于 multiGet 命令。
 
-**1. 开发函数**
+#### 1. 开发函数
 
 ```java
 public class MultiGetFunction implements Function {
@@ -1405,13 +1409,15 @@ http://192.168.33.15:7070/pulse
 
 pulse 中可以在不同维护查看数据。**1. 总览** 内存，成员数，服务数，region 数量，集群读写等等。
 
-![img](../assets/133ac250-1689-11ea-94bc-f516225b4bcb.png) **2. ip 维度** 这里多了一个机器的链接详情：
+![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-13.png)
+**2. ip 维度** 这里多了一个机器的链接详情：
 
-![img](../assets/1d2a1810-1689-11ea-8812-dd393aeead92.png) **3. region 维度**
+![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-14.png)
+**3. region 维度**
 
 region 维度主要对 region 进行描述：
 
-![img](../assets/27c5da70-1689-11ea-a523-0bd97445ce75.png)
+![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-15.png)
 
 #### 监控
 
@@ -1456,7 +1462,7 @@ metricList.add(build);
 
 关于 JMX 的数据结构大家可以使用 jvisualvm 连接查看：
 
-![img](../assets/383aa700-1689-11ea-8812-dd393aeead92.png)
+![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-16.png)
 
 看它的目录结构，我们可以发现其实它就是按照集群、ip、region 进行区分的，与它的 pulse 中所能显示的保持一致性。
 
@@ -1464,9 +1470,9 @@ metricList.add(build);
 
 进入 ES 后我们再通过 Grafana 进行展示，这样就可以看见历史指标的波动情况，为分析问题提供依据。
 
-![img](../assets/3e6d9100-1689-11ea-8c8a-f5a12e386854.png)
+![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-17.png)
 
-![img](../assets/430d09c0-1689-11ea-a6a9-8f5c13f0663b.png)
+![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-18.png)
 
 如上图所示是我们的一些重点指标。
 
@@ -1483,15 +1489,20 @@ metricList.add(build);
 
 当计算机因关闭、断电、硬件故障或操作系统故障而崩溃时，其所有应用程序和缓存服务器及 其本地缓存都将丢失。其他计算机上的系统成员会收到通知，说明此计算机的成员已意外离开集群。
 
-**要从机器崩溃中恢复：**
-1. 确定在此计算机上运行的进程。 
-2. 重新启动机器。 
-3. 如果 Geode 定位器在此处运行，请先启动它。注意：在启动任何应用程序或缓存服务器之前，必须至少运行一个定位器。 
+#### 要从机器崩溃中恢复
+
+1. 确定在此计算机上运行的进程。
+2. 重新启动机器。
+3. 如果 Geode 定位器在此处运行，请先启动它。注意：在启动任何应用程序或缓存服务器之前，必须至少运行一个定位器。
 4. 按常规顺序启动应用程序和缓存服务器。
 
 #### 防止和恢复磁盘完全错误
 
-监视 Geode 成员的磁盘使用情况非常重要。 如果成员缺少足够的磁盘空间用于磁盘存储，则该成员会尝试关闭磁盘存储及其关联的缓存，并记录错误消息。由于成员磁盘空间不足而导致的关闭可能导致数据丢失，数据文件损坏，日志文件损坏以及可能对您的应用程序产生负面影响 的其他错误情况。为成员提供足够的磁盘空间后，可以重新启动该成员。**换言之，一定要做磁盘容量监控！** #### java.lang.OutOfMemoryError
+监视 Geode 成员的磁盘使用情况非常重要。如果成员缺少足够的磁盘空间用于磁盘存储，则该成员会尝试关闭磁盘存储及其关联的缓存，并记录错误消息。由于成员磁盘空间不足而导致的关闭可能导致数据丢失、数据文件损坏、日志文件损坏以及可能对应用程序产生负面影响的其他错误情况。为成员提供足够的磁盘空间后，可以重新启动该成员。
+
+**换言之，一定要做磁盘容量监控！**
+
+#### java.lang.OutOfMemoryError
 
 如果应用程序经常内存不足，您可能需要对其进行分析以确定原因，可以尝试 -Xmx 重置最大堆大小来增加直接内存。
 

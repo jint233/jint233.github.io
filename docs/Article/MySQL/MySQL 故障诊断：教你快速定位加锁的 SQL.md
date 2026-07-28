@@ -1,6 +1,6 @@
 # MySQL 故障诊断：教你快速定位加锁的 SQL
 
-### 为什么会加锁
+## 为什么会加锁
 
 锁是可以协调并发连接访问 MySQL 数据库资源的一种技术，可以保证数据的一致性。
 
@@ -34,6 +34,7 @@ mysql> select * from t1;
 |    3 | c      |
 +------+--------+
 3 rows in set (0.00 sec)
+
 ```
 
 会话 1，开启事务，更新 id=1 的数据：
@@ -67,7 +68,7 @@ mysql> show processlist;
 
 我们可以看到 delete 这个 SQL 的进程在执行中，并没有发现其他有价值的内容，那锁在哪里了。接下来的步骤带你一步步的定位出加锁的 SQL。
 
-**定位锁等待**
+### 定位锁等待
 
 ```sql
 mysql> select * from information_schema.innodb_lock_waits;
@@ -81,7 +82,7 @@ mysql> select * from information_schema.innodb_lock_waits;
 
 结果显示有一个锁等待。
 
-**定位锁**
+### 定位锁
 
 ```sql
 mysql> select * from information_schema.innodb_locks;
@@ -96,7 +97,7 @@ mysql> select * from information_schema.innodb_locks;
 
 结果显示有两个锁相关内容。
 
-**定位事务**
+### 定位事务
 
 ```sql
 mysql> select trx_id,trx_started,trx_requested_lock_id,trx_query,trx_mysql_thread_id from information_schema.innodb_trx;
@@ -134,5 +135,3 @@ mysql> select * from performance_schema.events_statements_current where thread_i
 ```
 
 结果中我们找到了加锁的 update 的 SQL 语句。**总结** 在 MySQL 数据库中出现了锁，不要着急，我们通过这个方法可以快速定位加锁的 SQL，你学会了吗？
-
-```

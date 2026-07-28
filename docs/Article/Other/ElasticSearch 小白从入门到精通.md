@@ -1,6 +1,6 @@
 # ElasticSearch 小白从入门到精通
 
-### 什么是 ElasticSearch
+## 什么是 ElasticSearch
 
 ElasticSearch 简称为 ES，网址为：
 
@@ -8,7 +8,7 @@ ElasticSearch 简称为 ES，网址为：
 
 ES 是一个分布式的开源搜索和分析引擎，适用于文本、数字、地理空间、结构化数据、非结构化数据等数据的搜索。ES 是在 Apache Lucene 的基础上完成开发。由 Elastic 于 2010 年发布。ES 通过其简单的 REST 风格的 API、分布式特性、速度和可扩容闻名世界。是 Elastic Stack 的核心组件。Elastic Stack 是一套用于数据采集、扩充、保存、分析、可视化的开源工具。Elastic Stack 称之为 ELK。目前 ELK 包含一系列丰富的轻量数据采集代理，这些代理被称之为 Beats。
 
-#### ES 的用途
+### ES 的用途
 
 主要有以下的用途：
 
@@ -90,11 +90,11 @@ docker restart es
 
 测试：
 
-![img](../assets/199ad3c0-cee2-11eb-bfdf-b9d6bba95aa3.png)
+![img](../assets/ElasticSearch%20%E5%B0%8F%E7%99%BD%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E7%B2%BE%E9%80%9A-1.png)
 
 查看分词器是否安装上：
 
-![img](../assets/25ebc030-cee2-11eb-ac3e-190fba44d759.png)
+![img](../assets/ElasticSearch%20%E5%B0%8F%E7%99%BD%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E7%B2%BE%E9%80%9A-2.png)
 
 ### ES 查询
 
@@ -564,7 +564,7 @@ curl -X PUT "localhost:9200/my_index/_mapping/my_type?pretty" -H 'Content-Type: 
 
 创建 ES 集群：
 
-![img](../assets/f8f185b0-cee6-11eb-81e7-cb4b73a5fa4f.png)
+![img](../assets/ElasticSearch%20%E5%B0%8F%E7%99%BD%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E7%B2%BE%E9%80%9A-3.png)
 
 连接 ES：
 
@@ -602,7 +602,7 @@ public class JavaEsTest {
 
 测试结果：
 
-![img](../assets/1053b2a0-cee7-11eb-a372-c3e5da0127b2.png)
+![img](../assets/ElasticSearch%20%E5%B0%8F%E7%99%BD%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E7%B2%BE%E9%80%9A-4.png)
 
 ### 总结
 

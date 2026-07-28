@@ -1,6 +1,6 @@
 # MySQL 故障诊断：一个 ALTER TALBE 执行了很久，你慌不慌？
 
-### 先了解下 MySQL 数据字典
+## 先了解下 MySQL 数据字典
 
 当我们对一张大表执行了一个 ALTER TABLE 操作，执行了很久，也不知道是否执行完成，进程在那挂着，此时的你，干瞪眼，进度看不到，进程不敢杀，就问你慌不慌？
 
@@ -34,14 +34,13 @@ performance_schema 这个是什么，是不是用它来让我们解除慌张？
 
 想要使用这个能力，我们需要开启几个功能。
 
-**Enable the stage/innodb/alter% instruments**
+#### 启用 `stage/innodb/alter%` instruments
 
 ```sql
 mysql> UPDATE performance_schema.setup_instruments
-```
-
 ->        SET ENABLED = 'YES'
 ->        WHERE NAME LIKE 'stage/innodb/alter%';
+```
 
 ```plaintext
 Query OK, 0 rows affected (0.01 sec)
@@ -49,34 +48,37 @@ Query OK, 0 rows affected (0.01 sec)
 Rows matched: 7  Changed: 0  Warnings: 0
 ```
 
-**Enable the stage event consumer tables**
+#### 启用 stage event consumer 表
 
 ```sql
 mysql> UPDATE performance_schema.setup_consumers
-```
-
 ->        SET ENABLED = 'YES'
 ->        WHERE NAME ='events_stages_current';
+```
 
-```sql
+```plaintext
 Query OK, 1 row affected (0.00 sec)
 
 Rows matched: 1  Changed: 1  Warnings: 0
-mysql> UPDATE performance_schema.setup_consumers
 ```
 
+```sql
+mysql> UPDATE performance_schema.setup_consumers
 ->        SET ENABLED = 'YES'
 ->        WHERE NAME ='events_stages_history';
+```
 
-```sql
+```plaintext
 Query OK, 1 row affected (0.01 sec)
 
 Rows matched: 1  Changed: 1  Warnings: 0
-mysql> UPDATE performance_schema.setup_consumers
 ```
 
+```sql
+mysql> UPDATE performance_schema.setup_consumers
 ->        SET ENABLED = 'YES'
 ->        WHERE NAME ='events_stages_history_long';
+```
 
 ```plaintext
 Query OK, 1 row affected (0.00 sec)

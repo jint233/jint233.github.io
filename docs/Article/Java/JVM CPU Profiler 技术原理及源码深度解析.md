@@ -11,12 +11,12 @@
 在用 IDEA 打开需要诊断的 Java 项目后，在 "Preferences -> Build, Execution, Deployment -> Java Profiler" 界面添加一个 "CPU Profiler"，然后回到项目，单击右上角的 "Run with Profiler" 启动项目并开始 CPU Profiling 过程。一定时间后（推荐 5min），在 Profiler 界面点击 "Stop Profiling and Show Results"，即可看到 Profiling 的结果，包含火焰图和调用树，如下图所示：
 
 <figure markdown="span">
-  ![img](../assets/80cac68ffeaf0064ca261d5acf285353439115.png)
+  ![img](../assets/JVM%20CPU%20Profiler%20%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E5%8F%8A%E6%BA%90%E7%A0%81%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90-1.png)
   <figcaption>Intellij IDEA - 性能火焰图 </figcaption>
 </figure>
 
 <figure markdown="span">
-  ![img](../assets/d212c393113d821841023d66c50cb8b8710861.png)
+  ![img](../assets/JVM%20CPU%20Profiler%20%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E5%8F%8A%E6%BA%90%E7%A0%81%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90-2.png)
   <figcaption>Intellij IDEA - 调用堆栈树 </figcaption>
 </figure>
 
@@ -297,7 +297,7 @@ flamegraph.pl stacktraces.txt > stacktraces.svg
 效果如下图所示：
 
 <figure markdown="span">
-  ![img](../assets/ae2b3dda630d2de82eb632a6e8d5bee9336049.png)
+  ![img](../assets/JVM%20CPU%20Profiler%20%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86%E5%8F%8A%E6%BA%90%E7%A0%81%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90-3.png)
   <figcaption> 通过 flamegraph.pl 生成的火焰图 </figcaption>
 </figure>
 

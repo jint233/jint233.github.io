@@ -6,7 +6,7 @@
 
 除了这 5 种日志，在需要的时候还会创建 DDL 日志。本文暂先讨论错误日志、一般查询日志、慢查询日志和二进制日志，中继日志和主从复制有关，将在复制的章节中介绍。下一篇文章将介绍 innodb 事务日志，见：[MySQL 的事务日志](https://www.cnblogs.com/f-ck-need-u/p/9010872.html)。
 
-# 1.日志刷新操作
+## 1. 日志刷新操作
 
 以下操作会刷新日志文件，刷新日志文件时会关闭旧的日志文件并重新打开日志文件。对于有些日志类型，如二进制日志，刷新日志会滚动日志文件，而不仅仅是关闭并重新打开。
 
@@ -14,9 +14,10 @@
 mysql> FLUSH LOGS;
 shell> mysqladmin flush-logs
 shell> mysqladmin refresh
+
 ```
 
-# 2.错误日志
+## 2. 错误日志
 
 错误日志是最重要的日志之一，它记录了 MariaDB/MySQL 服务启动和停止正确和错误的信息，还记录了 mysqld 实例运行过程中发生的错误事件信息。
 
@@ -60,13 +61,13 @@ mysql> show variables like 'log_error';
 2017-03-29 01:15:14 2362 [Note] IPv6 is available.
 2017-03-29 01:15:14 2362 [Note]   - '::' resolves to '::';
 2017-03-29 01:15:14 2362 [Note] Server socket created on IP: '::'.
-2017-03-29 01:15:14 2362 [Warning] 'proxies_priv' entry '@ [email protected]' ignored in --skip-name-resolve mode.
+2017-03-29 01:15:14 2362 [Warning] 'proxies_priv' entry '@ root@localhost' ignored in --skip-name-resolve mode.
 2017-03-29 01:15:14 2362 [Note] Event Scheduler: Loaded 0 events
 2017-03-29 01:15:14 2362 [Note] /usr/local/mysql/bin/mysqld: ready for connections.
 Version: '5.6.35'  socket: '/mydata/data/mysql.sock'  port: 3306  MySQL Community Server (GPL)
 ```
 
-# 3.一般查询日志
+## 3. 一般查询日志
 
 查询日志分为一般查询日志和慢查询日志，它们是通过查询是否超出变量 long_query_time 指定时间的值来判定的。在超时时间内完成的查询是一般查询，可以将其记录到一般查询日志中，**但是建议关闭这种日志（默认是关闭的）**，超出时间的查询是慢查询，可以将其记录到慢查询日志中。
 
@@ -125,7 +126,7 @@ Time                Id Command    Argument
 
 由此可知，一般查询日志查询的不止是 select 语句，几乎所有的语句都会记录。
 
-# 4.慢查询日志
+## 4. 慢查询日志
 
 查询超出变量 long_query_time 指定时间值的为慢查询。但是查询获取锁(包括锁等待)的时间不计入查询时间内。
 
@@ -174,13 +175,13 @@ select sleep(10);
 [root@xuexi data] mysqldumpslow --help
 ```
 
-| 选项           | 说明                                                                                                                                                          |
-|--------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `-d`         | Debug 模式：显示内部解析过程，用于调试。                                                                                                                                     |
-| `-v`         | Verbose（详细）模式：显示每条查询的详细统计信息（如总时间、平均时间、锁定时间、返回行数等）。                                                                                                          |
-| `-t NUM`     | Top N 查询：仅显示排序后最“突出”的前 `NUM` 条慢查询（默认按总耗时排序）。                                                                                                                |
+| 选项         | 说明                                                                                                                                                                                                                                  |
+|--------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `-d`         | Debug 模式：显示内部解析过程，用于调试。                                                                                                                                                                                              |
+| `-v`         | Verbose（详细）模式：显示每条查询的详细统计信息（如总时间、平均时间、锁定时间、返回行数等）。                                                                                                                                         |
+| `-t NUM`     | Top N 查询：仅显示排序后最“突出”的前 `NUM` 条慢查询（默认按总耗时排序）。                                                                                                                                                             |
 | `-a`         | 禁用抽象归一化：<br>默认情况下，`mysqldumpslow` 会将 SQL 中的数字统一替换为 `N`，字符串替换为 `'S'`，以便合并相似语句（例如 `WHERE id = 100` 和 `WHERE id = 200` 被视为同一条）。<br>使用 `-a` 后，保留原始数值和字符串，不进行归类。 |
-| `-g PATTERN` | 正则筛选（类似 grep）：<br>仅处理包含匹配 `PATTERN`（Perl 兼容正则表达式）的语句。<br>⚠️ 注意：并非仅用于筛选 `SELECT`，可匹配任意内容，如 `-g 'SELECT'`、`-g 'user_id'`、`-g '^UPDATE'` 等。                    |
+| `-g PATTERN` | 正则筛选（类似 grep）：<br>仅处理包含匹配 `PATTERN`（Perl 兼容正则表达式）的语句。<br>⚠️ 注意：并非仅用于筛选 `SELECT`，可匹配任意内容，如 `-g 'SELECT'`、`-g 'user_id'`、`-g '^UPDATE'` 等。                                         |
 
 该工具归类的时候，默认会将 **同文本但变量值不同的查询语句视为同一类，并使用 N 代替其中的数值变量，使用 S 代替其中的字符串变量**。可以使用-a 来禁用这种替换。如：
 
@@ -234,7 +235,7 @@ Count: 1  Time=10.00s (10s)  Lock=0.00s (0s)  Rows=1.0 (1), root[root]@localhost
 
 慢查询在 SQL 语句调优的时候非常有用，应该将它启用起来，且应该让慢查询阈值尽量小，例如 1 秒甚至低于 1 秒。就像一天执行上千次的 1 秒语句，和一天执行几次的 20 秒语句，显然更值得去优化这个 1 秒的语句。
 
-# 5.二进制日志
+## 5. 二进制日志
 
 ## 5.1 二进制日志文件
 
@@ -248,7 +249,7 @@ Count: 1  Time=10.00s (10s)  Lock=0.00s (0s)  Rows=1.0 (1), root[root]@localhost
 
 MariaDB/MySQL 默认没有启动二进制日志，要启用二进制日志使用 --log-bin=[on|off|file_name] 选项指定，如果没有给定 file_name，则默认为 datadir 下的主机名加"-bin"，并在后面跟上一串数字表示日志序列号，如果给定的日志文件中包含了后缀(logname.suffix)将忽略后缀部分。
 
-![img](../assets/733013-20180507084125816-1681048114.png)
+![img](../assets/MySQL%20%E6%97%A5%E5%BF%97%E8%AF%A6%E8%A7%A3-1.png)
 
 或者在配置文件中的[mysqld]部分设置 log-bin 也可以。注意：对于 mysql 5.7，直接启动 binlog 可能会导致 mysql 服务启动失败，这时需要在配置文件中的 mysqld 为 mysql 实例分配 server_id。
 
@@ -301,10 +302,10 @@ shell> mysqladmin -uroot -p refresh
 下面是每个二进制日志文件的初始信息。可以看到记录了时间和位置信息(at 4)。
 
 ```plaintext
-[[email protected] data]# mysqlbinlog mysql-bin.000001 
+[root@localhost data]# mysqlbinlog mysql-bin.000001
 /*!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=1*/;
 /*!40019 SET @@session.max_insert_delayed_threads=0*/;
-/*!50003 SET @[email protected]@COMPLETION_TYPE,COMPLETION_TYPE=0*/;
+/*!50003 SET @@SESSION.COMPLETION_TYPE=0*/;
 DELIMITER /*!*/;
 # at 4
 #170329  2:18:10 server id 1  end_log_pos 120 CRC32 0x40f62523  Start: binlog v 4, server v 5.6.35-log created 170329  2:18:10 at startup
@@ -318,7 +319,7 @@ AAAAAAAAAAAAAAAAAADiqNpYEzgNAAgAEgAEBAQEEgAAXAAEGggAAAAICAgCAAAACgoKGRkAASMl
 DELIMITER ;
 # End of log file
 ROLLBACK /* added by mysqlbinlog */;
-/*!50003 SET [email protected]_COMPLETION_TYPE*/;
+/*!50003 SET @@SESSION.COMPLETION_TYPE*/;
 /*!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=0*/;
 ```
 
@@ -334,10 +335,10 @@ insert into student values(1,'malongshuai','male'),(2,'gaoxiaofang','female');
 再查看二进制日志信息。
 
 ```sql
-[[email protected] data]# mysqlbinlog mysql-bin.000001 
+[root@localhost data]# mysqlbinlog mysql-bin.000001
 /*!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=1*/;
 /*!40019 SET @@session.max_insert_delayed_threads=0*/;
-/*!50003 SET @[email protected]@COMPLETION_TYPE,COMPLETION_TYPE=0*/;
+/*!50003 SET @@SESSION.COMPLETION_TYPE=0*/;
 DELIMITER /*!*/;
 # at 4
 #170329  2:18:10 server id 1  end_log_pos 120 CRC32 0x40f62523  Start: binlog v 4, server v 5.6.35-log created 170329  2:18:10 at startup
@@ -383,13 +384,13 @@ COMMIT/*!*/;
 DELIMITER ;
 # End of log file
 ROLLBACK /* added by mysqlbinlog */;
-/*!50003 SET [email protected]_COMPLETION_TYPE*/;
+/*!50003 SET @@SESSION.COMPLETION_TYPE*/;
 /*!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=0*/; 
 ```
 
 将上述信息整理为下图：其中 timestamp 记录的是从 1970-01-01 到现在的总秒数时间戳，可以使用 date -d '@1490736093' 转换。
 
-![img](../assets/733013-20180507085958196-1633846460.png)
+![img](../assets/MySQL%20%E6%97%A5%E5%BF%97%E8%AF%A6%E8%A7%A3-2.png)
 
 - 位置 0-120 记录的是二进制日志的一些固定信息。
 - 位置 120-305 记录的是 use 和 create table 语句，语句的记录时间为 5:20:00。但注意，这里的 use 不是执行的 use 语句，而是 MySQL 发现要操作的数据库为 test，而自动进行的操作并记录下来。人为的 use 语句是不会记录的。
@@ -402,20 +403,20 @@ ROLLBACK /* added by mysqlbinlog */;
 使用-r 命令将日志文件导入到指定文件中，使用重定向也可以实现同样的结果。并使用-s 查看简化的日志文件。
 
 ```plaintext
-[[email protected] data]# mysqlbinlog mysql-bin.000001 -r /tmp/binlog.000001
-[[email protected] data]# mysqlbinlog mysql-bin.000001 -s>/tmp/binlog.sample
+[root@localhost data]# mysqlbinlog mysql-bin.000001 -r /tmp/binlog.000001
+[root@localhost data]# mysqlbinlog mysql-bin.000001 -s>/tmp/binlog.sample
 ```
 
 比较这两个文件，看看简化的日志文件简化了哪些东西。
 
-![img](../assets/733013-20180507090446176-118990478.png)
+![img](../assets/MySQL%20%E6%97%A5%E5%BF%97%E8%AF%A6%E8%A7%A3-3.png)
 
 从上图中可以看出，使用-s 后，少了基于行的日志信息，也少了记录的位置和时间信息。
 
 使用-o 可以忽略前 N 个条目，例如上面的操作涉及了 6 个操作。忽略掉前 3 个后的日志显示如下：可以看到直接从位置 441 开始显示了。
 
 ```sql
-[[email protected] data]# mysqlbinlog mysql-bin.000001 -o 3
+[root@localhost data]# mysqlbinlog mysql-bin.000001 -o 3
 ...前面固定部分省略...
 '/*!*/;
 # at 441
@@ -449,7 +450,7 @@ DELIMITER ;
 ```sql
 mysql> use mysql;
 mysql> create table mytest(id int);
-[[email protected] data]# mysqlbinlog mysql-bin.000001 -d mysql
+[root@localhost data]# mysqlbinlog mysql-bin.000001 -d mysql
 ...前固定部分省略...'/*!*/;
 # at 120
 # at 305
@@ -487,7 +488,7 @@ mysqlbinlog 最有用的两个选项就是指定时间和位置来输出日志�
 指定时间时，将输出指定时间范围内的日志。指定的时间可以不和日志中记录的日志相同。
 
 ```sql
-[[email protected] data]# mysqlbinlog mysql-bin.000001 --start-datetime='2017-03-28 00:00:01' --stop-datetime='2017-03-29 05:21:23'
+[root@localhost data]# mysqlbinlog mysql-bin.000001 --start-datetime='2017-03-28 00:00:01' --stop-datetime='2017-03-29 05:21:23'
 ...前面固定部分省略...
 '/*!*/;
 # at 120
@@ -516,12 +517,12 @@ DELIMITER ;
 同理指定位置也一样，但是指定位置时有个要求是如果指定起始位置，则必须指定日志文件中明确的起始位置。例如，日志文件中有位置 120、305、441，可以指定起始和结束位置为 120、500，但是不可以指定起止位置为 150、500，因为日志文件中不存在 150 这个位置。
 
 ```cpp
-[[email protected] data]# mysqlbinlog mysql-bin.000001 --start-position=150 --stop-position=441
+[root@localhost data]# mysqlbinlog mysql-bin.000001 --start-position=150 --stop-position=441
 ...前面固定部分省略...
 '/*!*/;
 ERROR: Error in Log_event::read_log_event(): 'read error', data_len: 4202496, event_type: 0
 ...后面固定部分省略... 
-[[email protected] data]# mysqlbinlog mysql-bin.000001 --start-position=305 --stop-position=500
+[root@localhost data]# mysqlbinlog mysql-bin.000001 --start-position=305 --stop-position=500
 ...前面固定部分省略... 
 '/*!*/;
 # at 305
@@ -554,7 +555,7 @@ DELIMITER ;
 可以通过查看二进制的 index 文件来查看当前正在使用哪些二进制日志。
 
 ```plaintext
-[[email protected] data]# cat mysql-bin.index 
+[root@localhost data]# cat mysql-bin.index
 ./mysql-bin.000003
 ./mysql-bin.000004
 ./mysql-bin.000005
@@ -583,7 +584,7 @@ mysql> show binary logs;
 mysql> show binlog events in 'mysql-bin.000005';
 ```
 
-![img](../assets/733013-20180507091129596-1182363918.png)
+![img](../assets/MySQL%20%E6%97%A5%E5%BF%97%E8%AF%A6%E8%A7%A3-4.png)
 
 可以指定起始位置。同样，起始位置必须指定正确，不能指定不存在的位置。
 
@@ -644,8 +645,9 @@ mysql> show warnings;
 +---------+------+---------------------------------------------------------------------------+
 ```
 
-**3.**  **使用--expire_logs_days=N**  **选项指定过了多少天日志自动过期清空。** 5.4 二进制日志的记录格式
---------------
+**3.**  **使用--expire_logs_days=N**  **选项指定过了多少天日志自动过期清空。**
+
+### 5.4 二进制日志的记录格式
 
 在 MySQL 5.1 之前，MySQL 只有一种基于语句 statement 形式的日志记录格式。即将所有的相关操作记录为 SQL 语句形式。但是这样的记录方式对某些特殊信息无法同步记录，例如 uuid，now()等这样动态变化的值。
 从 MySQL 5.1 开始，MySQL 支持 statement、row、mixed 三种形式的记录方式。row 形式是基于行来记录，也就是将相关行的每一列的值都在日志中保存下来，这样的结果会导致日志文件变得非常大，但是保证了动态值的确定性。还有一种 mixed 形式，表示如何记录日志由 MySQL 自己来决定。
@@ -662,7 +664,7 @@ mysql> insert into student values(7,'xiaowoniu','female',now());
 查看产生的日志。
 
 ```plaintext
-[[email protected] data]# mysqlbinlog mysql-bin.000005
+[root@localhost data]# mysqlbinlog mysql-bin.000005
 ...前面固定部分省略...
 '/*!*/;
 
@@ -709,7 +711,7 @@ DELIMITER ;
 发现是一堆看不懂的东西，使用-vv 可将这些显示出来。可以看出，结果中记录的非常详细，这也是为什么基于 row 记录日志会导致日志文件极速变大。
 
 ```sql
-[[email protected] data]# mysqlbinlog mysql-bin.000005 -vv
+[root@localhost data]# mysqlbinlog mysql-bin.000005 -vv
 ...前面省略...
 BINLOG '
 gPraWBMBAAAAOgAAAAIBAAAAAF4AAAAAAAEABHRlc3QAB3N0dWRlbnQABAMP/hIFHgD3AQAMCf3N
@@ -780,6 +782,4 @@ mysqlbinlog mysql-bin.[\*] | mysql -uroot -p password
 mysqlbinlog mysql-bin.000001 > /tmp/a.sql
 mysqlbinlog mysql-bin.000002 >>/tmp/a.sql
 mysql -u root -p password -e "source /tmp/a.sql"
-```
-
 ```

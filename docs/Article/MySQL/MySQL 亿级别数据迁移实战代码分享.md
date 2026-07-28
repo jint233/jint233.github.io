@@ -1,6 +1,6 @@
 # MySQL 亿级别数据迁移实战代码分享
 
-### x 业务背景
+## x 业务背景
 
 某一项技术的出现是为了解决问题的，我们之所以要学习某个技术，是因为这个技术解决了我们工作中遇到的痛点。上亿条数据在 MySQL 中有索引的条件下，实际上只是查询是没有太大问题的，在没有特别大的并发的情况下，只是插入特别慢。
 
@@ -33,9 +33,9 @@ Spring Batch 的文档很全面，但对于初学者来说，整个文档读完�
 
 #### 架构图
 
-![img](../assets/8bd2ac90-2f8f-11ea-a6f3-07a41d160500.png)
+![img](../assets/MySQL%20%E4%BA%BF%E7%BA%A7%E5%88%AB%E6%95%B0%E6%8D%AE%E8%BF%81%E7%A7%BB%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81%E5%88%86%E4%BA%AB-1.png)
 
-![img](../assets/96a647d0-2f8f-11ea-a6f3-07a41d160500.png)
+![img](../assets/MySQL%20%E4%BA%BF%E7%BA%A7%E5%88%AB%E6%95%B0%E6%8D%AE%E8%BF%81%E7%A7%BB%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81%E5%88%86%E4%BA%AB-2.png)
 
 第一张图是架构图，第二张分区处理图。
 
@@ -69,7 +69,7 @@ Spring Batch 的文档很全面，但对于初学者来说，整个文档读完�
 
 实现步骤：
 
-**1. 新建一个 Spring Boot 工程引入**
+## 1. 新建一个 Spring Boot 工程并引入依赖
 
 ```java
 <dependency>
@@ -99,7 +99,7 @@ spring:
       enabled: false
 ```
 
-**2. 多数据源配置**
+## 2. 多数据源配置
 
 ```java
 package cn.gitchat.share.config;
@@ -171,7 +171,7 @@ protected JobRepository createJobRepository() throws Exception {
 }
 ```
 
-**3. 读取的配置**
+## 3. 读取配置
 
 ```java
 /**
@@ -421,9 +421,9 @@ JobExecution abandon(long var1) throws NoSuchJobExecutionException, JobExecution
 ```
 
 在 Spring Batch 的 Admin 管理系统中主要就是通过这个类来获取任务的执行情况。**9. 总结** 通过上面的演示可以清楚的看到 Spring Batch 的执行逻辑，Spring Batch 定义了模板，我们在使用过程中只需要按照接口提供相应的数据来源和输出的接口即可。其他的事务处理，多线程池，批量处理，内存控制都由框架来完成。那么 Spring Batch 是怎么样保证在大数据量级的情况下，内存不溢出然后又保证性能的呢，下面用一张图进行展示 Spring Batch 是通过怎么的处理，保证在数据量巨大的情况下，高性能的进行数据的读写的。
-![img](../assets/d9d2ef90-2f8f-11ea-b7a2-bd62e8fb625b.png)
+![img](../assets/MySQL%20%E4%BA%BF%E7%BA%A7%E5%88%AB%E6%95%B0%E6%8D%AE%E8%BF%81%E7%A7%BB%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81%E5%88%86%E4%BA%AB-3.png)
 
-#### 其他业务场景的扩展
+### 其他业务场景的扩展
 
 在实际中项目处理中，我们面对的系统情况可能并不是一个单表这样简单的业务情况，比如多表合一、一表分表为多表，在迁移过程中数据变更的情形。那么这些场景该如何处理呢？**1. 多表合一的场景** 在多表合一的场景下，实际上如何两张表有关联，那么附表上一定要建立索引。我们还是会让查询逻辑在主表上，千万不要使用 Join 联查，亿级别的数据如何联查，那么基础系统就要崩溃了。此时我们需要将需要拼装的业务逻辑放在 Processor 里面，比如在我们的案例场景下，需要将 User 的信息冗余到新的一个表中那么只需要将 UserService 注入到 PayRecordExtProcessor 中，然后再通过 `userService.getId (payRecord.getUserId ())` 这种方式去 load 用户信息，用户的 Id 肯定有索引，这样查询性能不会有太多的损耗。这也是现在大厂为啥要求在业务系统开发的过程中尽快不要使用 Join 联查的原因。
 

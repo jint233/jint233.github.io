@@ -6,7 +6,7 @@ Java 中的大部分同步类（Lock、Semaphore、ReentrantLock 等）都是基
 
 下面列出本篇文章的大纲和思路，以便于大家更好地理解：
 
-![img](../assets/9d182d944e0889c304ef529ba50a4fcd205214.png)
+![img](../assets/%E4%BB%8E%20ReentrantLock%20%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%9C%8B%20AQS%20%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E5%BA%94%E7%94%A8-1.png)
 
 ## 1 ReentrantLock
 
@@ -14,7 +14,7 @@ Java 中的大部分同步类（Lock、Semaphore、ReentrantLock 等）都是基
 
 ReentrantLock 意思为可重入锁，指的是一个线程能够对一个临界资源重复加锁。为了帮助大家更好地理解 ReentrantLock 的特性，我们先将 ReentrantLock 跟常用的 Synchronized 进行比较，其特性如下（蓝色部分为本篇文章主要剖析的点）：
 
-![img](../assets/412d294ff5535bbcddc0d979b2a339e6102264.png)
+![img](../assets/%E4%BB%8E%20ReentrantLock%20%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%9C%8B%20AQS%20%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E5%BA%94%E7%94%A8-2.png)
 
 下面通过伪代码，进行更加直观的比较：
 
@@ -109,7 +109,7 @@ static final class FairSync extends Sync {
 
 首先，我们通过下面的架构图来整体了解一下 AQS 框架：
 
-![img](../assets/82077ccf14127a87b77cefd1ccf562d3253591.png)
+![img](../assets/%E4%BB%8E%20ReentrantLock%20%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%9C%8B%20AQS%20%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E5%BA%94%E7%94%A8-3.png)
 
 - 上图中有颜色的为 Method，无颜色的为 Attribution。
 - 总的来说，AQS 框架共分为五层，自上而下由浅入深，从 AQS 对外暴露的 API 到底层基础数据。
@@ -117,7 +117,7 @@ static final class FairSync extends Sync {
 
 下面我们会从整体到细节，从流程到方法逐一剖析 AQS 框架，主要分析过程如下：
 
-![img](../assets/d2f7f7fffdc30d85d17b44266c3ab05323338.png)
+![img](../assets/%E4%BB%8E%20ReentrantLock%20%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%9C%8B%20AQS%20%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E5%BA%94%E7%94%A8-4.png)
 
 ### 2.1 原理概览
 
@@ -127,7 +127,7 @@ CLH：Craig、Landin and Hagersten 队列，是单向链表，AQS 中的队列�
 
 主要原理图如下：
 
-![img](../assets/7132e4cef44c26f62835b197b239147b18062.png)
+![img](../assets/%E4%BB%8E%20ReentrantLock%20%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%9C%8B%20AQS%20%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E5%BA%94%E7%94%A8-5.png)
 
 AQS 使用一个 Volatile 的 int 类型的成员变量来表示同步状态，通过内置的 FIFO 队列来完成资源获取的排队工作，通过 CAS 完成对 State 值的修改。
 
@@ -135,35 +135,35 @@ AQS 使用一个 Volatile 的 int 类型的成员变量来表示同步状态，�
 
 先来看下 AQS 中最基本的数据结构 ——Node，Node 即为上面 CLH 变体队列中的节点。
 
-![img](../assets/960271cf2b5c8a185eed23e98b72c75538637.png)
+![img](../assets/%E4%BB%8E%20ReentrantLock%20%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%9C%8B%20AQS%20%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E5%BA%94%E7%94%A8-6.png)
 
 解释一下几个方法和属性值的含义：
 
-| 方法和属性值      | 含义                                                             |
-|-------------|----------------------------------------------------------------|
-| waitStatus  | 当前节点在队列中的状态                                                    |
-| thread      | 表示处于该节点的线程                                                     |
-| prev        | 前驱指针                                                           |
-| predecessor | 返回前驱节点，没有的话抛出 npe                                              |
-| nextWaiter  | 指向下一个处于 CONDITION 状态的节点（由于本篇文章不讲述 Condition Queue 队列，这个指针不多介绍） |
-| next        | 后继指针                                                           |
+| 方法和属性值 | 含义                                                                                             |
+|--------------|--------------------------------------------------------------------------------------------------|
+| waitStatus   | 当前节点在队列中的状态                                                                           |
+| thread       | 表示处于该节点的线程                                                                             |
+| prev         | 前驱指针                                                                                         |
+| predecessor  | 返回前驱节点，没有的话抛出 npe                                                                   |
+| nextWaiter   | 指向下一个处于 CONDITION 状态的节点（由于本篇文章不讲述 Condition Queue 队列，这个指针不多介绍） |
+| next         | 后继指针                                                                                         |
 
 线程两种锁的模式：
 
-| 模式        | 含义              |
-|-----------|-----------------|
-| SHARED    | 表示线程以共享的模式等待锁   |
+| 模式      | 含义                           |
+|-----------|--------------------------------|
+| SHARED    | 表示线程以共享的模式等待锁     |
 | EXCLUSIVE | 表示线程正在以独占的方式等待锁 |
 
 waitStatus 有下面几个枚举值：
 
-| 枚举        | 含义                              |
-|-----------|---------------------------------|
-| 0         | 当一个 Node 被初始化的时候的默认值            |
-| CANCELLED | 为 1，表示线程获取锁的请求已经取消了             |
-| CONDITION | 为 - 2，表示节点在等待队列中，节点线程等待唤醒       |
+| 枚举      | 含义                                               |
+|-----------|----------------------------------------------------|
+| 0         | 当一个 Node 被初始化的时候的默认值                 |
+| CANCELLED | 为 1，表示线程获取锁的请求已经取消了               |
+| CONDITION | 为 - 2，表示节点在等待队列中，节点线程等待唤醒     |
 | PROPAGATE | 为 - 3，当前线程处在 SHARED 情况下，该字段才会使用 |
-| SIGNAL    | 为 - 1，表示线程已经准备好了，就等资源释放了        |
+| SIGNAL    | 为 - 1，表示线程已经准备好了，就等资源释放了       |
 
 #### 2.1.2 同步状态 State
 
@@ -176,17 +176,17 @@ private volatile int state;
 
 下面提供了几个访问这个字段的方法：
 
-| 方法名                                                                 | 描述                |
-|---------------------------------------------------------------------|-------------------|
-| protected final int getState ()                                     | 获取 State 的值       |
-| protected final void setState (int newState)                        | 设置 State 的值       |
+| 方法名                                                              | 描述                    |
+|---------------------------------------------------------------------|-------------------------|
+| protected final int getState ()                                     | 获取 State 的值         |
+| protected final void setState (int newState)                        | 设置 State 的值         |
 | protected final boolean compareAndSetState (int expect, int update) | 使用 CAS 方式更新 State |
 
 这几个方法都是 Final 修饰的，说明子类中无法重写它们。我们可以通过修改 State 字段表示的同步状态来实现多线程的独占模式和共享模式（加锁过程）。
 
-![img](../assets/27605d483e8935da683a93be015713f331378.png)
+![img](../assets/%E4%BB%8E%20ReentrantLock%20%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%9C%8B%20AQS%20%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E5%BA%94%E7%94%A8-7.png)
 
-![img](../assets/3f1e1a44f5b7d77000ba4f9476189b2e32806.png)
+![img](../assets/%E4%BB%8E%20ReentrantLock%20%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%9C%8B%20AQS%20%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E5%BA%94%E7%94%A8-8.png)
 
 对于我们自定义的同步工具，需要自定义获取同步状态和释放状态的方式，也就是 AQS 架构图中的第一层：API 层。
 
@@ -194,13 +194,13 @@ private volatile int state;
 
 从架构图中可以得知，AQS 提供了大量用于自定义同步器实现的 Protected 方法。自定义同步器实现的相关方法也只是为了通过修改 State 字段来实现多线程的独占模式或者共享模式。自定义同步器需要实现以下方法（ReentrantLock 需要实现的方法如下，并不是全部）：
 
-| 方法名                                          | 描述                                                             |
-|----------------------------------------------|----------------------------------------------------------------|
-| protected boolean isHeldExclusively ()       | 该线程是否正在独占资源。只有用到 Condition 才需要去实现它。                            |
-| protected boolean tryAcquire (int arg)       | 独占方式。arg 为获取锁的次数，尝试获取资源，成功则返回 True，失败则返回 False。                |
-| protected boolean tryRelease (int arg)       | 独占方式。arg 为释放锁的次数，尝试释放资源，成功则返回 True，失败则返回 False。                |
+| 方法名                                       | 描述                                                                                                                   |
+|----------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
+| protected boolean isHeldExclusively ()       | 该线程是否正在独占资源。只有用到 Condition 才需要去实现它。                                                            |
+| protected boolean tryAcquire (int arg)       | 独占方式。arg 为获取锁的次数，尝试获取资源，成功则返回 True，失败则返回 False。                                        |
+| protected boolean tryRelease (int arg)       | 独占方式。arg 为释放锁的次数，尝试释放资源，成功则返回 True，失败则返回 False。                                        |
 | protected int tryAcquireShared (int arg)     | 共享方式。arg 为获取锁的次数，尝试获取资源。负数表示失败；0 表示成功，但没有剩余可用资源；正数表示成功，且有剩余资源。 |
-| protected boolean tryReleaseShared (int arg) | 共享方式。arg 为释放锁的次数，尝试释放资源，如果释放后允许唤醒后续等待结点返回 True，否则返回 False。     |
+| protected boolean tryReleaseShared (int arg) | 共享方式。arg 为释放锁的次数，尝试释放资源，如果释放后允许唤醒后续等待结点返回 True，否则返回 False。                  |
 
 一般来说，自定义同步器要么是独占方式，要么是共享方式，它们也只需实现 tryAcquire-tryRelease、tryAcquireShared-tryReleaseShared 中的一种即可。
 
@@ -208,11 +208,11 @@ AQS 也支持自定义同步器同时实现独占和共享两种方式，如 Ree
 
 以非公平锁为例，这里主要阐述一下非公平锁与 AQS 之间方法的关联之处，具体每一处核心方法的作用会在文章后面详细进行阐述。
 
-![img](../assets/b8b53a70984668bc68653efe9531573e78636.png)
+![img](../assets/%E4%BB%8E%20ReentrantLock%20%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%9C%8B%20AQS%20%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E5%BA%94%E7%94%A8-9.png)
 
 为了帮助大家理解 ReentrantLock 和 AQS 之间方法的交互过程，以非公平锁为例，我们将加锁和解锁的交互流程单独拎出来强调一下，以便于对后续内容的理解。
 
-![img](../assets/7aadb272069d871bdee8bf3a218eed8136919.png)
+![img](../assets/%E4%BB%8E%20ReentrantLock%20%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%9C%8B%20AQS%20%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E5%BA%94%E7%94%A8-10.png)
 
 加锁：
 
@@ -230,7 +230,7 @@ AQS 也支持自定义同步器同时实现独占和共享两种方式，如 Ree
 
 通过上面的描述，大概可以总结出 ReentrantLock 加锁解锁时 API 层核心方法的映射关系。
 
-![img](../assets/f30c631c8ebbf820d3e8fcb6eee3c0ef18748.png)
+![img](../assets/%E4%BB%8E%20ReentrantLock%20%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%9C%8B%20AQS%20%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E5%BA%94%E7%94%A8-11.png)
 
 ## 2.3 通过 ReentrantLock 理解 AQS
 
@@ -356,7 +356,7 @@ private Node enq(final Node node) {
 1. 当没有线程获取到锁时，线程 1 获取锁成功。
 2. 线程 2 申请锁，但是锁被线程 1 占有。
 
-    ![img](../assets/e9e385c3c68f62c67c8d62ab0adb613921117.png)
+    ![img](../assets/%E4%BB%8E%20ReentrantLock%20%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%9C%8B%20AQS%20%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E5%BA%94%E7%94%A8-12.png)
 
 3. 如果再有线程要获取锁，依次在队列中往后排队即可。
 
@@ -500,11 +500,11 @@ private final boolean parkAndCheckInterrupt() {
 
 上述方法的流程图如下：
 
-![img](../assets/c124b76dcbefb9bdc778458064703d1135485.png)
+![img](../assets/%E4%BB%8E%20ReentrantLock%20%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%9C%8B%20AQS%20%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E5%BA%94%E7%94%A8-13.png)
 
 从上图可以看出，跳出当前循环的条件是当 “前置节点是头结点，且当前线程获取锁成功”。为了防止因死循环导致 CPU 资源被浪费，我们会判断前置节点的状态来决定是否要将当前线程挂起，具体挂起流程用流程图表示如下（shouldParkAfterFailedAcquire 流程）：
 
-![img](../assets/9af16e2481ad85f38ca322a225ae737535740.png)
+![img](../assets/%E4%BB%8E%20ReentrantLock%20%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%9C%8B%20AQS%20%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E5%BA%94%E7%94%A8-14.png)
 
 从队列中释放节点的疑虑打消了，那么又有新问题了：
 
@@ -591,15 +591,15 @@ private void cancelAcquire(Node node) {
 
 当前节点是尾节点。
 
-![img](../assets/b845211ced57561c24f79d56194949e822049.png)
+![img](../assets/%E4%BB%8E%20ReentrantLock%20%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%9C%8B%20AQS%20%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E5%BA%94%E7%94%A8-15.png)
 
 当前节点是 Head 的后继节点。
 
-![img](../assets/ab89bfec875846e5028a4f8fead32b7117975.png)
+![img](../assets/%E4%BB%8E%20ReentrantLock%20%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%9C%8B%20AQS%20%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E5%BA%94%E7%94%A8-16.png)
 
 当前节点不是 Head 的后继节点，也不是尾节点。
 
-![img](../assets/45d0d9e4a6897eddadc4397cf53d6cd522452.png)
+![img](../assets/%E4%BB%8E%20ReentrantLock%20%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%9C%8B%20AQS%20%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E5%BA%94%E7%94%A8-17.png)
 
 通过上面的流程，我们对于 CANCELLED 节点状态的产生和变化已经有了大致的了解，但是为什么所有的变化都是对 Next 指针进行了操作，而没有对 Prev 指针进行操作呢？什么情况下会对 Prev 指针进行操作？
 
@@ -880,13 +880,13 @@ private volatile int state;
 
 除了上边 ReentrantLock 的可重入性的应用，AQS 作为并发编程的框架，为很多其他同步工具提供了良好的解决方案。下面列出了 JUC 中的几种同步工具，大体介绍一下 AQS 的应用场景：
 
-| 同步工具                   | 同步工具与 AQS 的关联                                                                           |
-|------------------------|-----------------------------------------------------------------------------------------|
+| 同步工具               | 同步工具与 AQS 的关联                                                                                                                                       |
+|------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | ReentrantLock          | 使用 AQS 保存锁重复持有的次数。当一个线程获取锁时，ReentrantLock 记录当前获得锁的线程标识，用于检测是否重复获取，以及错误线程试图解锁操作时异常情况的处理。 |
-| Semaphore              | 使用 AQS 同步状态来保存信号量的当前计数。tryRelease 会增加计数，acquireShared 会减少计数。                            |
-| CountDownLatch         | 使用 AQS 同步状态来表示计数。计数为 0 时，所有的 Acquire 操作（CountDownLatch 的 await 方法）才可以通过。                |
-| ReentrantReadWriteLock | 使用 AQS 同步状态中的 16 位保存写锁持有的次数，剩下的 16 位用于保存读锁的持有次数。                                        |
-| ThreadPoolExecutor     | Worker 利用 AQS 同步状态实现对独占线程变量的设置（tryAcquire 和 tryRelease）。                                |
+| Semaphore              | 使用 AQS 同步状态来保存信号量的当前计数。tryRelease 会增加计数，acquireShared 会减少计数。                                                                  |
+| CountDownLatch         | 使用 AQS 同步状态来表示计数。计数为 0 时，所有的 Acquire 操作（CountDownLatch 的 await 方法）才可以通过。                                                   |
+| ReentrantReadWriteLock | 使用 AQS 同步状态中的 16 位保存写锁持有的次数，剩下的 16 位用于保存读锁的持有次数。                                                                         |
+| ThreadPoolExecutor     | Worker 利用 AQS 同步状态实现对独占线程变量的设置（tryAcquire 和 tryRelease）。                                                                              |
 
 ### 3.3 自定义同步工具
 

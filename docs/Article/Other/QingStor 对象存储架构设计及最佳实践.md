@@ -18,7 +18,7 @@
 
 ## QingStor®️对象存储核心优势
 
-![0_1591683403636_1.png](../assets/1591683404995-1-resized.png)
+![0_1591683403636_1.png](../assets/QingStor%20%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8F%8A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-1.png)
 
 上面讲的几点是对象存储产品所具备的通用特征，接下来介绍一下青云 QingCloud 自研的存储产品 QingStor®️对象存储独有的核心优势，主要包括三方面：
 
@@ -33,7 +33,7 @@
 
 ## QingStor®️对象存储全局数据模型
 
-![img](../assets/v2-f800ddad5d7dd343c294809254a20210_1440w.jpg)
+![img](../assets/QingStor%20%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8F%8A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-2.jpg)
 
 上图是 QingStor®️对象存储的全局数据模型，可以理解成一个逻辑上的视图。
 
@@ -47,7 +47,7 @@ Zone 由很多个 Bucket（存储桶）组成，在使用对象存储时，必�
 
 ## QingStor®️对象存储架构解析
 
-![img](../assets/v2-ca68985db9450f8f4e428d2955b303db_1440w.jpg)
+![img](../assets/QingStor%20%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8F%8A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-3.jpg)
 
 这是 QingStor®️对象存储的后台系统架构，这个架构图经过了一些简化和抽象。
 
@@ -83,7 +83,7 @@ QingStor®️对象存储是一款存储产品，其核心功能是做数据的�
 
 ## QingStor®️对象存储子系统实现
 
-![img](../assets/v2-99d5670614ad8b17a5fba7da9a61b24a_1440w.jpg)
+![img](../assets/QingStor%20%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8F%8A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-4.jpg)
 
 在接入子系统中最重要是 Gateway 服务，Gateway 服务本质上是在后台运行的 Server，它运行在网关节点上。
 
@@ -105,7 +105,7 @@ Gateway 服务本身是无状态的，也就是请求被哪一个 Gateway 是服
 
 此外，将 Gateway 实现为无状态服务，可以非常方便地进行水平扩展，通过增加 Gateway 服务实例个数来顶住高并发的访问量，保证服务可用。
 
-![img](../assets/v2-e173f7b1beb5d73d4a37e4383b5c43be_1440w.jpg)
+![img](../assets/QingStor%20%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8F%8A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-5.jpg)
 
 接下来谈谈索引子系统的架构，索引子系统的主要功能是存储和管理对象数据的元数据，元数据包括对象的类型、大小、写入时间与存储位置等信息。
 
@@ -137,7 +137,7 @@ QingStor®️对象存储在处理列出存储桶中对象的查询接口时，�
 
 此外，在单个节点上采用 KV 存储引擎提升写入效率，同时支持 list 接口的高效查询。
 
-![img](../assets/v2-e173f7b1beb5d73d4a37e4383b5c43be_720w.jpg)
+![img](../assets/QingStor%20%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8F%8A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-6.jpg)
 
 存储子系统存的是对象数据本身，对象存储应对的是海量场景，数据量非常大，而且会持续增加，访问量也会非常大，而且有增加的可能性，因此架构的设计要保障系统可以不断提升性能。此外，还需要保证数据的安全性和集群的稳定性。
 
@@ -167,7 +167,7 @@ QingStor®️对象存储同时支持另一种扩容方式，将既有数据迁�
 
 QingStor®️对象存储的数据传输采用 RDMA 高效传输协议，RDMA 是一种在不同的节点之间传输数据的机制，它不需要经过 CPU，直接通过硬件控制将数据从一个节点拷贝到另一个节点，和 CPU 的执行是并行的，是一种高效传输数据的方式。
 
-![img](../assets/v2-4d0a2a289709814c7290958b9e3c2fee_720w.jpg)
+![img](../assets/QingStor%20%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8F%8A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-7.jpg)
 
 事件子系统在 QingStor®️对象存储的架构中，不处于数据读写的核心流程上，但它提供了很多非常重要的功能，生命周期管理、跨区域复制以及自定义回调都是基于事件子系统来进行设计的。
 
@@ -179,7 +179,7 @@ QingStor®️对象存储的数据传输采用 RDMA 高效传输协议，RDMA �
 
 ## QingStor®️对象存储海量小文件优化实践
 
-![img](../assets/v2-7879d07e493132234ac2e7622c1cac5b_720w.jpg)
+![img](../assets/QingStor%20%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8F%8A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-8.jpg)
 
 接下来谈谈 QingStor®️对象存储对海量小文件场景的优化。
 
@@ -213,7 +213,7 @@ QingStor®️对象存储的数据传输采用 RDMA 高效传输协议，RDMA �
 
 ## QingStor®️对象存储重点功能介绍
 
-![img](../assets/v2-865d09710c23249fd5657ef0d7438ebf_720w.jpg)
+![img](../assets/QingStor%20%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8F%8A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-9.jpg)
 
 QingStor®️对象存储支持两种部署方式：一种是标准部署，集群由网关节点和存储节点组成。
 
@@ -271,7 +271,7 @@ S3 是亚马逊对象存储服务访问接口的标准，QingStor®️对象存�
 
 QingStor®️对象存储交通行业最佳实践
 
-![img](../assets/v2-debdc9e18afac60dbf40fddfca05ca6f_720w.jpg)
+![img](../assets/QingStor%20%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E5%8F%8A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5-10.jpg)
 
 最后我们从智能交通平台这个场景出发，看看如何在业务中使用 QingStor®️对象存储。智能交通平台的主要应用是高速公路上的视频监控，以及在收费站进行拍照、收费、车牌识别等业务。
 

@@ -17,7 +17,7 @@ latest: Pulling from library/debian
 c5e155d5a1d1: Pull complete 
 Digest: sha256:75f7d0590b45561bfa443abad0b3e0f86e2811b1fc176f786cd30eb078d1846f
 Status: Downloaded newer image for debian:latest
-[email protected]:/# cat /etc/os-release 
+root@container:/# cat /etc/os-release
 PRETTY_NAME="Debian GNU/Linux 9 (stretch)"
 NAME="Debian GNU/Linux"
 VERSION_ID="9"
@@ -26,7 +26,7 @@ ID=debian
 HOME_URL="https://www.debian.org/"
 SUPPORT_URL="https://www.debian.org/support"
 BUG_REPORT_URL="https://bugs.debian.org/"
-[email protected]:/# 
+root@container:/#
 ```
 
 看终端的日志，首先会查找本地是否有 `debian` 的镜像，如果没有则从镜像仓库（若不指定，默认是 docker.io）pull；pull 镜像成功后，再以此镜像来启动容器。
@@ -340,7 +340,7 @@ Run 'docker image COMMAND --help' for more information on a command.
 
 ```shell
 / # docker run --rm -it debian
-[email protected]:/# toilet
+root@container:/# toilet
 bash: toilet: command not found
 ```
 
@@ -349,7 +349,7 @@ bash: toilet: command not found
 看上面的输入，当前的 PATH 中并没有该命令。我们使用 `apt` 进行安装。
 
 ```shell
-[email protected]:/# apt update
+root@container:/# apt update
 Get:1 http://security-cdn.debian.org/debian-security stretch/updates InRelease [94.3 kB]
 Ign:2 http://cdn-fastly.deb.debian.org/debian stretch InRelease
 Get:5 http://security-cdn.debian.org/debian-security stretch/updates/main amd64 Packages [489 kB]
@@ -363,7 +363,7 @@ Reading package lists... Done
 Building dependency tree
 Reading state information... Done
 All packages are up to date.
-[email protected]:/# apt install toilet -y
+root@container:/# apt install toilet -y
 Reading package lists... Done
 Building dependency tree
 Reading state information... Done
@@ -387,13 +387,13 @@ Processing triggers for libc-bin (2.24-11+deb9u4) ...
 可以看到，安装已经完成，我们在终端下输入 `toilet docker` 来查看下效果：
 
 ```shell
-[email protected]:/# toilet docker
+root@container:/# toilet docker
      #                #                   
   mmm#   mmm    mmm   #   m   mmm    m mm 
  #" "#  #" "#  #"  "  # m"   #"  #   #"  "
  #   #  #   #  #      #"#    #""""   #    
  "#m##  "#m#"  "#mm"  #  "m  "#mm"   #    
-[email protected]:/#
+root@container:/#
 ```
 
 该命令已经安装完成，并工作良好。现在我们使用当前容器来创建一个包含 `toilet` 命令的 Docker 镜像。
@@ -418,7 +418,7 @@ debian              latest              8d31923452f8        5 days ago          
 
 ```shell
 / # docker run --rm -it local/debian:toilet 
-[email protected]:/# toilet debian
+root@container:/# toilet debian
      #         #        "                 
   mmm#   mmm   #mmm   mmm     mmm   m mm  
  #" "#  #"  #  #" "#    #    "   #  #"  # 
@@ -485,7 +485,7 @@ local/debian        toilet                    9ca72f9dcedb        26 minutes ago
 
 ```shell
 /toilet # docker run --rm -it local/debian:toilet-using-dockerfile
-[email protected]:/# toilet debian
+root@container:/# toilet debian
      #         #        "                 
   mmm#   mmm   #mmm   mmm     mmm   m mm  
  #" "#  #"  #  #" "#    #    "   #  #"  # 
@@ -592,11 +592,11 @@ CMD [ "java", "-jar", "/app/gs-spring-boot-0.1.0.jar" ]
 我们先来看下是否使用此选项的区别，我启动一个 `debian` 的容器进行测试：
 
 ```shell
-[email protected]:/# apt install  --no-install-recommends openjdk-8-jdk | grep 'additional disk space will be used'
+root@container:/# apt install  --no-install-recommends openjdk-8-jdk | grep 'additional disk space will be used'
 ...
 After this operation, 344 MB of additional disk space will be used.
 ^C
-[email protected]:/# apt install openjdk-8-jdk | grep 'additional disk space will be used'
+root@container:/# apt install openjdk-8-jdk | grep 'additional disk space will be used'
 ...
 After this operation, 548 MB of additional disk space will be used.
 ^C
@@ -630,11 +630,11 @@ local/spring-boot   2                   178dacdaf015        9 hours ago         
 
 ```shell
 (MoeLove) ➜  docker run --rm -it debian
-[email protected]:/# apt -qq  update 
+root@container:/# apt -qq  update
 All packages are up to date.
-[email protected]:/# du -sh /var/lib/apt/lists/
+root@container:/# du -sh /var/lib/apt/lists/
 16M     /var/lib/apt/lists/
-[email protected]:/# 
+root@container:/#
 ```
 
 可以看到有 16M 左右的大小，我们修改 `Dockerfile` 增加删除操作：

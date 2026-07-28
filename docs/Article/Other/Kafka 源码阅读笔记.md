@@ -2,7 +2,9 @@
 
 作者：guolonglin，腾讯 IEG 后台开发工程师
 
-### **一、Kafka 总览** 1）kafka 集群是由 broker 组成，每个 borker 拥有一个 controller，基于 zookeeper 做集群 controller leader 选举，以及存储集群核心元数据，leader controller 负责管理整个集群
+## 一、Kafka 总览
+
+Kafka 集群由 broker 组成；每个 broker 都拥有一个 controller，基于 ZooKeeper 进行 controller leader 选举并存储集群核心元数据。leader controller 负责管理整个集群。
 
 2）以 Topic->partition-> replication 来存储生产者数据，每个 partition 为一个 Log，log 分段存储于文件中；
 
@@ -10,17 +12,17 @@
 
 4）Kafka Broker 结构。
 
-![img](../assets/v2-a176b3a0f9a6653e6676d7e2e7bfad9f_1440w.jpg)
+![img](../assets/Kafka%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-1.jpg)
 
 ### **二、Broker 结构** 1）
 
-![img](../assets/v2-08b4addcaa904492f0e1cff65842c626_1440w.jpg)
+![img](../assets/Kafka%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-2.jpg)
 
 2）每个 borker 进程，都包含各个管理器，如 socketServer 网络处理，replicaManager 副本管理器，kafkaController 集群管理器，groupCoordinator 消息者数据管理器，LogManager 日志数据管理器，kafkaScheduler 定时器，zkClient 与 zookeeper 通信管理器，transactionCoordinator 事务协调器。
 
 ### **三、通信框架** 1）
 
-![img](../assets/v2-58f8d2e60d96853b5f6ba8f89b922c22_1440w.jpg)
+![img](../assets/Kafka%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-3.jpg)
 
 2）socketserver 会启动一个 acceptor 线程，用于接收和创建新 socket，并轮询安排给 processor thread 来处理后续的数据 io；
 
@@ -30,7 +32,7 @@
 
 5）
 
-![img](../assets/v2-8a7a1f6e0d753f085d29aee32fd064a0_1440w.jpg)
+![img](../assets/Kafka%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-4.jpg)
 
 6）处理完请求后，封装成 reponse，根据 ProcessorID 放入对应的 responseQueue 由对应的 processor 线程完成回复。
 
@@ -38,7 +40,7 @@
 
 2）
 
-![img](../assets/v2-3979c9a7498aa531fe932a4dce9fbb48_1440w.jpg)
+![img](../assets/Kafka%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-5.jpg)
 
 3）每个 topic 由很多个 partition 组成，由 key hash 值分配到不同的 partition，每个 partition 拥有多个副本 replica 做主从，确保数据的安全性。
 
@@ -46,17 +48,17 @@
 
 5）
 
-![img](../assets/v2-f9e2b01e4ff0b55f547f3b5b0ddadb0d_1440w.jpg)
+![img](../assets/Kafka%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-6.jpg)
 
 6）
 
-![img](../assets/v2-33a0c3ae8e0a9e725176b12dfbed4d66_1440w.jpg)
+![img](../assets/Kafka%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-7.jpg)
 
 7）当在 Log 中需要查找获取一条消息时，会根据偏移首先定位到处于哪个 logsegment 文件，再根据索引文件定位，Logsegment 是由跳跃表组成的，便于搜索，再从数据文件读取消息；
 
 8）
 
-![img](../assets/v2-9bc88e7c281de6235e8b03171e77f049_1440w.jpg)
+![img](../assets/Kafka%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-8.jpg)
 
 9）索引文件由 K,V 组成，K 是相对文件中第几条消息，V 是文件中的绝对位置，索引文件可以用来做二分查找，从索引文件中找到位置之后，再从数据文件中顺序查找，具体那条消息数据，为了避免索引文件太大，会相隔一定字节才写入一条索引；
 
@@ -68,13 +70,13 @@
 
 3）当 controller 成为 leader 时，会向 zookeeper 注册相关监听； 4）
 
-![img](../assets/v2-a09c9461c5effeb3ac70b7d085f2c853_1440w.jpg)
+![img](../assets/Kafka%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-9.jpg)
 
 5）这些监听集群数据状态的变化，如 增加 topic partition replica 等，当监听到数据发生变化，leaderController 就会得到通知并处理，处理完成后会同步相关数据给其它 followerController；
 
 6）controller 是以单工作线程形式运行的，其它请求通过封装为 job 投递到 controller 处理线程； 7）
 
-![img](../assets/v2-e8f2365ccfdc87144c540d73f7678ada_1440w.jpg)
+![img](../assets/Kafka%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-10.jpg)
 
 8）borker 上下线、副本增加重分配、topic 增加等，通过 zookeeper 通知并创建 job 投入 job 队列等待工作线程处理；
 
@@ -94,7 +96,7 @@
 
 ### **七、groupCoordinator 消费数据管理** 1）
 
-![img](../assets/v2-145845fc2b00c44fa8fe3f68f818f9d2_1440w.jpg)
+![img](../assets/Kafka%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-11.jpg)
 
 2）GroupCoordinator 提供访问消费者数据的接口，GroupMetadataManager 负责管理消费者组的数据，GroupMetadata 保存消费者组的数据，MemberMetadata 保存组里每个成员的数据；
 

@@ -4,7 +4,7 @@ innodb 事务日志包括 redo log 和 undo log。redo log 是重做日志，提
 
 undo log 不是 redo log 的逆向过程，其实它们都算是用来恢复的日志： **1.redo log 通常是物理日志，记录的是数据页的物理修改，而不是某一行或某几行修改成怎样怎样，它用来恢复提交后的物理数据页(恢复数据页，且只能恢复到最后一次提交的位置)。**  **2.undo 用来回滚行记录到某个版本。undo log 一般是逻辑日志，根据每行记录进行记录。**
 
-# 1.redo log
+## 1. redo log
 
 ## 1.1 redo log 和二进制日志的区别
 
@@ -28,7 +28,7 @@ redo log 包括两部分：一是内存中的日志缓冲(redo log buffer)，该
 
 也就是说，从 redo log buffer 写日志到磁盘的 redo log file 中，过程如下：
 
-![img](../assets/733013-20180508101949424-938931340.png)
+![img](../assets/MySQL%20%E4%BA%8B%E5%8A%A1%E6%97%A5%E5%BF%97%28redolog%20%E5%92%8C%20undolog%29-1.png)
 
 > 在此处需要注意一点，一般所说的 log file 并不是磁盘上的物理日志文件，而是操作系统缓存中的 log file，官方手册上的意思也是如此(例如：With a value of 2, the contents of the **InnoDB log buffer are written to the log file** after each transaction commit and **the log file is flushed to disk approximately once per second** )。但说实话，这不太好理解，既然都称为 file 了，应该已经属于物理文件了。所以在本文后续内容中都以 os buffer 或者 file system buffer 来表示官方手册中所说的 Log file，然后 log file 则表示磁盘上的物理日志文件，即 log file on disk。
 >
@@ -40,7 +40,7 @@ MySQL 支持用户自定义在 commit 时如何将 log buffer 中的日志刷 lo
 - 当设置为 0 的时候，事务提交时不会将 log buffer 中日志写入到 os buffer，而是每秒写入 os buffer 并调用 fsync()写入到 log file on disk 中。也就是说设置为 0 时是(大约)每秒刷新写入到磁盘中的，当系统崩溃，会丢失 1 秒钟的数据。
 - 当设置为 2 的时候，每次提交都仅写入到 os buffer，然后是每秒调用 fsync()将 os buffer 中的日志写入到 log file on disk。
 
-![img](../assets/733013-20180508104623183-690986409.png)
+![img](../assets/MySQL%20%E4%BA%8B%E5%8A%A1%E6%97%A5%E5%BF%97%28redolog%20%E5%92%8C%20undolog%29-2.png)
 
 注意，有一个变量 innodb_flush_log_at_timeout 的值为 1 秒，该变量表示的是刷日志的频率，很多人误以为是控制 innodb_flush_log_at_trx_commit 值为 0 和 2 时的 1 秒频率，实际上并非如此。测试时将频率设置为 5 和设置为 1，当 innodb_flush_log_at_trx_commit 设置为 0 和 2 的时候性能基本都是不变的。关于这个频率是控制什么的，在后面的"刷日志到磁盘的规则"中会说。
 
@@ -104,7 +104,7 @@ Query OK, 0 rows affected (2.10 sec)
 
 最后可以发现，其实值为 2 和 0 的时候，它们的差距并不太大，但 2 却比 0 要安全的多。它们都是每秒从 os buffer 刷到磁盘，它们之间的时间差体现在 log buffer 刷到 os buffer 上。因为将 log buffer 中的日志刷新到 os buffer 只是内存数据的转移，并没有太大的开销，所以每次提交和每秒刷入差距并不大。可以测试插入更多的数据来比较，以下是插入 100W 行数据的情况。从结果可见，值为 2 和 0 的时候差距并不大，但值为 1 的性能却差太多。
 
-![img](../assets/733013-20180508105836098-1767966445.png)
+![img](../assets/MySQL%20%E4%BA%8B%E5%8A%A1%E6%97%A5%E5%BF%97%28redolog%20%E5%92%8C%20undolog%29-3.png)
 
 尽管设置为 0 和 2 可以大幅度提升插入性能，但是在故障的时候可能会丢失 1 秒钟数据，这 1 秒钟很可能有大量的数据，从上面的测试结果看，100W 条记录也只消耗了 20 多秒，1 秒钟大约有 4W-5W 条数据，尽管上述插入的数据简单，但却说明了数据丢失的大量性。**更好的插入数据的做法是将值设置为** 1 **，然后修改存储过程，将每次循环都提交修改为只提交一次**，**这样既能保证数据的一致性，也能提升性能，修改如下：
 
@@ -140,7 +140,7 @@ innodb 存储引擎中，redo log 以块为单位进行存储的，每个块占 
 
 每个 redo log block 由 3 部分组成： **日志块头、日志块尾和日志主体**。其中日志块头占用 12 字节，日志块尾占用 8 字节，所以每个 redo log block 的日志主体部分只有 512-12-8=492 字节。
 
-![img](../assets/733013-20180508182701906-2079813573.png)
+![img](../assets/MySQL%20%E4%BA%8B%E5%8A%A1%E6%97%A5%E5%BF%97%28redolog%20%E5%92%8C%20undolog%29-4.png)
 
 因为 redo log 记录的是数据页的变化，当一个数据页产生的变化需要使用超过 492 字节()的 redo log 来记录，那么就会使用多个 redo log block 来记录该数据页的变化。
 
@@ -157,7 +157,7 @@ innodb 存储引擎中，redo log 以块为单位进行存储的，每个块占 
 
 上面所说的是一个日志块的内容，在 redo log buffer 或者 redo log file on disk 中，由很多 log block 组成。如下图：
 
-![img](../assets/733013-20180508182756285-1761418702.png)
+![img](../assets/MySQL%20%E4%BA%8B%E5%8A%A1%E6%97%A5%E5%BF%97%28redolog%20%E5%92%8C%20undolog%29-5.png)
 
 ## 1.4 log group 和 redo log file
 
@@ -174,7 +174,7 @@ mysql> show global variables like "innodb_log%";
 | innodb_log_files_in_group   | 2        |
 | innodb_log_group_home_dir   | ./       |
 +-----------------------------+----------+
-[[email protected] data]# ll /mydata/data/ib*
+[root@localhost data]# ll /mydata/data/ib*
 -rw-rw---- 1 mysql mysql 79691776 Mar 30 23:12 /mydata/data/ibdata1
 -rw-rw---- 1 mysql mysql 50331648 Mar 30 23:12 /mydata/data/ib_logfile0
 -rw-rw---- 1 mysql mysql 50331648 Mar 30 23:12 /mydata/data/ib_logfile1
@@ -188,7 +188,7 @@ mysql> show global variables like "innodb_log%";
 
 在每个组的第一个 redo log file 中，前 2KB 记录 4 个特定的部分，从 2KB 之后才开始记录 log block。除了第一个 redo log file 中会记录，log group 中的其他 log file 不会记录这 2KB，但是却会腾出这 2KB 的空间。如下：
 
-![img](../assets/733013-20180508183757511-1174307952.png)
+![img](../assets/MySQL%20%E4%BA%8B%E5%8A%A1%E6%97%A5%E5%BF%97%28redolog%20%E5%92%8C%20undolog%29-6.png)
 
 redo log file 的大小对 innodb 的性能影响非常大，设置的太大，恢复的时候就会时间较长，设置的太小，就会导致在写 redo log 的时候循环切换 redo log file。
 
@@ -205,7 +205,7 @@ redo log file 的大小对 innodb 的性能影响非常大，设置的太大，�
 
 如下图，分别是 insert 和 delete 大致的记录方式。
 
-![img](../assets/733013-20180508184303598-1449455496.png)
+![img](../assets/MySQL%20%E4%BA%8B%E5%8A%A1%E6%97%A5%E5%BF%97%28redolog%20%E5%92%8C%20undolog%29-7.png)
 
 ## 1.6 日志刷盘的规则
 
@@ -287,7 +287,7 @@ innodb 从执行修改语句开始：
 
 详细说明如下图：
 
-![img](../assets/733013-20190321200630187-1720258576.png)
+![img](../assets/MySQL%20%E4%BA%8B%E5%8A%A1%E6%97%A5%E5%BF%97%28redolog%20%E5%92%8C%20undolog%29-8.png)
 
 上图中，从上到下的横线分别代表：时间轴、buffer 中数据页中记录的 LSN(data_in_buffer_lsn)、磁盘中数据页中记录的 LSN(data_page_on_disk_lsn)、buffer 中重做日志记录的 LSN(redo_log_in_buffer_lsn)、磁盘中重做日志文件中记录的 LSN(redo_log_on_disk_lsn)以及检查点记录的 LSN(checkpoint_lsn)。
 
@@ -353,7 +353,7 @@ log sequence number = log flushed up to > pages flushed up to = last checkpoint 
 - innodb_log_group_home_dir =./：# 事务日志组路径，当前目录表示数据目录
 - innodb_mirrored_log_groups =1：# 指定事务日志组的镜像组个数，但镜像功能好像是强制关闭的，所以只有一个 log group。在 MySQL5.7 中该变量已经移除。
 
-# 2.undo log
+## 2. undo log
 
 ## 2.1 基本概念
 
@@ -372,7 +372,7 @@ innodb 存储引擎对 undo 的管理采用段的方式。**rollback segment** �
 undo log 默认存放在共享表空间中。
 
 ```plaintext
-[[email protected] data]# ll /mydata/data/ib*
+[root@localhost data]# ll /mydata/data/ib*
 -rw-rw---- 1 mysql mysql 79691776 Mar 31 01:42 /mydata/data/ibdata1
 -rw-rw---- 1 mysql mysql 50331648 Mar 31 01:42 /mydata/data/ib_logfile0
 -rw-rw---- 1 mysql mysql 50331648 Mar 31 01:42 /mydata/data/ib_logfile1
@@ -419,7 +419,7 @@ undo 相关的变量在 MySQL5.6 中已经变得很少。如下：它们的意�
   - 如果不是主键列，在 undo log 中直接反向记录是如何 update 的。即 update 是直接进行的。
   - 如果是主键列，update 分两部执行：先删除该行，再插入一行目标行。
 
-# 3.binlog 和事务日志的先后顺序及 group commit
+## 3. binlog 和事务日志的先后顺序及 group commit
 
 提醒：建议看看下面的评论。
 
@@ -437,7 +437,7 @@ undo 相关的变量在 MySQL5.6 中已经变得很少。如下：它们的意�
 
 MySQL5.6 中分为 3 个步骤： **flush 阶段、sync 阶段、commit 阶段。**
 
-![img](../assets/733013-20180508203426454-427168291.png)
+![img](../assets/MySQL%20%E4%BA%8B%E5%8A%A1%E6%97%A5%E5%BF%97%28redolog%20%E5%92%8C%20undolog%29-9.png)
 
 - flush 阶段：向内存中写入每个事务的二进制日志。
 - sync 阶段：将内存中的二进制日志刷盘。若队列中有多个事务，那么仅一次 fsync 操作就完成了二进制日志的刷盘操作。这在 MySQL5.6 中称为 BLGC(binary log group commit)。

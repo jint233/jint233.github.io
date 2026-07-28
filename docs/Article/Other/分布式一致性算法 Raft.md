@@ -22,7 +22,7 @@ Raft 将共识问题分解三个子问题：
 
 这里先介绍一下日志同步的概念：服务器接收客户的数据更新/删除请求，这些请求会落地为命令日志。只要输入状态机的日志命令相同，状态机的执行结果就相同。所以 Raft 的核心就是 leader 发出日志同步请求，follower 接收并同步日志，最终保证整个集群的日志一致性。
 
-![img](../assets/v2-02b6004fd2b7886d10ccd611b6d66d6c_1440w.jpg)
+![img](../assets/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B8%80%E8%87%B4%E6%80%A7%E7%AE%97%E6%B3%95%20Raft-1.jpg)
 
 ## 2.1 Leader Election 领导选举
 
@@ -49,13 +49,13 @@ Raft 将共识问题分解三个子问题：
 
     具体的节点状态转换参考下图：
 
-    ![img](../assets/v2-537082d871c75e59f6b7556b48cee932_1440w.jpg)
+    ![img](../assets/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B8%80%E8%87%B4%E6%80%A7%E7%AE%97%E6%B3%95%20Raft-2.jpg)
 
     Raft 算法把时间轴划分为不同任期 Term。每个任期 Term 都有自己的编号 TermId，该编号全局唯一且单调递增。如下图，每个任务的开始都 **Leader Election 领导选举**。如果选举成功，则进入维持任务 Term 阶段，此时 leader 负责接收客户端请求并，负责复制日志。Leader 和所有 follower 都保持通信，如果 follower 发现通信超时，TermId 递增并发起新的选举。如果选举成功，则进入新的任期。如果选举失败，TermId 递增，然后重新发起选举直到成功。
 
     举个例子，参考下图，Term N 选举成功，Term N+1 和 Term N+2 选举失败，Term N+3 重新选举成功。
 
-    ![img](../assets/v2-4b0b8661f85d76f662d742ba5b2abcb9_1440w.jpg)
+    ![img](../assets/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B8%80%E8%87%B4%E6%80%A7%E7%AE%97%E6%B3%95%20Raft-3.jpg)
 
     具体的说，Leader 在任期内会周期性向其他 follower 节点发送心跳来维持地位。follower 如果发现心跳超时，就认为 leader 节点宕机或不存在。随机等待一定时间后，follower 会发起选举，变成 candidate，然后去竞选 leader。选举结果有三种情况：
 
@@ -104,7 +104,7 @@ follower 收到日志复制请求的处理流程：
 
 举个例子，最上面表示日志索引，这个是保证唯一性。每个方块代表指定任期内的数据操作，目前来看，LogIndex 1-4 的日志已经完成同步，LogIndex 5 的正在同步，LogIndex6 还未开始同步。Raft 日志提交的过程有点类似两阶段原子提交协议 2PC，不过和 2PC 的最大区别是，Raft 要求超过一般节点同意即可 commited，2PC 要求所有节点同意才能 commited。
 
-![img](../assets/v2-2f3ad84935c439bf16b0018351162173_1440w.jpg)
+![img](../assets/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B8%80%E8%87%B4%E6%80%A7%E7%AE%97%E6%B3%95%20Raft-4.jpg)
 
 **日志不一致问题** ：在正常情况下，leader 和 follower 的日志复制能够保证整个集群的一致性，但是遇到 leader 崩溃的时候，leader 和 follower 日志可能出现了不一致的状态，此时 follower 相比 leader 缺少部分日志。
 
@@ -156,7 +156,7 @@ Raft 规定：只 **有拥有最新提交日志的 follower 节点才有资格�
 
 下面举个例子来解释为什么需要这个原则，如下图，假如集群中 follower4 在 LogIndex3 故障宕机，经过一段时间间，任期 Term3 的 leader 接收并提交了很多日志（LogIndex1-5 已经提交，LogIndex6 正在复制中）。然后 follower4 恢复正常，在没有和 leader 完成同步日志的情况下，如果 leader 突然宕机，此时开始领导选举。再假设在 Term4 follower4 当选 leader。根据日志复制的规则，其他 follower 强制复制 leader 的日志，那么已经提交却没完成同步的日志将会被强制覆盖掉，这回导致已提交日志被覆盖。
 
-![img](../assets/v2-b82a1fbff057248ef6f203113b28a41b_1440w.jpg)
+![img](../assets/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B8%80%E8%87%B4%E6%80%A7%E7%AE%97%E6%B3%95%20Raft-5.jpg)
 
 ## 2.3.5 State Machine Safety 状态机安全性：确保当前任期日志提交
 
@@ -174,7 +174,7 @@ Raft 规定：只 **有拥有最新提交日志的 follower 节点才有资格�
 
 下面举个例子来解释为什么需要这个原则，如下图：
 
-![img](../assets/v2-7d59b070a40226665fdfec7aad4135c7_1440w.jpg)
+![img](../assets/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B8%80%E8%87%B4%E6%80%A7%E7%AE%97%E6%B3%95%20Raft-6.jpg)
 
 1. 任期 Term2：
 

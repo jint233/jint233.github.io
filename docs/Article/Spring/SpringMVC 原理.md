@@ -6,7 +6,7 @@
 
 在看源码之前我们先看下 Spring MVC 在 Spring 中的架构依赖，它不是一个单独的项目，它有依赖的爸爸 spring-web 项目，也有两个兄弟 spring-webflux 和 spring-websocket 项目，本文只讲 Spring MVC，Spring Webflux 和 Spring WebSocket 日后会更新 Chat。
 
-![img](../assets/423ba560-3227-11ea-b8e0-e5f2366b7ae1.jpg)
+![img](../assets/SpringMVC%20%E5%8E%9F%E7%90%86-1.jpg)
 
 ## 一、上下文在 Web 容器中的启动
 
@@ -48,7 +48,7 @@
 ### 1.2 IOC 容器启动的基本过程
 
 先看下 ContextLoaderListener 的类图：
-![img](../assets/4b2e3250-322c-11ea-9a23-3953d44b4f10.jpg)
+![img](../assets/SpringMVC%20%E5%8E%9F%E7%90%86-2.jpg)
 
 org.springframework.web.context.ContextLoaderListener，实现 ServletContextListener 接口，继承 ContextLoader 类，实现 Servlet 容器启动和关闭时，分别初始化和销毁 WebApplicationContext 容器。(注意，这个 ContextLoaderListener 类，是在 spring-web 项目中。)
 ContextLoaderListener 初始化 Root WebApplicationContext 的入口在 ContextLoaderListener#contextInitialized() 方法中，代码如下：
@@ -143,9 +143,9 @@ public WebApplicationContext initWebApplicationContext(ServletContext servletCon
 
 - <4> 处，如果 context 是 ConfigurableWebApplicationContext 的子类，如果未刷新，则进行配置和刷新。
 
-  - <4.1> 处，如果未刷新（激活）。默认情况下，是符合这个条件的，所以会往下执行。
+- <4.1> 处，如果未刷新（激活）。默认情况下，是符合这个条件的，所以会往下执行。
 
-  - <4.2> 处，无父容器，则进行加载和设置。默认情况下，ContextLoader#loadParentContext(ServletContext servletContext) 方法，返回 null。代码如下：
+- <4.2> 处，无父容器，则进行加载和设置。默认情况下，ContextLoader#loadParentContext(ServletContext servletContext) 方法，返回 null。代码如下：
 
     ```java
     // ContextLoader.java
@@ -157,7 +157,7 @@ public WebApplicationContext initWebApplicationContext(ServletContext servletCon
 
 这是一个让子类实现的方法。当然，子类 ContextLoaderListener 并没有重写该方法。所以，实际上，\<4.2> 处的逻辑，可以暂时忽略。
 
-  - <4.3> 处，调用 `#configureAndRefreshWebApplicationContext(ConfigurableWebApplicationContext wac, ServletContext sc)` 方法，配置 ConfigurableWebApplicationContext 对象，并进行刷新。
+- <4.3> 处，调用 `#configureAndRefreshWebApplicationContext(ConfigurableWebApplicationContext wac, ServletContext sc)` 方法，配置 ConfigurableWebApplicationContext 对象，并进行刷新。
 
 - <5> 处，记录 context 在 ServletContext 中。这样，如果 web.xml 如果定义了多个 ContextLoader，就会在 \<1> 处报错。
 
@@ -294,6 +294,7 @@ public WebApplicationContext initWebApplicationContext(ServletContext servletCon
   </context-param>
 
 ```
+
   <4> 处，调用 #customizeContext(ServletContext sc, ConfigurableWebApplicationContext wac) 方法，执行自定义初始化 wac。 【关键】\<5> 处， 刷新 wac，执行初始化。此处，就会进行一些的 Spring 容器的初始化。
 
 ## 二、DispatcherServlet 的启动和初始化
@@ -319,8 +320,7 @@ public WebApplicationContext initWebApplicationContext(ServletContext servletCon
 
 即， Servlet WebApplicationContext 容器的初始化，是在 DispatcherServlet 初始化的过程中执行。
 DispatcherServlet 的类图如下：
-![img](../assets/584a3d50-3234-11ea-b8e0-e5f2366b7ae1.jpg)
-
+![img](../assets/SpringMVC%20%E5%8E%9F%E7%90%86-3.jpg)
 
 - HttpServletBean，负责将 ServletConfig 设置到当前 Servlet 对象中。
 
@@ -467,7 +467,6 @@ protected void initServletBean() throws ServletException {
 ```
 
 ### 2.2 FrameworkServlet
-```
 
 org.springframework.web.servlet.FrameworkServlet，实现 ApplicationContextAware 接口，继承 HttpServletBean 抽象类，负责初始化 Spring Servlet WebApplicationContext 容器。同时，FrameworkServlet 自身也是一个抽象类。
 跟进到 FrameworkServlet#initServletBean() 方法，进一步初始化当前 Servlet 对象。实际上，重心在初始化 Servlet WebApplicationContext 容器。代码如下：
@@ -727,7 +726,6 @@ protected void initStrategies(ApplicationContext context) {
 
 一共有 9 个组件。下面，我们对这 9 个组件，做一个简单的介绍。
 
-
 #### 2.3.1 MultipartResolver
 
 org.springframework.web.multipart.MultipartResolver，内容类型（Content-Type）为 multipart/\* 的请求的解析器接口。
@@ -936,7 +934,7 @@ public interface FlashMapManager {
 ## 三、MVC 是怎么处理 HTTP 分发请求的
 
 一个用户的请求，是如何被 DispatcherServlet 处理的。如下图所示：
-![img](../assets/2480b4f0-323d-11ea-924d-0fd6db928ace.jpg)
+![img](../assets/SpringMVC%20%E5%8E%9F%E7%90%86-4.jpg)
 摘自《Spring MVC 原理探秘——一个请求的旅行过程》
 整体流程实际不复杂，但是涉及的全部代码会非常多，所以下面重点在于解析整体的流程。
 
@@ -1597,7 +1595,6 @@ protected View resolveViewName(String viewName, @Nullable Map<String, Object> mo
 ## 总结
 
 Spring MVC 的初始化及请求分发处理请求的流程总结：
-
 
 - ContextLoaderListener 监听 Servlet 容器（tomcat、jetty、jboss 等）的启动事件，调用 `ContextLoaderListener #contextInitialized(ServletContextEvent event)` 方法，初始化 Root WebApplicationContext 容器。
 
