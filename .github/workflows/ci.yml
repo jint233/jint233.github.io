@@ -1,24 +1,63 @@
-name: ci 
+name: Build and deploy documentation
+
 on:
   push:
     branches:
       - main
+
 permissions:
   contents: write
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - uses: actions/setup-python@v5
         with:
           python-version: 3.x
-      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV 
-      - uses: actions/cache@v4
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - id: changes
+        name: Detect affected modules
+        shell: bash
+        run: |
+          base_ref='${{ github.event.before }}'
+          if [[ "$base_ref" =~ ^0+$ ]] || ! git cat-file -e "$base_ref^{commit}" 2>/dev/null; then
+            modules=all
+          else
+            modules="$(./scripts/changed-modules.sh "$base_ref" HEAD)"
+          fi
+          echo "modules=$modules" >> "$GITHUB_OUTPUT"
+
+      - name: Install dependencies
+        if: steps.changes.outputs.modules != 'none'
+        run: pip install --no-cache-dir -r requirements.txt
+
+      - name: Restore published modules
+        if: steps.changes.outputs.modules != 'none' && steps.changes.outputs.modules != 'all'
+        shell: bash
+        run: |
+          mkdir -p site
+          git fetch origin gh-pages --depth=1
+          git archive origin/gh-pages | tar -x -C site
+
+      - name: Build affected modules
+        if: steps.changes.outputs.modules != 'none'
+        run: ./scripts/build-modules.sh '${{ steps.changes.outputs.modules }}'
+
+      - name: Deploy to GitHub Pages
+        if: steps.changes.outputs.modules != 'none'
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          key: mkdocs-material-${{ env.cache_id }}
-          path: .cache
-          restore-keys: |
-            mkdocs-material-
-      - run: pip install mkdocs-material==9.5.5 mkdocs-glightbox
-      - run: mkdocs gh-deploy --force
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./site
