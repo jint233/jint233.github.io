@@ -33,9 +33,9 @@ Spring Batch 的文档很全面，但对于初学者来说，整个文档读完�
 
 #### 架构图
 
-![img](../assets/MySQL%20%E4%BA%BF%E7%BA%A7%E5%88%AB%E6%95%B0%E6%8D%AE%E8%BF%81%E7%A7%BB%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81%E5%88%86%E4%BA%AB-1.png)
+![img](../assets/MySQL 亿级别数据迁移实战代码分享-1.png)
 
-![img](../assets/MySQL%20%E4%BA%BF%E7%BA%A7%E5%88%AB%E6%95%B0%E6%8D%AE%E8%BF%81%E7%A7%BB%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81%E5%88%86%E4%BA%AB-2.png)
+![img](../assets/MySQL 亿级别数据迁移实战代码分享-2.png)
 
 第一张图是架构图，第二张分区处理图。
 
@@ -420,7 +420,7 @@ JobExecution abandon(long var1) throws NoSuchJobExecutionException, JobExecution
 ```
 
 在 Spring Batch 的 Admin 管理系统中主要就是通过这个类来获取任务的执行情况。**9. 总结** 通过上面的演示可以清楚的看到 Spring Batch 的执行逻辑，Spring Batch 定义了模板，我们在使用过程中只需要按照接口提供相应的数据来源和输出的接口即可。其他的事务处理，多线程池，批量处理，内存控制都由框架来完成。那么 Spring Batch 是怎么样保证在大数据量级的情况下，内存不溢出然后又保证性能的呢，下面用一张图进行展示 Spring Batch 是通过怎么的处理，保证在数据量巨大的情况下，高性能的进行数据的读写的。
-![img](../assets/MySQL%20%E4%BA%BF%E7%BA%A7%E5%88%AB%E6%95%B0%E6%8D%AE%E8%BF%81%E7%A7%BB%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81%E5%88%86%E4%BA%AB-3.png)
+![img](../assets/MySQL 亿级别数据迁移实战代码分享-3.png)
 
 ### 其他业务场景的扩展
 

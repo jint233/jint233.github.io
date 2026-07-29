@@ -26,7 +26,7 @@ SPI 的大概流程是：
 
 一个 SPI 的典型案例就是 JDBC 的驱动，Java JDBC 定义接口规范（java.sql.Driver），各个数据库厂商（MySQL/Oracle/MS SQLServer 等）去完成具体的实现，然后通过 SPI 配置文件引入具体的实现类，如下图：
 
-![jdbc spi](../assets/SpringBoot%20%E6%95%99%E7%A8%8B%EF%BC%9A%E5%A6%82%E4%BD%95%E5%BC%80%E5%8F%91%E4%B8%80%E4%B8%AA%20starter-1.jpg)
+![jdbc spi](../assets/SpringBoot 教程：如何开发一个 starter-1.jpg)
 
 ## Java SPI 机制示例
 
@@ -37,7 +37,7 @@ SPI 的大概流程是：
 - 创建 SPI 的配置文件，实现类路径写入配置文件中
 - 通过 Java SPI 机制调用
 
-![java spi 例子](../assets/SpringBoot%20%E6%95%99%E7%A8%8B%EF%BC%9A%E5%A6%82%E4%BD%95%E5%BC%80%E5%8F%91%E4%B8%80%E4%B8%AA%20starter-2.jpg)
+![java spi 例子](../assets/SpringBoot 教程：如何开发一个 starter-2.jpg)
 
 ## Spring Boot SPI 机制底层实现
 

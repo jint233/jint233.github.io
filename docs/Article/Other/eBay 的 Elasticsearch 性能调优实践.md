@@ -77,7 +77,7 @@ Pronto 团队为每种类型的机器和每个支持的 Elasticsearch 版本运�
 
 - **使用批量请求。** - **使用多线程发送请求。** - **增加刷新时间间隔。** 每次刷新事件发生时，Elasticsearch 都会创建一个新的 Lucene 段，并在稍后进行合并。增加刷新时间间隔将降低创建和合并的开销。请注意，文档只有在刷新后才能搜索到。
 
-![img](../assets/eBay%20%E7%9A%84%20Elasticsearch%20%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98%E5%AE%9E%E8%B7%B5-1.png)
+![img](../assets/eBay 的 Elasticsearch 性能调优实践-1.png)
 
 性能和刷新时间间隔之间的关系
 
@@ -85,7 +85,7 @@ Pronto 团队为每种类型的机器和每个支持的 Elasticsearch 版本运�
 
 `Index/_stats?filter_path= indices. **.refresh,indices.**.segments,indices. **.merges`-**减少副本数量。**对于每个索引请求，Elasticsearch 需要将文档写入主分片和所有副本分片。显然，副本过多会减慢索引速度，但另一方面，这将提高搜索性能。我们将在本文后面讨论这个问题。
 
-![img](../assets/eBay%20%E7%9A%84%20Elasticsearch%20%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98%E5%AE%9E%E8%B7%B5-2.png)
+![img](../assets/eBay 的 Elasticsearch 性能调优实践-2.png)
 性能和副本数之间的关系
 
 从上图可以看出，随着副本数增加，吞吐量下降，响应时间增加。
@@ -98,13 +98,13 @@ Pronto 团队为每种类型的机器和每个支持的 Elasticsearch 版本运�
 
 - **尽可能使用过滤器上下文（Filter）替代查询上下文（Query）。** 查询子句用于回答“这个文档与此子句相匹配的程度”，而过滤器子句用于回答“这个文档是否匹配这个子句”，Elasticsearch 只需要回答“是”或“否”，不需要为过滤器子句计算相关性分数，而且过滤器结果可以缓存。有关详细信息，请参阅[查询和过滤上下文](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html)。
 
-![img](../assets/eBay%20%E7%9A%84%20Elasticsearch%20%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98%E5%AE%9E%E8%B7%B5-3.png)
+![img](../assets/eBay 的 Elasticsearch 性能调优实践-3.png)
 查询和过滤器性能比较
 
 - **增加刷新时间间隔。** 正如我们在[索引性能调优](https://www.ebayinc.com/stories/blogs/tech/elasticsearch-performance-tuning-practice-at-ebay/#tune_indexing_performance)中所提到的，Elasticsearch 每次刷新时都会创建一个新的段。增加刷新时间间隔将有助于减少段数并降低搜索的 IO 成本。并且，一旦发生刷新并且数据改变，缓存将会失效。增加刷新时间间隔可以使 Elasticsearch 更高效地利用缓存。
 - **增加副本数。** Elasticsearch 可以在主分片或副本分片上执行搜索。副本越多，搜索可用的节点就越多。
 
-![img](../assets/eBay%20%E7%9A%84%20Elasticsearch%20%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98%E5%AE%9E%E8%B7%B5-4.png)
+![img](../assets/eBay 的 Elasticsearch 性能调优实践-4.png)
 搜索性能和副本数之间的关系
 
 从上图可以看出，搜索吞吐量几乎与副本数量成线性关系。注意在这个测试中，测试集群有足够的数据节点来确保每个分片都有一个专有节点。如果这个条件不能满足，搜索吞吐量就不会这么好。
@@ -117,7 +117,7 @@ Pronto 团队为每种类型的机器和每个支持的 Elasticsearch 版本运�
 
 我们测试了一个拥有 1 亿个文档，大约 150GB 的索引。我们使用了 100 个线程发送搜索请求。
 
-![img](../assets/eBay%20%E7%9A%84%20Elasticsearch%20%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98%E5%AE%9E%E8%B7%B5-5.png)
+![img](../assets/eBay 的 Elasticsearch 性能调优实践-5.png)
 搜索性能和分片数量之间的关系
 
 从上图可以看出，最优的分片数量为 11 个。开始时搜索吞吐量增大（响应时间减少），但随着分片数量的增加，搜索吞吐量减小（响应时间增加）。
@@ -228,10 +228,10 @@ Pronto 团队建立了基于 [Gatling](https://gatling.io/) 的在线性能分�
 
 用户可以查看每个测试的 Gatling 报告，并查看 Kibana 预定义的可视化图像，以便进一步分析和比较，如下所示。
 
-![img](../assets/eBay%20%E7%9A%84%20Elasticsearch%20%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98%E5%AE%9E%E8%B7%B5-6.png)
+![img](../assets/eBay 的 Elasticsearch 性能调优实践-6.png)
 Gatling 报告
 
-![img](../assets/eBay%20%E7%9A%84%20Elasticsearch%20%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98%E5%AE%9E%E8%B7%B5-7.png)
+![img](../assets/eBay 的 Elasticsearch 性能调优实践-7.png)
 Gatling 报告
 
 ## 总结

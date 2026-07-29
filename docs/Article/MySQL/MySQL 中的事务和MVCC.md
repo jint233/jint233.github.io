@@ -48,7 +48,7 @@ CREATE TABLE `student` (
 
 #### 脏写
 
-![image.png](../assets/MySQL%20%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1%E5%92%8CMVCC-1.png)
+![image.png](../assets/MySQL 中的事务和MVCC-1.png)
 如图所示：
 
 1. sessionA 和 sessionB 开启了一个事务；
@@ -61,7 +61,7 @@ CREATE TABLE `student` (
 
 #### 脏读
 
-![image.png](../assets/MySQL%20%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1%E5%92%8CMVCC-2.png)
+![image.png](../assets/MySQL 中的事务和MVCC-2.png)
 如图所示：
 
 1. sessionA 和 sessionB 开启了一个事务；
@@ -70,7 +70,7 @@ CREATE TABLE `student` (
 
 #### 不可重复读
 
-![image.png](../assets/MySQL%20%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1%E5%92%8CMVCC-3.png)
+![image.png](../assets/MySQL 中的事务和MVCC-3.png)
 如图所示：
 
 1. sessionA 和 sessionB 开启了一个事务；
@@ -80,7 +80,7 @@ CREATE TABLE `student` (
 
 #### 幻读
 
-![image.png](../assets/MySQL%20%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1%E5%92%8CMVCC-4.png)
+![image.png](../assets/MySQL 中的事务和MVCC-4.png)
 如图所示：
 
 1. sessionA 和 sessionB 开启了一个事务；
@@ -117,18 +117,18 @@ MVCC，全称是 Mutil-Version Concurrency Control，翻译成中文是多版本
 - transaction_id 必须，事务 Id，代表这一行数据是由哪个事务 id 创建的。
 - roll_pointer 必须，回滚指针，指向这行数据的上一个版本。
 
-如下图所示： ![image.png](../assets/MySQL%20%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1%E5%92%8CMVCC-5.png)
+如下图所示： ![image.png](../assets/MySQL 中的事务和MVCC-5.png)
 
 在这里需要着重说明下事务 id，当我们开启一个事务，并不会马上获得事务 id，哪怕我们在事务中执行 select 语句，也是没有事务 id 的（事务 id 为 0），只有执行 insert/update/delete 语句才能获得事务 id，这一点尤为重要。
 
 其中和 MVCC 紧密相关的是 transaction_id 和 roll_pointer 两个字段，在开发过程中，我们无需关心，但是要研究 MVCC，我们必须关心。
 
-如果有类似这样的一行数据： ![image.png](../assets/MySQL%20%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1%E5%92%8CMVCC-6.png)
+如果有类似这样的一行数据： ![image.png](../assets/MySQL 中的事务和MVCC-6.png)
 代表这行数据是由 transaction_id 为 9 的事务创建出来的，roll_pointer 是空的，因为这是一条新纪录。
 
 _实际上，roll_pointer 并不是空的，如果真要解释，需要绕一大圈，理解成空的，问题也不大。_
 
-当我们开启事务，对这条数据进行修改，会变成这样： ![image.png](../assets/MySQL%20%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1%E5%92%8CMVCC-7.png)
+当我们开启事务，对这条数据进行修改，会变成这样： ![image.png](../assets/MySQL 中的事务和MVCC-7.png)
 
 有点感觉了吧，这就像一个单向链表，称之为“版本链”，最上面的数据是这个数据的最新版本，roll_pointer 指向这个数据的旧版本，给人的感觉就是一行数据有多个版本，是不是符合“多版本并发控制”中的“多版本”这个概念， 那么“并发控制”又是怎么做到的呢，别急，继续往下看。
 
@@ -158,7 +158,7 @@ _实际上，roll_pointer 并不是空的，如果真要解释，需要绕一大
 
 看完上面的描述，是不是觉得“云里雾里”，“不知所云”，甚至“脑阔疼，整个人都不好了”。
 
-我们换个方法来解释，看会不会更容易理解点： ![image.png](../assets/MySQL%20%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1%E5%92%8CMVCC-8.png)
+我们换个方法来解释，看会不会更容易理解点： ![image.png](../assets/MySQL 中的事务和MVCC-8.png)
 在事务启动的一瞬间（执行 CURD 操作），会创建出 ReadView，对于一个数据版本的 trx_id 来说，有以下三种情况：
 
 - 如果落在低水位，表示生成这个版本的事务已经提交了，或者是当前事务自己生成的，这个版本可见。
@@ -169,7 +169,7 @@ _实际上，roll_pointer 并不是空的，如果真要解释，需要绕一大
 
 #### READ COMMITTED——每次读取数据都会创建 ReadView
 
-假设，现在系统只有一个活跃的事务 T，事务 id 是 100，事务中修改了数据，但是还没有提交，形成的版本链是这样的： ![image.png](../assets/MySQL%20%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1%E5%92%8CMVCC-9.png)
+假设，现在系统只有一个活跃的事务 T，事务 id 是 100，事务中修改了数据，但是还没有提交，形成的版本链是这样的： ![image.png](../assets/MySQL 中的事务和MVCC-9.png)
 
 现在 A 事务启动，并且执行了 select 语句，此时会创建出一个 ReadView，m_ids 是【100】，min_trx_id 是 100， max_trx_id 是 101，creator_trx_id 是 0。
 

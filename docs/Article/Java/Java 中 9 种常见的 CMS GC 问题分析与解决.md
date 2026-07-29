@@ -18,7 +18,7 @@
 
 想要系统性地掌握 GC 问题处理，笔者这里给出一个学习路径，整体文章的框架也是按照这个结构展开，主要分四大步。
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-1.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-1.jpg)
 
 - **建立知识体系：** 从 JVM 的内存结构到垃圾收集的算法和收集器，学习 GC 的基础知识，掌握一些常用的 GC 问题分析工具。
 - **确定评价指标：** 了解基本 GC 的评价方法，摸清如何设定独立系统的指标，以及在业务场景中判断 GC 是否存在问题的手段。
@@ -47,7 +47,7 @@
 
 从 JCP（Java Community Process）的官网中可以看到，目前 Java 版本最新已经到了 Java 16，未来的 Java 17 以及现在的 Java 11 和 Java 8 是 LTS 版本，JVM 规范也在随着迭代在变更，由于本文主要讨论 CMS，此处还是放 Java 8 的内存结构。
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-2.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-2.jpg)
 
 GC 主要工作在 Heap 区和 MetaSpace 区（上图蓝色部分），在 Direct Memory 中，如果使用的是 DirectByteBuffer，那么在分配内存不够时则是 GC 通过 `Cleaner#clean` 间接管理。
 
@@ -82,11 +82,11 @@ Java 中对象地址操作主要使用 Unsafe 调用了 C 的 allocate 和 free 
 
 三种算法在是否移动对象、空间和时间方面的一些对比，假设存活对象数量为 _L_、堆空间大小为 _H_，则：
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-3.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-3.jpg)
 
 把 mark、sweep、compaction、copying 这几种动作的耗时放在一起看，大致有这样的关系：
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-4.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-4.jpg)
 
 虽然 compaction 与 copying 都涉及移动对象，但取决于具体算法，compaction 可能要先计算一次对象的目标地址，然后修正指针，最后再移动对象。copying 则可以把这几件事情合为一体来做，所以可以快一些。另外，还需要留意 GC 带来的开销不能只看 Collector 的耗时，还得看 Allocator 。如果能保证内存没碎片，分配就可以用 pointer bumping 方式，只需要挪一个指针就完成了分配，非常快。而如果内存有碎片就得用 freelist 之类的方式管理，分配速度通常会慢一些。
 
@@ -94,7 +94,7 @@ Java 中对象地址操作主要使用 Unsafe 调用了 C 的 allocate 和 free 
 
 目前在 Hotspot VM 中主要有分代收集和分区收集两大类，具体可以看下面的这个图，不过未来会逐渐向分区收集发展。在美团内部，有部分业务尝试用了 ZGC（感兴趣的同学可以学习下这篇文章《[新一代垃圾回收器 ZGC 的探索与实践](https://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651752559&idx=1&sn=c720b67e93db1885d72dab8799bba78c&chksm=bd1251228a65d834db610deb2ce55003e0fc1f90793e84873096db19027936f6add301242545&scene=21#wechat_redirect)》），其余基本都停留在 CMS 和 G1 上。另外在 JDK11 后提供了一个不执行任何垃圾回收动作的回收器 Epsilon（A No-Op Garbage Collector）用作性能分析。另外一个就是 Azul 的 Zing JVM，其 C4（Concurrent Continuously Compacting Collector）收集器也在业内有一定的影响力。
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-5.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-5.jpg)
 
 备注：值得一提的是，早些年国内 GC 技术的布道者 RednaxelaFX （江湖人称 R 大）也曾就职于 Azul，本文的一部分材料也参考了他的一些文章。
 
@@ -109,13 +109,13 @@ Java 中对象地址操作主要使用 Unsafe 调用了 C 的 allocate 和 free 
 - **ZGC：** JDK11 中推出的一款低延迟垃圾回收器，适用于大内存低延迟服务的内存管理和回收，SPECjbb 2015 基准测试，在 128G 的大堆下，最大停顿时间才 1.68 ms，停顿时间远胜于 G1 和 CMS。
 - **Shenandoah：** 由 Red Hat 的一个团队负责开发，与 G1 类似，基于 Region 设计的垃圾收集器，但不需要 Remember Set 或者 Card Table 来记录跨 Region 引用，停顿时间和堆的大小没有任何关系。停顿时间与 ZGC 接近，下图为与 CMS 和 G1 等收集器的 benchmark。
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-6.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-6.jpg)
 
 #### 常用收集器
 
 目前使用最多的是 CMS 和 G1 收集器，二者都有分代的概念，主要内存结构如下：
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-7.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-7.jpg)
 
 #### 其他收集器
 
@@ -154,7 +154,7 @@ Java 中对象地址操作主要使用 Unsafe 调用了 C 的 allocate 和 free 
 
 目前各大互联网公司的系统基本都更追求低延时，避免一次 GC 停顿的时间过长对用户体验造成损失，衡量指标需要结合一下应用服务的 SLA，主要如下两点来判断：
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-8.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-8.jpg)
 
 简而言之，即为 **一次停顿的时间不超过应用服务的 TP9999，GC 的吞吐量不小于 99.99%**。举个例子，假设某个服务 A 的 TP9999 为 80 ms，平均 GC 停顿为 30 ms，那么该服务的最大停顿时间最好不要超过 80 ms，GC 频次控制在 5 min 以上一次。如果满足不了，那就需要调优或者通过更多资源来进行并联冗余。（大家可以先停下来，看看监控平台上面的 gc.meantime 分钟级别指标，如果超过了 6 ms 那单机 GC 吞吐量就达不到 4 个 9 了。）
 
@@ -164,7 +164,7 @@ Java 中对象地址操作主要使用 Unsafe 调用了 C 的 allocate 和 free 
 
 拿到 GC 日志，我们就可以简单分析 GC 情况了，通过一些工具，我们可以比较直观地看到 Cause 的分布情况，如下图就是使用 gceasy 绘制的图表：
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-9.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-9.jpg)
 
 如上图所示，我们很清晰的就能知道是什么原因引起的 GC，以及每次的时间花费情况，但是要分析 GC 的问题，先要读懂 GC Cause，即 JVM 什么样的条件下选择进行 GC 操作，具体 Cause 的分类可以看一下 Hotspot 源码：src/share/vm/gc/shared/gcCause.hpp 和 src/share/vm/gc/shared/gcCause.cpp 中。
 
@@ -344,7 +344,7 @@ Mutator 的类型根据对象存活时间比例图来看主要分为两种，在
 
 当然，除了二者之外还有介于两者之间的场景，本篇文章主要讨论第一种情况。对象 Survival Time 分布图，对我们设置 GC 参数有着非常重要的指导意义，如下图就可以简单推算分代的边界。
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-10.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-10.jpg)
 
 #### GC 问题分类
 
@@ -386,7 +386,7 @@ Mutator 的类型根据对象存活时间比例图来看主要分为两种，在
 
 服务 **刚刚启动时 GC 次数较多**，最大空间剩余很多但是依然发生 GC，这种情况我们可以通过观察 GC 日志或者通过监控工具来观察堆的空间变化情况即可。GC Cause 一般为 Allocation Failure，且在 GC 日志中会观察到经历一次 GC ，堆内各个空间的大小会被调整，如下图所示：
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-11.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-11.jpg)
 
 #### (2) 原因
 
@@ -436,7 +436,7 @@ HeapWord* GenCollectedHeap::expand_heap_and_allocate(size_t size, bool   is_tlab
 
 整个伸缩的模型理解可以看这个图，当 committed 的空间大小超过了低水位 / 高水位的大小，capacity 也会随之调整：
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-12.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-12.jpg)
 
 #### (3) 策略
 
@@ -720,7 +720,7 @@ void MetaspaceGC::compute_new_size() {
 jcmd <PID> GC.class_stats|awk '{print$13}'|sed  's/\(.*\)\.\(.*\)/\1/g'|sort |uniq -c|sort -nrk1
 ```
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-13.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-13.jpg)
 
 如果无法从整体的角度定位，可以添加 `-XX:+TraceClassLoading` 和 `-XX:+TraceClassUnLoading` 参数观察详细的类加载和卸载信息。
 
@@ -740,7 +740,7 @@ jcmd <PID> GC.class_stats|awk '{print$13}'|sed  's/\(.*\)\.\(.*\)/\1/g'|sort |un
 
 **Full GC 比较频繁**，且经历过一次 GC 之后 Old 区的 **变化比例非常大**。比如说 Old 区触发的回收阈值是 80%，经历过一次 GC 之后下降到了 10%，这就说明 Old 区的 70% 的对象存活时间其实很短，如下图所示，Old 区大小每次 GC 后从 2.1G 回收到 300M，也就是说回收掉了 1.8G 的垃圾，只有 **300M 的活跃对象**。整个 Heap 目前是 4G，活跃对象只占了不到十分之一。
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-14.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-14.jpg)
 
 过早晋升的危害：
 
@@ -822,9 +822,9 @@ uint ageTable::compute_tenuring_threshold(size_t survivor_capacity) {
 
 拿笔者的一次典型过早晋升优化来看，原配置为 Young 1.2G + Old 2.8G，通过观察 CMS GC 的情况找到存活对象大概为 300~400M，于是调整 Old 1.5G 左右，剩下 2.5G 分给 Young 区。仅仅调了一个 Young 区大小参数（`-Xmn`），整个 JVM 一分钟 Young GC 从 26 次降低到了 11 次，单次时间也没有增加，总的 GC 时间从 1100ms 降低到了 500ms，CMS GC 次数也从 40 分钟左右一次降低到了 7 小时 30 分钟一次。
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-15.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-15.jpg)
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-16.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-16.jpg)
 
 如果是分配速率过大：
 
@@ -841,9 +841,9 @@ uint ageTable::compute_tenuring_threshold(size_t survivor_capacity) {
 
 关于在调整 Young 与 Old 的比例时，如何选取具体的 NewRatio 值，这里将问题抽象成为一个蓄水池模型，找到以下关键衡量指标，大家可以根据自己场景进行推算。
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-17.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-17.jpg)
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-18.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-18.jpg)
 
 - NewRatio 的值 r 与 va、vp、vyc、voc、rs 等值存在一定函数相关性（rs 越小 r 越大、r 越小 vp 越小，…，之前尝试使用 NN 来辅助建模，但目前还没有完全算出具体的公式，有想法的同学可以在评论区给出你的答案 ）。
 - 总停顿时间 T 为 Young GC 总时间 Tyc 和 Old GC 总时间 Toc 之和，其中 Tyc 与 vyc 和 vp 相关，Toc 与 voc 相关。
@@ -1008,7 +1008,7 @@ bool CMSCollector::shouldConcurrentCollect() {
 
 处理这种常规内存泄漏问题基本是一个思路，主要步骤如下：
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-19.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-19.jpg)
 
 Dump Diff 和 Leak Suspects 比较直观就不介绍了，这里说下其它几个关键点：
 
@@ -1016,7 +1016,7 @@ Dump Diff 和 Leak Suspects 比较直观就不介绍了，这里说下其它几�
 - **分析 Top Component：** 要记得按照对象、类、类加载器、包等多个维度观察 Histogram，同时使用 outgoing 和 incoming 分析关联的对象，另外就是 Soft Reference 和 Weak Reference、Finalizer 等也要看一下。
 - **分析 Unreachable：** 重点看一下这个，关注下 Shallow 和 Retained 的大小。如下图所示，笔者之前一次 GC 优化，就根据 Unreachable Objects 发现了 Hystrix 的滑动窗口问题。
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-20.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-20.jpg)
 
 #### (4) 小结
 
@@ -1030,7 +1030,7 @@ Dump Diff 和 Leak Suspects 比较直观就不介绍了，这里说下其它几�
 
 CMS GC 单次 STW 最大超过 1000ms，不会频繁发生，如下图所示最长达到了 8000ms。某些场景下会引起 “雪崩效应”，这种场景非常危险，我们应该尽量避免出现
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-21.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-21.jpg)
 
 #### (2) 原因
 
@@ -1157,7 +1157,7 @@ void CMSParInitialMarkTask::work(uint worker_id) {
 }
 ```
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-22.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-22.jpg)
 
 整个过程比较简单，从 GC Root 出发标记 Old 中的对象，处理完成后借助 BitMap 处理下 Young 区对 Old 区的引用，整个过程基本都比较快，很少会有较大的停顿。
 
@@ -1246,7 +1246,7 @@ void CMSCollector::checkpointRootsFinalWork() {
 }
 ```
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-23.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-23.jpg)
 
 Final Remark 是最终的第二次标记，这种情况只有在 Background GC 执行了 InitialMarking 步骤的情形下才会执行，如果是 Foreground GC 执行的 InitialMarking 步骤则不需要再次执行 FinalRemark。Final Remark 的开始阶段与 Init Mark 处理的流程相同，但是后续多了 Card Table 遍历、Reference 实例的清理并将其加入到 Reference 维护的 pend_list 中，如果要收集元数据信息，还要清理 SystemDictionary、CodeCache、SymbolTable、StringTable 等组件中不再使用的资源。
 
@@ -1380,15 +1380,15 @@ Netty 中是：OutOfDirectMemoryError: failed to allocate capacity byte (s) of d
 
 gperftools 是 Google 开发的一款非常实用的工具集，它的原理是在 Java 应用程序运行时，当调用 malloc 时换用它的 libtcmalloc.so，这样就能对内存分配情况做一些统计。我们使用 gperftools 来追踪分配内存的命令。如下图所示，通过 gperftools 发现 Java_java_util_zip_Inflater_init 比较可疑。
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-24.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-24.jpg)
 
 接下来可以使用 Btrace，尝试定位具体的调用栈。Btrace 是 Sun 推出的一款 Java 追踪、监控工具，可以在不停机的情况下对线上的 Java 程序进行监控。如下图所示，通过 Btrace 定位出项目中的 ZipHelper 在频繁调用 GZIPInputStream ，在堆外内存分配对象。
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-25.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-25.jpg)
 
 最终定位到是，项目中对 GIPInputStream 的使用错误，没有正确的 close ()。
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-26.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-26.jpg)
 
 除了项目本身的原因，还可能有外部依赖导致的泄漏，如 Netty 和 Spring Boot，详细情况可以学习下这两篇文章：《[疑案追踪：Spring Boot 内存泄露排查记](https://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651750037&idx=2&sn=847fb15d4413354355c33a46a7bccf55&chksm=bd12a7d88a652ecea5789073973abb9545e76a8972c843968a6efd1fb3a918ef07eed8abb37e&scene=21#wechat_redirect)》、《[Netty 堆外内存泄露排查盛宴](https://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651749037&idx=2&sn=d1d6b0348eea5cd80e2c7a56c8a61fa9&chksm=bd12a3e08a652af684fd8d96e81fc0e0fded69dd847051e6b0f791f3726da0415c9552ee2615&scene=21#wechat_redirect)》。
 
@@ -1396,7 +1396,7 @@ gperftools 是 Google 开发的一款非常实用的工具集，它的原理是�
 
 首先可以使用 NMT + jcmd 分析泄漏的堆外内存是哪里申请，确定原因后，使用不同的手段，进行原因定位。
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-27.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-27.jpg)
 
 ### 场景九：JNI 引发的 GC 问题
 
@@ -1467,7 +1467,7 @@ JNIEXPORT void JNICALL Java_GCLockerTest_release(JNIEnv* env, jclass klass, jint
 
 运行该 JNI 程序，可以看到发生的 GC 都是 GCLocker Initiated GC，并且注意在 “Acquired” 和 “Released” 时不可能发生 GC。
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-28.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-28.jpg)
 
 GC Locker 可能导致的不良后果有：
 
@@ -1481,7 +1481,7 @@ GC Locker 可能导致的不良后果有：
 - JNI 调用需要谨慎，不一定可以提升性能，反而可能造成 GC 问题。
 - 升级 JDK 版本到 14，避免 [JDK-8048556](https://bugs.openjdk.java.net/browse/JDK-8048556) 导致的重复 GC。
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-29.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-29.jpg)
 
 #### (4) 小结
 
@@ -1495,7 +1495,7 @@ JNI 产生的 GC 问题较难排查，需要谨慎使用。
 
 下图为整体 GC 问题普适的处理流程，重点的地方下面会单独标注，其他的基本都是标准处理流程，此处不再赘述，最后在整个问题都处理完之后有条件的话建议做一下复盘。
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-30.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-30.jpg)
 
 - **制定标准：** 这块内容其实非常重要，但大部分系统都是缺失的，笔者过往面试的同学中只有不到一成的同学能给出自己的系统 GC 标准到底什么样，其他的都是用的统一指标模板，缺少预见性，具体指标制定可以参考 3.1 中的内容，需要结合应用系统的 TP9999 时间和延迟、吞吐量等设定具体的指标，而不是被问题驱动。
 - **保留现场：** 目前线上服务基本都是分布式服务，某个节点发生问题后，如果条件允许一定不要直接操作重启、回滚等动作恢复，优先通过摘掉流量的方式来恢复，这样我们可以将堆、栈、GC 日志等关键信息保留下来，不然错过了定位根因的时机，后续解决难度将大大增加。当然除了这些，应用日志、中间件日志、内核日志、各种 Metrics 指标等对问题分析也有很大帮助。
@@ -1506,7 +1506,7 @@ JNI 产生的 GC 问题较难排查，需要谨慎使用。
 
 送上一张问题根因鱼骨图，一般情况下我们在处理一个 GC 问题时，只要能定位到问题的 “病灶”，有的放矢，其实就相当于解决了 80%，如果在某些场景下不太好定位，大家可以借助这种根因分析图通过 **排除法** 去定位。
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-31.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-31.jpg)
 
 ### 5.3 调优建议
 
@@ -1517,7 +1517,7 @@ JNI 产生的 GC 问题较难排查，需要谨慎使用。
 - **调优重点：** 总体上来讲，我们开发的过程中遇到的问题类型也基本都符合正态分布，太简单或太复杂的基本遇到的概率很低，笔者这里将中间最重要的三个场景添加了 “\*” 标识，希望阅读完本文之后可以观察下自己负责的系统，是否存在上述问题。
 - **GC 参数：** 如果堆、栈确实无法第一时间保留，一定要保留 GC 日志，这样我们最起码可以看到 GC Cause，有一个大概的排查方向。关于 GC 日志相关参数，最基本的 -XX:+HeapDumpOnOutOfMemoryError 等一些参数就不再提了，笔者建议添加以下参数，可以提高我们分析问题的效率。
 
-![img](../assets/Java%20%E4%B8%AD%209%20%E7%A7%8D%E5%B8%B8%E8%A7%81%E7%9A%84%20CMS%20GC%20%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E4%B8%8E%E8%A7%A3%E5%86%B3-32.jpg)
+![img](../assets/Java 中 9 种常见的 CMS GC 问题分析与解决-32.jpg)
 
 - **其他建议：** 上文场景中没有提到，但是对 GC 性能也有提升的一些建议。
 - **主动式 GC：** 也有另开生面的做法，通过监控手段监控观测 Old 区的使用情况，即将到达阈值时将应用服务摘掉流量，手动触发一次 Major GC，减少 CMS GC 带来的停顿，但随之系统的健壮性也会减少，如非必要不建议引入。

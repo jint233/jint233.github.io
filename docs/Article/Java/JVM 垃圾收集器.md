@@ -73,7 +73,7 @@ Java 语言最显著的特点就是引入了垃圾回收机制，它使 Java 程
 标记 - 清除算法的执行的过程如下图所示
 
 <figure markdown="span">
-  ![img](../assets/JVM%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8-1.png)
+  ![img](../assets/JVM 垃圾收集器-1.png)
   <figcaption> 复制算法 </figcaption>
 </figure>
 
@@ -87,7 +87,7 @@ Java 语言最显著的特点就是引入了垃圾回收机制，它使 Java 程
 复制算法的执行过程如下图所示
 
 <figure markdown="span">
-  ![img](../assets/JVM%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8-2.png)
+  ![img](../assets/JVM 垃圾收集器-2.png)
   <figcaption> 复制算法的执行过程 </figcaption>
 </figure>
 
@@ -105,7 +105,7 @@ Java 语言最显著的特点就是引入了垃圾回收机制，它使 Java 程
 标记 - 整理算法的执行过程如下图所示
 
 <figure markdown="span">
-  ![img](../assets/JVM%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8-3.png)
+  ![img](../assets/JVM 垃圾收集器-3.png)
   <figcaption> 标记 - 整理算法 </figcaption>
 </figure>
 
@@ -114,7 +114,7 @@ Java 语言最显著的特点就是引入了垃圾回收机制，它使 Java 程
 当前商业虚拟机都采用分代收集的垃圾收集算法。分代收集算法，顾名思义是根据对象的存活周期将内存划分为几块。一般包括年轻代、老年代 和 永久代，如图所示
 
 <figure markdown="span">
-  ![img](../assets/JVM%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8-4.png)
+  ![img](../assets/JVM 垃圾收集器-4.png)
   <figcaption> 分代收集算法 </figcaption>
 </figure>
 
@@ -124,7 +124,7 @@ Java 语言最显著的特点就是引入了垃圾回收机制，它使 Java 程
 
 下图展示了 7 种作用于不同分代的收集器，其中用于回收新生代的收集器包括 Serial、PraNew、Parallel Scavenge，回收老年代的收集器包括 Serial Old、Parallel Old、CMS，还有用于回收整个 Java 堆的 G1 收集器。不同收集器之间的连线表示它们可以搭配使用。
 
-![img](../assets/JVM%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8-5.png)
+![img](../assets/JVM 垃圾收集器-5.png)
 
 - Serial 收集器（复制算法）: 新生代单线程收集器，标记和清理都是单线程，优点是简单高效；
 

@@ -12,17 +12,17 @@ Kafka 集群由 broker 组成；每个 broker 都拥有一个 controller，基�
 
 4）Kafka Broker 结构。
 
-![img](../assets/Kafka%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-1.jpg)
+![img](../assets/Kafka 源码阅读笔记-1.jpg)
 
 ### **二、Broker 结构** 1）
 
-![img](../assets/Kafka%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-2.jpg)
+![img](../assets/Kafka 源码阅读笔记-2.jpg)
 
 2）每个 borker 进程，都包含各个管理器，如 socketServer 网络处理，replicaManager 副本管理器，kafkaController 集群管理器，groupCoordinator 消息者数据管理器，LogManager 日志数据管理器，kafkaScheduler 定时器，zkClient 与 zookeeper 通信管理器，transactionCoordinator 事务协调器。
 
 ### **三、通信框架** 1）
 
-![img](../assets/Kafka%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-3.jpg)
+![img](../assets/Kafka 源码阅读笔记-3.jpg)
 
 2）socketserver 会启动一个 acceptor 线程，用于接收和创建新 socket，并轮询安排给 processor thread 来处理后续的数据 io；
 
@@ -32,7 +32,7 @@ Kafka 集群由 broker 组成；每个 broker 都拥有一个 controller，基�
 
 5）
 
-![img](../assets/Kafka%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-4.jpg)
+![img](../assets/Kafka 源码阅读笔记-4.jpg)
 
 6）处理完请求后，封装成 reponse，根据 ProcessorID 放入对应的 responseQueue 由对应的 processor 线程完成回复。
 
@@ -40,7 +40,7 @@ Kafka 集群由 broker 组成；每个 broker 都拥有一个 controller，基�
 
 2）
 
-![img](../assets/Kafka%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-5.jpg)
+![img](../assets/Kafka 源码阅读笔记-5.jpg)
 
 3）每个 topic 由很多个 partition 组成，由 key hash 值分配到不同的 partition，每个 partition 拥有多个副本 replica 做主从，确保数据的安全性。
 
@@ -48,17 +48,17 @@ Kafka 集群由 broker 组成；每个 broker 都拥有一个 controller，基�
 
 5）
 
-![img](../assets/Kafka%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-6.jpg)
+![img](../assets/Kafka 源码阅读笔记-6.jpg)
 
 6）
 
-![img](../assets/Kafka%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-7.jpg)
+![img](../assets/Kafka 源码阅读笔记-7.jpg)
 
 7）当在 Log 中需要查找获取一条消息时，会根据偏移首先定位到处于哪个 logsegment 文件，再根据索引文件定位，Logsegment 是由跳跃表组成的，便于搜索，再从数据文件读取消息；
 
 8）
 
-![img](../assets/Kafka%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-8.jpg)
+![img](../assets/Kafka 源码阅读笔记-8.jpg)
 
 9）索引文件由 K,V 组成，K 是相对文件中第几条消息，V 是文件中的绝对位置，索引文件可以用来做二分查找，从索引文件中找到位置之后，再从数据文件中顺序查找，具体那条消息数据，为了避免索引文件太大，会相隔一定字节才写入一条索引；
 
@@ -70,13 +70,13 @@ Kafka 集群由 broker 组成；每个 broker 都拥有一个 controller，基�
 
 3）当 controller 成为 leader 时，会向 zookeeper 注册相关监听； 4）
 
-![img](../assets/Kafka%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-9.jpg)
+![img](../assets/Kafka 源码阅读笔记-9.jpg)
 
 5）这些监听集群数据状态的变化，如 增加 topic partition replica 等，当监听到数据发生变化，leaderController 就会得到通知并处理，处理完成后会同步相关数据给其它 followerController；
 
 6）controller 是以单工作线程形式运行的，其它请求通过封装为 job 投递到 controller 处理线程； 7）
 
-![img](../assets/Kafka%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-10.jpg)
+![img](../assets/Kafka 源码阅读笔记-10.jpg)
 
 8）borker 上下线、副本增加重分配、topic 增加等，通过 zookeeper 通知并创建 job 投入 job 队列等待工作线程处理；
 
@@ -96,7 +96,7 @@ Kafka 集群由 broker 组成；每个 broker 都拥有一个 controller，基�
 
 ### **七、groupCoordinator 消费数据管理** 1）
 
-![img](../assets/Kafka%20%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0-11.jpg)
+![img](../assets/Kafka 源码阅读笔记-11.jpg)
 
 2）GroupCoordinator 提供访问消费者数据的接口，GroupMetadataManager 负责管理消费者组的数据，GroupMetadata 保存消费者组的数据，MemberMetadata 保存组里每个成员的数据；
 

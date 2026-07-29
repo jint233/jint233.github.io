@@ -17,7 +17,7 @@ public Class B {
 
 ### spring bean 的生命周期
 
-![img](../assets/Spring%20%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E5%BC%8F-1.png)
+![img](../assets/Spring 循环依赖及解决方式-1.png)
 
 获取一个 Bean 的操作从 getBean(String name) 开始主要步骤为
 
@@ -47,7 +47,7 @@ public Object getBean(String name) {
 
 #### A 依赖 B 的情况下的加载流程
 
-![img](../assets/Spring%20%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E5%BC%8F-2.png)
+![img](../assets/Spring 循环依赖及解决方式-2.png)
 
 伪代码如下：
 
@@ -64,7 +64,7 @@ public Object getBean(String name) {
 
 ##### A、B 互相依赖的加载流程
 
-![img](../assets/Spring%20%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E5%BC%8F-3.png)
+![img](../assets/Spring 循环依赖及解决方式-3.png)
 
 以上就会出现一个问题，由于 a、b 都是单例 Bean，加载 b 的时候，到了上图中标红的阶段后，b 依赖注入的 a 的引用应该是通过 getBean(A) 得到的引入，如果还是以上的逻辑，又再一次走入了 A 的创建逻辑，此时就是发生了循环依赖。下面我们就开始介绍 Spring 是如何解决循环依赖的。
 
@@ -84,7 +84,7 @@ private final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
 
 这个时候我们考虑再引入一个 Map 存放引用，earlySingletonObjects 这个 map 我们打算存放提前暴露 bean 的引用，实例化以后，我们就把对象放入到 earlySingletonObjects 这个 map 中，这样在 加载 b 的过程中，b.setA(getBean("a")),我们就可以在 earlySingletonObjects 拿到 a 的引用，此时 a 仅仅经过了实例化，并没有设置属性。流程如下：
 
-![img](../assets/Spring%20%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E5%BC%8F-4.png)
+![img](../assets/Spring 循环依赖及解决方式-4.png)
 
 1、getBean(A)
 
@@ -108,7 +108,7 @@ private final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
 
 到目前为止，发现使用二级缓存似乎就能解决我们的问题。看起来很美好，这是 Spring IOC 的特性，Spring 的另一大特性是 AOP 面向切面编程，动态增强对象，不管使用 JDK 的动态代理和 Cglib 动态代理，都会生成一个全新的对象。下图中我标出了 AOP 动态增强的位置。
 
-![img](../assets/Spring%20%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E5%BC%8F-5.png)
+![img](../assets/Spring 循环依赖及解决方式-5.png)
 
 此时就会出现一个问题，因为经过 AOP 以后，生成的是增强后的 bean 对象，也就是一个全新的对象，我们可以看到经过图中的流程后，单例池中会存在两个 bean：增强后的 a、b 对象，此时 a 对象中依赖的 b 为增强后的，而 b 对象依赖的 a 是为原始对象，未增强的。所以使用二级缓存解决不了循环依赖中发生过 aop 的引用问题。
 
@@ -122,7 +122,7 @@ private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(1
 
 下面是加入了三级缓存和 AOP 的流程图，PS：可能会有点乱。。。。。。
 
-![img](../assets/Spring%20%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E5%BC%8F-6.png)
+![img](../assets/Spring 循环依赖及解决方式-6.png)
 
 上面就是三级缓存的作用，其中有个三级缓存到二级缓存的升级过程，这个非常重重要，这个主要是防止重复 aop。好的，写到这里，我们对 Spring 如何使用三级缓存解决循环依赖的流程已经大概清楚了，下面分析一下源码。
 

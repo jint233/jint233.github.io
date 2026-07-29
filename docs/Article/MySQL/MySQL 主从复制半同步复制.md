@@ -8,7 +8,7 @@
 
 半同步复制(semi-synchronous replication)是指 master 在将新生成的 binlog 发送给各 slave 时，只需等待一个(默认)slave 返回的 ack 信息就返回成功。
 
-![img](../assets/MySQL%20%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%8D%8A%E5%90%8C%E6%AD%A5%E5%A4%8D%E5%88%B6-1.png)
+![img](../assets/MySQL 主从复制半同步复制-1.png)
 
 MySQL 5.7 对半同步复制作了大改进，新增了一个 master 线程。在 MySQL 5.7 以前，master 上的 binlog dump 线程负责两件事：dump 日志给 slave 的 io_thread；接收来自 slave 的 ack 消息。它们是串行方式工作的。在 MySQL 5.7 中，新增了一个专门负责接受 ack 消息的线程 ack collector thread。这样 master 上有两个线程独立工作，可以同时发送 binlog 到 slave 和接收 slave 的 ack。
 
@@ -25,9 +25,9 @@ MySQL 5.7 对半同步复制作了大改进，新增了一个 master 线程。�
 
 画图理解就很清晰。(前提：已经设置了`sync_binlog=1`，否则 binlog 刷盘时间由操作系统决定)
 
-![img](../assets/MySQL%20%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%8D%8A%E5%90%8C%E6%AD%A5%E5%A4%8D%E5%88%B6-2.png)
+![img](../assets/MySQL 主从复制半同步复制-2.png)
 
-![img](../assets/MySQL%20%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%8D%8A%E5%90%8C%E6%AD%A5%E5%A4%8D%E5%88%B6-3.png)
+![img](../assets/MySQL 主从复制半同步复制-3.png)
 
 再来分析下这两种模式的优缺点。
 
@@ -209,7 +209,7 @@ mysql> show global variables like "%semi%";
 
 本文实现如下拓扑图所示的半同步传统复制。如果要实现半同步 GTID 复制，也只是在 gtid 复制的基础上改改配置文件而已。
 
-![img](../assets/MySQL%20%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%8D%8A%E5%90%8C%E6%AD%A5%E5%A4%8D%E5%88%B6-4.png)
+![img](../assets/MySQL 主从复制半同步复制-4.png)
 
 具体环境：
 

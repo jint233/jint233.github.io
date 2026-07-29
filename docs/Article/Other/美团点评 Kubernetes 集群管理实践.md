@@ -10,7 +10,7 @@
 
 美团点评在集群管理和资源优化这条道路上已经“摸爬滚打”多年。2013 年，开始构建基于传统虚拟化技术的资源交付方式；2015 年 7 月，开始建立完善的集群管理与调度系统——HULK，目标是推动美团点评服务容器化；2016 年，完成基于 Docker 容器技术自研实现了弹性伸缩能力，来提升交付速度和应对快速扩缩容的需求，实现弹性扩容、缩容，提升资源利用率，提升业务运维效率，合理有效的降低企业 IT 运维成本；2018 年，开始基于 Kubernetes 来进行资源管理和调度，进一步提升资源的使用效率。
 
-![美团点评集群管理与调度平台演进](../assets/%E7%BE%8E%E5%9B%A2%E7%82%B9%E8%AF%84%20Kubernetes%20%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5-1.png)
+![美团点评集群管理与调度平台演进](../assets/美团点评 Kubernetes 集群管理实践-1.png)
 
 美团点评集群管理与调度平台演进
 
@@ -24,7 +24,7 @@
 
 ### 架构介绍
 
-![HULK2.0 架构图](../assets/%E7%BE%8E%E5%9B%A2%E7%82%B9%E8%AF%84%20Kubernetes%20%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5-2.jpg)
+![HULK2.0 架构图](../assets/美团点评 Kubernetes 集群管理实践-2.jpg)
 
 HULK2.0 架构图
 
@@ -38,7 +38,7 @@ HULK2.0 架构图
 
 为什么会选择 Kubernetes 呢？Kubernetes 并不是市面上唯一的集群管理平台（其他如 Docker Swarm 或 Mesos），之所以选择它，除了它本身优秀的架构设计，我们更加看重的是 Kubernetes 提供的不是一个解决方案，而是一个平台和一种能力。这种能力能够让我们真正基于美团点评的实际情况来扩展，同时能够依赖和复用多年来的技术积累，给予我们更多选择的自由，包括我们可以快速地部署应用程序，而无须面对传统平台所具有的风险，动态地扩展应用程序以及更好的资源分配策略。
 
-![HULK-Kubernetes 架构图](../assets/%E7%BE%8E%E5%9B%A2%E7%82%B9%E8%AF%84%20Kubernetes%20%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5-3.jpg)
+![HULK-Kubernetes 架构图](../assets/美团点评 Kubernetes 集群管理实践-3.jpg)
 
 HULK-Kubernetes 架构图
 
@@ -61,7 +61,7 @@ Kubernetes 集群作为整个 HULK 集群资源管理与平台的基础，需求
 
 Kubernetes 调度器工作模型如下：
 
-![kube-scheduler 示意图](../assets/%E7%BE%8E%E5%9B%A2%E7%82%B9%E8%AF%84%20Kubernetes%20%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5-4.jpg)
+![kube-scheduler 示意图](../assets/美团点评 Kubernetes 集群管理实践-4.jpg)
 
 kube-scheduler 示意图
 
@@ -75,7 +75,7 @@ kube-scheduler 示意图
 - 优选阶段：软性条件，对通过的节点按照优先级排序，称之为 Priorities。每一个 Priority 都是一个影响因素，都有一定的权重。
 - 选定阶段：从优选列表中选择优先级最高的节点，称为 Select。选择的 Node 即为最终部署 Pod 的机器。
 
-![kube-scheduler 调度过程](../assets/%E7%BE%8E%E5%9B%A2%E7%82%B9%E8%AF%84%20Kubernetes%20%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5-5.jpg)
+![kube-scheduler 调度过程](../assets/美团点评 Kubernetes 集群管理实践-5.jpg)
 
 kube-scheduler 调度过程
 
@@ -83,7 +83,7 @@ kube-scheduler 调度过程
 
 为此，我们提出了“预选失败中断机制”，即一旦某个预选条件不满足，那么该 Node 即被立即放弃，后面的预选条件不再做判断计算，从而大大减少了计算量，调度性能也大大提升。如下图所示：
 
-![kube-scheduler 的 Predicates 过程](../assets/%E7%BE%8E%E5%9B%A2%E7%82%B9%E8%AF%84%20Kubernetes%20%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5-6.jpg)
+![kube-scheduler 的 Predicates 过程](../assets/美团点评 Kubernetes 集群管理实践-6.jpg)
 
 kube-scheduler 的 Predicates 过程
 
@@ -125,7 +125,7 @@ kube-scheduler 的局部最优解
 
 ## 资源管理与优化
 
-![资源管理与优化](../assets/%E7%BE%8E%E5%9B%A2%E7%82%B9%E8%AF%84%20Kubernetes%20%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5-7.png)
+![资源管理与优化](../assets/美团点评 Kubernetes 集群管理实践-7.png)
 
 资源管理与优化
 

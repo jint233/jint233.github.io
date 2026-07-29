@@ -86,7 +86,7 @@ sysctl -p 重载
 
 一般我们选择第一个 tgz 的包 ，版本我这里先选用 1.8 的，为了后续测试滚动升级使用。
 
-![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-1.png)
+![img](../assets/铁总在用的高性能分布式缓存计算框架 Geode-1.png)
 
 #### 上传，解压，配置 /etc/profile
 
@@ -226,7 +226,7 @@ http://192.168.33.15:7070/pulse
 
 先看个效果图：
 
-![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-2.png)
+![img](../assets/铁总在用的高性能分布式缓存计算框架 Geode-2.png)
 
 ### gfsh 常用命令介绍
 
@@ -1043,11 +1043,11 @@ Geode 非常贴心地为我们继承了 Swagger 插件：
 <http://192.168.33.15:8888/geode/swagger-ui.html#/> 
 ```
 
-![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-3.png)
+![img](../assets/铁总在用的高性能分布式缓存计算框架 Geode-3.png)
 
-![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-4.png)
+![img](../assets/铁总在用的高性能分布式缓存计算框架 Geode-4.png)
 
-![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-5.png)
+![img](../assets/铁总在用的高性能分布式缓存计算框架 Geode-5.png)
 
 具体 API 可参考官方网页：
 
@@ -1059,19 +1059,19 @@ Geode 非常贴心地为我们继承了 Swagger 插件：
 
 点对点的方式也叫对等方式，就是我们没有专门的 Geode 集群，服务是迁入到我们应用程序中的。
 
-![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-6.png)
+![img](../assets/铁总在用的高性能分布式缓存计算框架 Geode-6.png)
 
 #### C/S
 
 该模式就是我们常用的集群模式，有一个 Geode 的中心集群，应用程序通过客户端去调用， 这个模式跟 ES 的集群， Redis 的集群非常相似。
 
-![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-7.png)
+![img](../assets/铁总在用的高性能分布式缓存计算框架 Geode-7.png)
 
 #### 多站点
 
 所谓的多站点，就是跨机房，跨地域进行数据同步，非常适合做备份之类的部署， Geode 能够保证数据的最终一致性。目前我们的生产环境通过多站点引入备份集群，以备容灾和其他非主要业务的访问。
 
-![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-8.png)
+![img](../assets/铁总在用的高性能分布式缓存计算框架 Geode-8.png)
 
 ### Geode 滚动升级
 
@@ -1110,9 +1110,9 @@ File saved to /opt/./cluster-config-back.zip
 
 2. 第二个导出配置文件，是一些常规配置，以前修改过的，关于 region 等的一些配置。
 
-![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-9.png)
+![img](../assets/铁总在用的高性能分布式缓存计算框架 Geode-9.png)
 
-![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-10.png)
+![img](../assets/铁总在用的高性能分布式缓存计算框架 Geode-10.png)
 
 #### 拷贝新版本
 
@@ -1271,11 +1271,11 @@ rm -rf apache-geode-1.9.2.tgz
 
 原因解读：
 
-![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-11.png)
+![img](../assets/铁总在用的高性能分布式缓存计算框架 Geode-11.png)
 
 新的 1.8 的 client 包引入了新的类，这个新的类有 Java 9 的模块化信息，然后这个版本的 Tomcat 是无法扫描模块化 jar 包的。
 
-![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-12.png)
+![img](../assets/铁总在用的高性能分布式缓存计算框架 Geode-12.png)
 
 看 Tomcat 官网发现，在 7.0.83 的时候才支持了这个问题。使用了 7.0.91 测试就不报哪个异常了。
 
@@ -1400,15 +1400,15 @@ http://192.168.33.15:7070/pulse
 
 pulse 中可以在不同维护查看数据。**1. 总览** 内存，成员数，服务数，region 数量，集群读写等等。
 
-![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-13.png)
+![img](../assets/铁总在用的高性能分布式缓存计算框架 Geode-13.png)
 **2. ip 维度** 这里多了一个机器的链接详情：
 
-![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-14.png)
+![img](../assets/铁总在用的高性能分布式缓存计算框架 Geode-14.png)
 **3. region 维度**
 
 region 维度主要对 region 进行描述：
 
-![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-15.png)
+![img](../assets/铁总在用的高性能分布式缓存计算框架 Geode-15.png)
 
 #### 监控
 
@@ -1453,7 +1453,7 @@ metricList.add(build);
 
 关于 JMX 的数据结构大家可以使用 jvisualvm 连接查看：
 
-![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-16.png)
+![img](../assets/铁总在用的高性能分布式缓存计算框架 Geode-16.png)
 
 看它的目录结构，我们可以发现其实它就是按照集群、ip、region 进行区分的，与它的 pulse 中所能显示的保持一致性。
 
@@ -1461,9 +1461,9 @@ metricList.add(build);
 
 进入 ES 后我们再通过 Grafana 进行展示，这样就可以看见历史指标的波动情况，为分析问题提供依据。
 
-![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-17.png)
+![img](../assets/铁总在用的高性能分布式缓存计算框架 Geode-17.png)
 
-![img](../assets/%E9%93%81%E6%80%BB%E5%9C%A8%E7%94%A8%E7%9A%84%E9%AB%98%E6%80%A7%E8%83%BD%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E8%AE%A1%E7%AE%97%E6%A1%86%E6%9E%B6%20Geode-18.png)
+![img](../assets/铁总在用的高性能分布式缓存计算框架 Geode-18.png)
 
 如上图所示是我们的一些重点指标。
 

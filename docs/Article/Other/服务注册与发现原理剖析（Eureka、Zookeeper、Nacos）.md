@@ -4,7 +4,7 @@
 
 服务注册中心，是一个给服务提供者注册服务（产生服务列表）、给服务消费者获取服务信息（获取服务列表）的一个地方。服务列表记录着 IP、端口、服务名等信息，服务消费者通过这些信息进行远程调用。这里我画了一张图来描述服务注册中心、服务提供者和服务消费者的关系。
 
-![服务注册中心关系](../assets/%E6%9C%8D%E5%8A%A1%E6%B3%A8%E5%86%8C%E4%B8%8E%E5%8F%91%E7%8E%B0%E5%8E%9F%E7%90%86%E5%89%96%E6%9E%90%EF%BC%88Eureka%E3%80%81Zookeeper%E3%80%81Nacos%EF%BC%89-1.png)
+![服务注册中心关系](../assets/服务注册与发现原理剖析（Eureka、Zookeeper、Nacos）-1.png)
 
 在微服务架构当中，服务注册中心是必不可少的组件之一。比如 Dubbo 使用 ZooKeeper 作为服务注册中心、目前大多数公司都会使用 Eureka 作为 Spring Cloud 微服务的注册中心等等。
 
@@ -20,7 +20,7 @@ Spring Cloud Eureka 是在 Netflix 的 Eureka 的基础上进行二次开发而�
 
 网上很多人说 Eureka 闭源，其实没有，只是 Eurkea 2.x 分支不再维护，官方依然在积极地维护 Eureka 1.x，Spring Cloud 还是使用的 1.x 版本的 Eureka，所以不必过分担心，就算 Eureka 真的闭源了，Spring Cloud 还可以使用 ZooKeeper、Consul、Nacos 等等来实现服务治理。比如使用 ZooKeeper 替代 Eureka，也是改几行配置和换个 jar 的事情。
 
-**Eureka Server 与 Eureka Client 的关系：**![服务注册中心 Eureka](../assets/%E6%9C%8D%E5%8A%A1%E6%B3%A8%E5%86%8C%E4%B8%8E%E5%8F%91%E7%8E%B0%E5%8E%9F%E7%90%86%E5%89%96%E6%9E%90%EF%BC%88Eureka%E3%80%81Zookeeper%E3%80%81Nacos%EF%BC%89-2.png)
+**Eureka Server 与 Eureka Client 的关系：**![服务注册中心 Eureka](../assets/服务注册与发现原理剖析（Eureka、Zookeeper、Nacos）-2.png)
 
 ### 服务端（Eureka Server）
 
@@ -43,7 +43,7 @@ Eureka Client 可以是服务提供者客户端角色，也可以是服务消费
 
 单个 Eureka Server 节点情况下，假如宕机了，Eureka Client（服务消费者）还是可以继续工作，因为每个 Eureka Client 都会缓存一份服务列表到本地，但是一旦新服务上线，Eureka Client（服务消费者）就无法调用新服务了，因此还是需要搭建 Eureka Server 集群来实现高可用。下图是由 3 个节点组成的高可用集群：
 
-![Eureka Server 集群](../assets/%E6%9C%8D%E5%8A%A1%E6%B3%A8%E5%86%8C%E4%B8%8E%E5%8F%91%E7%8E%B0%E5%8E%9F%E7%90%86%E5%89%96%E6%9E%90%EF%BC%88Eureka%E3%80%81Zookeeper%E3%80%81Nacos%EF%BC%89-3.png)
+![Eureka Server 集群](../assets/服务注册与发现原理剖析（Eureka、Zookeeper、Nacos）-3.png)
 
 Eureka Server 集群当中的每个节点都是 **通过 Replicate（即复制）来同步数据**，没有主节点和从节点之分，所有节点都是平等而且数据都保持一致。因为结点之间是通过 **异步方式** 进行同步数据，不保证强一致性，保证可用性，所以是 AP。
 
@@ -55,7 +55,7 @@ Eureka Server 集群当中的每个节点都是 **通过 Replicate（即复制�
 
 ZooKeeper 既可以当作服务注册中心，也可以当作服务协调者（比如 hadoop 集群）。此处仅介绍服务注册中心，类似 Eureka，也是服务提供者向 ZK 注册服务，服务消费者获取 ZK 的服务列表进行远程调用，比如 Dubbo。服务注册中心、服务提供者和服务消费者的关系如下：
 
-![服务注册中心 Zookeeper](../assets/%E6%9C%8D%E5%8A%A1%E6%B3%A8%E5%86%8C%E4%B8%8E%E5%8F%91%E7%8E%B0%E5%8E%9F%E7%90%86%E5%89%96%E6%9E%90%EF%BC%88Eureka%E3%80%81Zookeeper%E3%80%81Nacos%EF%BC%89-4.png)
+![服务注册中心 Zookeeper](../assets/服务注册与发现原理剖析（Eureka、Zookeeper、Nacos）-4.png)
 
 ### 原理
 
@@ -83,7 +83,7 @@ ZK 的文件结构类似于 Linux 系统的树状结构，注册服务时，即�
 
 ### 架构图
 
-![Nacos 架构图](../assets/%E6%9C%8D%E5%8A%A1%E6%B3%A8%E5%86%8C%E4%B8%8E%E5%8F%91%E7%8E%B0%E5%8E%9F%E7%90%86%E5%89%96%E6%9E%90%EF%BC%88Eureka%E3%80%81Zookeeper%E3%80%81Nacos%EF%BC%89-5.png)
+![Nacos 架构图](../assets/服务注册与发现原理剖析（Eureka、Zookeeper、Nacos）-5.png)
 
 主要功能点
 ----- **服务注册与发现** 类似 Eureka、ZooKeeper、Consul 等组件，既可以支持 HTTP、https 的服务注册和发现，也可以支持 RPC 的服务注册和发现，比如 Dubbo，也是出自于阿里，完全可以替代 Eureka、ZooKeeper、Consul。**动态配置服务**
@@ -92,7 +92,7 @@ ZK 的文件结构类似于 Linux 系统的树状结构，注册服务时，即�
 
 ### 注册与发现的工作流程
 
-![Nacos 工作流程](../assets/%E6%9C%8D%E5%8A%A1%E6%B3%A8%E5%86%8C%E4%B8%8E%E5%8F%91%E7%8E%B0%E5%8E%9F%E7%90%86%E5%89%96%E6%9E%90%EF%BC%88Eureka%E3%80%81Zookeeper%E3%80%81Nacos%EF%BC%89-6.png)
+![Nacos 工作流程](../assets/服务注册与发现原理剖析（Eureka、Zookeeper、Nacos）-6.png)
 
 1. 假设 Nacos Server 已经启动，服务提供者启动时把服务注册到 Nacos 注册中心；
 2. 服务提供者注册成功后，定时发 http 请求（即心跳）到注册中心，证明自身服务实例可用；
@@ -108,7 +108,7 @@ Nacos 的客户端负载均衡是使用 Feign 实现，Feign 是使用接口 + �
 
 Nacos 的单节点，即 standalone 模式，配置的数据默认存储到内嵌的数据库 Derby 中，搭建集群时是不能使用内嵌的数据库，不然数据无法共享，可以使用 Mysql 进行数据存储。最好采用 3 个或 3 个以上 Nacos 节点来搭建集群，如图：
 
-![Nacos 集群](../assets/%E6%9C%8D%E5%8A%A1%E6%B3%A8%E5%86%8C%E4%B8%8E%E5%8F%91%E7%8E%B0%E5%8E%9F%E7%90%86%E5%89%96%E6%9E%90%EF%BC%88Eureka%E3%80%81Zookeeper%E3%80%81Nacos%EF%BC%89-7.png)
+![Nacos 集群](../assets/服务注册与发现原理剖析（Eureka、Zookeeper、Nacos）-7.png)
 
 ### Eureka、ZooKeeper、Nacos 区别
 

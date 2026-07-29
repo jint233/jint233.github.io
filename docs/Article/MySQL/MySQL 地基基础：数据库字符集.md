@@ -75,7 +75,7 @@ mysql> select * from information_schema.collations;
 mysql> show variables like 'character%';
 ```
 
-![img](../assets/MySQL%20%E5%9C%B0%E5%9F%BA%E5%9F%BA%E7%A1%80%EF%BC%9A%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AD%97%E7%AC%A6%E9%9B%86-1.png)
+![img](../assets/MySQL 地基基础：数据库字符集-1.png)
 
 参数解释：
 
@@ -104,7 +104,7 @@ DML 字符集选择：
 mysql> show variables like 'collation%';
 ```
 
-![img](../assets/MySQL%20%E5%9C%B0%E5%9F%BA%E5%9F%BA%E7%A1%80%EF%BC%9A%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AD%97%E7%AC%A6%E9%9B%86-2.png)
+![img](../assets/MySQL 地基基础：数据库字符集-2.png)
 
 参数说明：
 

@@ -6,11 +6,11 @@
 
 我们先看下 `AQS` 相关的 `UML` 图：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-1.jfif)
+![image.png](../assets/AQS 万字图文全面解析-1.jfif)
 
 思维导图：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-2.jfif)
+![image.png](../assets/AQS 万字图文全面解析-2.jfif)
 
 ## AQS 实现原理
 
@@ -22,7 +22,7 @@
 
 具体原理我们可以用一张图来简单概括：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-3.jfif)
+![image.png](../assets/AQS 万字图文全面解析-3.jfif)
 
 `AQS` 中提供了很多关于锁的实现方法，
 
@@ -53,14 +53,14 @@
 
 如果同时有 **三个线程** 并发抢占锁，此时 **线程一** 抢占锁成功，**线程二** 和 **线程三** 抢占锁失败，具体执行流程如下：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-4.jfif)
+![image.png](../assets/AQS 万字图文全面解析-4.jfif)
 
 此时 `AQS` 内部数据为：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-5.jfif)
+![image.png](../assets/AQS 万字图文全面解析-5.jfif)
 **线程二** 、 **线程三** 加锁失败：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-6.jfif)
+![image.png](../assets/AQS 万字图文全面解析-6.jfif)
 
 有图可以看出，等待队列中的节点 `Node` 是一个双向链表，这里 `SIGNAL` 是 `Node` 中 `waitStatus` 属性，`Node` 中还有一个 `nextWaiter` 属性，这个并未在图中画出来，这个到后面 `Condition` 会具体讲解的。
 
@@ -96,7 +96,7 @@ protected final void setExclusiveOwnerThread(Thread thread) {
 
 我们按照真实场景来分析，**线程一** 抢占锁成功后，`state` 变为 1，**线程二** 通过 `CAS` 修改 `state` 变量必然会失败。此时 `AQS` 中 `FIFO`(First In First Out 先进先出) 队列中数据如图所示：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-7.jfif)
+![image.png](../assets/AQS 万字图文全面解析-7.jfif)
 
 我们将 **线程二** 执行的逻辑一步步拆解来看：
 
@@ -179,13 +179,13 @@ private Node enq(final Node node) {
 
 第一遍循环时 `tail` 指针为空，进入 if 逻辑，使用 `CAS` 操作设置 `head` 指针，将 `head` 指向一个新创建的 `Node` 节点。此时 `AQS` 中数据：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-8.jfif)
+![image.png](../assets/AQS 万字图文全面解析-8.jfif)
 
 执行完成之后，`head`、`tail`、`t` 都指向第一个 `Node` 元素。
 
 接着执行第二遍循环，进入 `else` 逻辑，此时已经有了 `head` 节点，这里要操作的就是将 **线程二** 对应的 `Node` 节点挂到 `head` 节点后面。此时队列中就有了两个 `Node` 节点：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-9.jfif)
+![image.png](../assets/AQS 万字图文全面解析-9.jfif)
 
 `addWaiter ()` 方法执行完后，会返回当前线程创建的节点信息。继续往后执行 `acquireQueued (addWaiter (Node.EXCLUSIVE), arg)` 逻辑，此时传入的参数为 **线程二** 对应的 `Node` 节点信息：
 
@@ -239,7 +239,7 @@ private final boolean parkAndCheckInterrupt() {
 
 此时 `AQS` 中的数据如下图：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-10.jfif)
+![image.png](../assets/AQS 万字图文全面解析-10.jfif)
 
 此时 **线程二** 就静静的待在 `AQS` 的等待队列里面了，等着其他线程释放锁来唤醒它。
 
@@ -265,21 +265,21 @@ private Node addWaiter(Node mode) {
 
 此时等待队列的 `tail` 节点指向 **线程二**，进入 `if` 逻辑后，通过 `CAS` 指令将 `tail` 节点重新指向 **线程三**。接着 **线程三** 调用 `enq ()` 方法执行入队操作，和上面 **线程二** 执行方式是一致的，入队后会修改 **线程二** 对应的 `Node` 中的 `waitStatus=SIGNAL`。最后 **线程三** 也会被挂起。此时等待队列的数据如图：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-11.jfif)
+![image.png](../assets/AQS 万字图文全面解析-11.jfif)
 
 ### 线程一释放锁
 
 现在来分析下释放锁的过程，首先是 **线程一** 释放锁，释放锁后会唤醒 `head` 节点的后置节点，也就是我们现在的 **线程二**，具体操作流程如下：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-12.jfif)
+![image.png](../assets/AQS 万字图文全面解析-12.jfif)
 
 执行完后等待队列数据如下：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-13.jfif)
+![image.png](../assets/AQS 万字图文全面解析-13.jfif)
 
 此时 **线程二** 已经被唤醒，继续尝试获取锁，如果获取锁失败，则会继续被挂起。如果获取锁成功，则 `AQS` 中数据如图：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-14.jfif)
+![image.png](../assets/AQS 万字图文全面解析-14.jfif)
 
 接着还是一步步拆解来看，先看看 **线程一** 释放锁的代码：
 
@@ -317,7 +317,7 @@ protected final boolean tryRelease(int releases) {
 
 执行完 `ReentrantLock.tryRelease ()` 后，`state` 被设置成 0，Lock 对象的独占锁被设置为 null。此时看下 `AQS` 中的数据：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-15.jfif)
+![image.png](../assets/AQS 万字图文全面解析-15.jfif)
 
 接着执行 `java.util.concurrent.locks.AbstractQueuedSynchronizer.unparkSuccessor ()` 方法，唤醒 `head` 的后置节点：
 
@@ -344,7 +344,7 @@ private void unparkSuccessor(Node node) {
 
 被唤醒的 **线程二** 会接着尝试获取锁，用 `CAS` 指令修改 `state` 数据。 执行完成后可以查看 `AQS` 中数据：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-16.jfif)
+![image.png](../assets/AQS 万字图文全面解析-16.jfif)
 
 此时 **线程二** 被唤醒，**线程二** 接着之前被 `park` 的地方继续执行，继续执行 `acquireQueued ()` 方法。
 
@@ -378,7 +378,7 @@ final boolean acquireQueued(final Node node, int arg) {
 
 此时线程二获取锁成功，`AQS` 中队列数据如下：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-17.jfif)
+![image.png](../assets/AQS 万字图文全面解析-17.jfif)
 
 等待队列中的数据都等待着被垃圾回收。
 
@@ -386,23 +386,23 @@ final boolean acquireQueued(final Node node, int arg) {
 
 当 **线程二** 释放锁时，会唤醒被挂起的 **线程三**，流程和上面大致相同，被唤醒的 **线程三** 会再次尝试加锁，具体代码可以参考上面内容。具体流程图如下：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-18.jfif)
+![image.png](../assets/AQS 万字图文全面解析-18.jfif)
 
 此时 `AQS` 中队列数据如图：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-19.jfif)
+![image.png](../assets/AQS 万字图文全面解析-19.jfif)
 
 ### 公平锁实现原理
 
 上面所有的加锁场景都是基于 **非公平锁** 来实现的，**非公平锁** 是 `ReentrantLock` 的默认实现，那我们接着来看一下 **公平锁** 的实现原理，这里先用一张图来解释 **公平锁** 和 **非公平锁** 的区别： **非公平锁** 执行流程：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-20.jfif)
+![image.png](../assets/AQS 万字图文全面解析-20.jfif)
 
 这里我们还是用之前的线程模型来举例子，当 **线程二** 释放锁的时候，唤醒被挂起的 **线程三**，**线程三** 执行 `tryAcquire ()` 方法使用 `CAS` 操作来尝试修改 `state` 值，如果此时又来了一个 **线程四** 也来执行加锁操作，同样会执行 `tryAcquire ()` 方法。
 
 这种情况就会出现竞争，**线程四** 如果获取锁成功，**线程三** 仍然需要待在等待队列中被挂起。这就是所谓的 **非公平锁**，**线程三** 辛辛苦苦排队等到自己获取锁，却眼巴巴的看到 **线程四** 插队获取到了锁。**公平锁** 执行流程：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-21.jfif)
+![image.png](../assets/AQS 万字图文全面解析-21.jfif)
 
 公平锁在加锁的时候，会先判断 `AQS` 等待队列中是存在节点，如果存在节点则会直接入队等待，具体代码如下.
 
@@ -464,13 +464,13 @@ public final boolean hasQueuedPredecessors() {
 
 这段代码很有意思，返回 `false` 代表队列中没有节点或者仅有一个节点是当前线程创建的节点。返回 `true` 则代表队列中存在等待节点，当前线程需要入队等待。
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-22.jfif)
+![image.png](../assets/AQS 万字图文全面解析-22.jfif)
 
 先判断 `head` 是否等于 `tail`，如果队列中只有一个 `Node` 节点，那么 `head` 会等于 `tail`。
 
 接着判断 `(s = h.next) == null`，这种属于一种极端情况，在 `enq ()` 入队操作中，此时不是原子性操作，可能存在这种情况：
 
-![YcAPpD.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-23.jfif)
+![YcAPpD.png](../assets/AQS 万字图文全面解析-23.jfif)
 
 在第一个红框处，例如 **线程一** 执行完成，此时 head 已经有值，而还未执行 `tail=head` 的时候，此时 **线程二** 判断 `head != tail` 成立。而接着 **线程一** 执行完第二个红框处，此时 `tail = node`，但是并未将 `head.next` 指向 `node`。而这时 **线程二** 就会得到 `head.next == null` 成立，直接返回 true。这种情况代表有节点正在做入队操作。
 
@@ -533,7 +533,7 @@ public class ReentrantLockDemo {
 
 执行结果如下图：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-24.jfif)
+![image.png](../assets/AQS 万字图文全面解析-24.jfif)
 
 这里 **线程一** 先获取锁，然后使用 `await ()` 方法挂起当前线程并 **释放锁**，**线程二** 获取锁后使用 `signal` 唤醒 **线程一**。
 
@@ -541,7 +541,7 @@ public class ReentrantLockDemo {
 
 我们还是用上面的 `demo` 作为实例，执行的流程如下：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-25.jfif)
+![image.png](../assets/AQS 万字图文全面解析-25.jfif)
 **线程一** 执行 `await ()` 方法：
 
 先看下具体的代码实现，`#java.util.concurrent.locks.AbstractQueuedSynchronizer.ConditionObject.await ()`：
@@ -571,7 +571,7 @@ public class ReentrantLockDemo {
 
 执行完后我们可以看下 `Condition` 队列中的数据：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-26.jfif)
+![image.png](../assets/AQS 万字图文全面解析-26.jfif)
 
 具体实现代码为：
 
@@ -600,7 +600,7 @@ private Node addConditionWaiter() {
 
 具体流程如下图：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-27.jfif)
+![image.png](../assets/AQS 万字图文全面解析-27.jfif)
 **线程二** 执行 `signal ()` 方法：
 
 首先我们考虑下 **线程二** 已经获取到锁，此时 `AQS` 等待队列中已经没有了数据。
@@ -663,11 +663,11 @@ private Node enq(final Node node) {
 
 加入等待队列的代码在上面也已经分析过，此时等待队列中数据如下图：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-28.jfif)
+![image.png](../assets/AQS 万字图文全面解析-28.jfif)
 
 接着开始通过 `CAS` 修改当前节点的前置节点 `waitStatus` 为 `SIGNAL`，并且唤醒当前线程。此时 `AQS` 中等待队列数据为：
 
-![image.png](../assets/AQS%20%E4%B8%87%E5%AD%97%E5%9B%BE%E6%96%87%E5%85%A8%E9%9D%A2%E8%A7%A3%E6%9E%90-29.jfif)
+![image.png](../assets/AQS 万字图文全面解析-29.jfif)
 
 **线程一** 被唤醒后，继续执行 `await ()` 方法中的 while 循环。
 

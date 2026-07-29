@@ -12,13 +12,13 @@
 
 看这么个场景。A 系统发送数据到 BCD 三个系统，通过接口调用发送。如果 E 系统也要这个数据呢？那如果 C 系统现在不需要了呢？A 系统负责人几乎崩溃......
 
-![1636207793590](../assets/Kafka%E3%80%81ActiveMQ%E3%80%81RabbitMQ%E3%80%81RocketMQ%20%E5%8C%BA%E5%88%AB%E4%BB%A5%E5%8F%8A%E9%AB%98%E5%8F%AF%E7%94%A8%E5%8E%9F%E7%90%86-1.png)
+![1636207793590](../assets/Kafka、ActiveMQ、RabbitMQ、RocketMQ 区别以及高可用原理-1.png)
 
 在这个场景中，A 系统跟其它各种乱七八糟的系统严重耦合，A 系统产生一条比较关键的数据，很多系统都需要 A 系统将这个数据发送过来。A 系统要时时刻刻考虑 BCDE 四个系统如果挂了该咋办？要不要重发，要不要把消息存起来？头发都白了啊！
 
 如果使用 MQ，A 系统产生一条数据，发送到 MQ 里面去，哪个系统需要数据自己去 MQ 里面消费。如果新系统需要数据，直接从 MQ 里消费即可；如果某个系统不需要这条数据了，就取消对 MQ 消息的消费即可。这样下来，A 系统压根儿不需要去考虑要给谁发送数据，不需要维护这个代码，也不需要考虑人家是否调用成功、失败超时等情况。
 
-![1636207813239](../assets/Kafka%E3%80%81ActiveMQ%E3%80%81RabbitMQ%E3%80%81RocketMQ%20%E5%8C%BA%E5%88%AB%E4%BB%A5%E5%8F%8A%E9%AB%98%E5%8F%AF%E7%94%A8%E5%8E%9F%E7%90%86-2.png)
+![1636207813239](../assets/Kafka、ActiveMQ、RabbitMQ、RocketMQ 区别以及高可用原理-2.png)
 
 总结：通过一个 MQ，Pub/Sub 发布订阅消息这么一个模型，A 系统就跟其它系统彻底解耦了。
 
@@ -28,13 +28,13 @@
 
 再来看一个场景，A 系统接收一个请求，需要在自己本地写库，还需要在 BCD 三个系统写库，自己本地写库要 3ms，BCD 三个系统分别写库要 300ms、450ms、200ms。最终请求总延时是 3 + 300 + 450 + 200 = 953ms，接近 1s，用户感觉搞个什么东西，慢死了慢死了。用户通过浏览器发起请求，等待个 1s，这几乎是不可接受的。
 
-![1636207834273](../assets/Kafka%E3%80%81ActiveMQ%E3%80%81RabbitMQ%E3%80%81RocketMQ%20%E5%8C%BA%E5%88%AB%E4%BB%A5%E5%8F%8A%E9%AB%98%E5%8F%AF%E7%94%A8%E5%8E%9F%E7%90%86-3.png)
+![1636207834273](../assets/Kafka、ActiveMQ、RabbitMQ、RocketMQ 区别以及高可用原理-3.png)
 
 一般互联网类的企业，对于用户直接的操作，一般要求是每个请求都必须在 200 ms 以内完成，对用户几乎是无感知的。
 
 如果使用 MQ，那么 A 系统连续发送 3 条消息到 MQ 队列中，假如耗时 5ms，A 系统从接受一个请求到返回响应给用户，总时长是 3 + 5 = 8ms，对于用户而言，其实感觉上就是点个按钮，8ms 以后就直接返回了，爽！网站做得真好，真快！
 
-![1636207853631](../assets/Kafka%E3%80%81ActiveMQ%E3%80%81RabbitMQ%E3%80%81RocketMQ%20%E5%8C%BA%E5%88%AB%E4%BB%A5%E5%8F%8A%E9%AB%98%E5%8F%AF%E7%94%A8%E5%8E%9F%E7%90%86-4.png)
+![1636207853631](../assets/Kafka、ActiveMQ、RabbitMQ、RocketMQ 区别以及高可用原理-4.png)
 
 #### 削峰
 
@@ -44,11 +44,11 @@
 
 但是高峰期一过，到了下午的时候，就成了低峰期，可能也就 1w 的用户同时在网站上操作，每秒中的请求数量可能也就 50 个请求，对整个系统几乎没有任何的压力。
 
-![1636207877186](../assets/Kafka%E3%80%81ActiveMQ%E3%80%81RabbitMQ%E3%80%81RocketMQ%20%E5%8C%BA%E5%88%AB%E4%BB%A5%E5%8F%8A%E9%AB%98%E5%8F%AF%E7%94%A8%E5%8E%9F%E7%90%86-5.png)
+![1636207877186](../assets/Kafka、ActiveMQ、RabbitMQ、RocketMQ 区别以及高可用原理-5.png)
 
 如果使用 MQ，每秒 5k 个请求写入 MQ，A 系统每秒钟最多处理 2k 个请求，因为 MySQL 每秒钟最多处理 2k 个。A 系统从 MQ 中慢慢拉取请求，每秒钟就拉取 2k 个请求，不要超过自己每秒能处理的最大请求数量就 ok，这样下来，哪怕是高峰期的时候，A 系统也绝对不会挂掉。而 MQ 每秒钟 5k 个请求进来，就 2k 个请求出去，结果就导致在中午高峰期（1 个小时），可能有几十万甚至几百万的请求积压在 MQ 中。
 
-![1636207900187](../assets/Kafka%E3%80%81ActiveMQ%E3%80%81RabbitMQ%E3%80%81RocketMQ%20%E5%8C%BA%E5%88%AB%E4%BB%A5%E5%8F%8A%E9%AB%98%E5%8F%AF%E7%94%A8%E5%8E%9F%E7%90%86-6.png)
+![1636207900187](../assets/Kafka、ActiveMQ、RabbitMQ、RocketMQ 区别以及高可用原理-6.png)
 
 这个短暂的高峰期积压是 ok 的，因为高峰期过了之后，每秒钟就 50 个请求进 MQ，但是 A 系统依然会按照每秒 2k 个请求的速度在处理。所以说，只要高峰期一过，A 系统就会快速将积压的消息给解决掉。
 
@@ -160,7 +160,7 @@ RabbitMQ 有三种模式：单机模式、普通集群模式、镜像集群模�
 
 普通集群模式，意思就是在多台机器上启动多个 RabbitMQ 实例，每个机器启动一个。你创建的 queue，只会放在一个 RabbitMQ 实例上，但是每个实例都同步 queue 的元数据（元数据可以认为是 queue 的一些配置信息，通过元数据，可以找到 queue 所在实例）。你消费的时候，实际上如果连接到了另外一个实例，那么那个实例会从 queue 所在实例上拉取数据过来。
 
-![1636207934570](../assets/Kafka%E3%80%81ActiveMQ%E3%80%81RabbitMQ%E3%80%81RocketMQ%20%E5%8C%BA%E5%88%AB%E4%BB%A5%E5%8F%8A%E9%AB%98%E5%8F%AF%E7%94%A8%E5%8E%9F%E7%90%86-7.png)
+![1636207934570](../assets/Kafka、ActiveMQ、RabbitMQ、RocketMQ 区别以及高可用原理-7.png)
 
 这种方式确实很麻烦，也不怎么好，没做到所谓的分布式，就是个普通集群。因为这导致你要么消费者每次随机连接一个实例然后拉取数据，要么固定连接那个 queue 所在实例消费数据，前者有数据拉取的开销，后者导致单实例性能瓶颈。
 
@@ -172,7 +172,7 @@ RabbitMQ 有三种模式：单机模式、普通集群模式、镜像集群模�
 
 这种模式，才是所谓的 RabbitMQ 的高可用模式。跟普通集群模式不一样的是，在镜像集群模式下，你创建的 queue，无论元数据还是 queue 里的消息都会存在于多个实例上，就是说，每个 RabbitMQ 节点都有这个 queue 的一个完整镜像，包含 queue 的全部数据的意思。然后每次你写消息到 queue 的时候，都会自动把消息同步到多个实例的 queue 上。
 
-![1636207952401](../assets/Kafka%E3%80%81ActiveMQ%E3%80%81RabbitMQ%E3%80%81RocketMQ%20%E5%8C%BA%E5%88%AB%E4%BB%A5%E5%8F%8A%E9%AB%98%E5%8F%AF%E7%94%A8%E5%8E%9F%E7%90%86-8.png)
+![1636207952401](../assets/Kafka、ActiveMQ、RabbitMQ、RocketMQ 区别以及高可用原理-8.png)
 
 那么如何开启这个镜像集群模式呢？其实很简单，RabbitMQ 有很好的管理控制台，就是在后台新增一个策略，这个策略是镜像集群模式的策略，指定的时候是可以要求数据同步到所有节点的，也可以要求同步到指定数量的节点，再次创建 queue 的时候，应用这个策略，就会自动将数据同步到其他的节点上去了。
 
@@ -190,11 +190,11 @@ Kafka 0.8 以前，是没有 HA 机制的，就是任何一个 broker 宕机了�
 
 比如说，我们假设创建了一个 topic，指定其 partition 数量是 3 个，分别在三台机器上。但是，如果第二台机器宕机了，会导致这个 topic 的 1/3 的数据就丢了，因此这个是做不到高可用的。
 
-![1636207993062](../assets/Kafka%E3%80%81ActiveMQ%E3%80%81RabbitMQ%E3%80%81RocketMQ%20%E5%8C%BA%E5%88%AB%E4%BB%A5%E5%8F%8A%E9%AB%98%E5%8F%AF%E7%94%A8%E5%8E%9F%E7%90%86-9.png)
+![1636207993062](../assets/Kafka、ActiveMQ、RabbitMQ、RocketMQ 区别以及高可用原理-9.png)
 
 Kafka 0.8 以后，提供了 HA 机制，就是 replica（复制品） 副本机制。每个 partition 的数据都会同步到其它机器上，形成自己的多个 replica 副本。所有 replica 会选举一个 leader 出来，那么生产和消费都跟这个 leader 打交道，然后其他 replica 就是 follower。写的时候，leader 会负责把数据同步到所有 follower 上去，读的时候就直接读 leader 上的数据即可。只能读写 leader？很简单，要是你可以随意读写每个 follower，那么就要 care 数据一致性的问题，系统复杂度太高，很容易出问题。Kafka 会均匀地将一个 partition 的所有 replica 分布在不同的机器上，这样才可以提高容错性。
 
-![1636208023106](../assets/Kafka%E3%80%81ActiveMQ%E3%80%81RabbitMQ%E3%80%81RocketMQ%20%E5%8C%BA%E5%88%AB%E4%BB%A5%E5%8F%8A%E9%AB%98%E5%8F%AF%E7%94%A8%E5%8E%9F%E7%90%86-10.png)
+![1636208023106](../assets/Kafka、ActiveMQ、RabbitMQ、RocketMQ 区别以及高可用原理-10.png)
 
 这么搞，就有所谓的高可用性了，因为如果某个 broker 宕机了，没事儿，那个 broker 上面的 partition 在其他机器上都有副本的，如果这上面有某个 partition 的 leader，那么此时会从 follower 中重新选举一个新的 leader 出来，大家继续读写那个新的 leader 即可。这就有所谓的高可用性了。
 

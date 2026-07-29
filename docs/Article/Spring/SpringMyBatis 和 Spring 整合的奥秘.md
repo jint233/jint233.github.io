@@ -14,7 +14,7 @@ Spring 之所以是目前 Java 最受欢迎的框架，几乎所有的 Java 项�
 
 因为现在有了 SpringBoot，所以 Mybatis 和 Spring 的整合变得非常简单，但是如果没有 SpringBoot，该怎么整合呢？我翻阅了百度的前几页，不知道是不是搜索关键词问题，几乎全是用 XML 的方式去整合 Mybatis 和 Spring 的，零 XML 配置，它不香吗？
 
-代码结构： ![image.png](../assets/SpringMyBatis%20%E5%92%8C%20Spring%20%E6%95%B4%E5%90%88%E7%9A%84%E5%A5%A5%E7%A7%98-1.png)
+代码结构： ![image.png](../assets/SpringMyBatis 和 Spring 整合的奥秘-1.png)
 
 具体实现：
 
@@ -196,7 +196,7 @@ this.importBeanDefinitionRegistrars.put(registrar, importingClassMetadata);
 private final Map<ImportBeanDefinitionRegistrar, AnnotationMetadata> importBeanDefinitionRegistrars = new LinkedHashMap<>();
 ```
 
-让我们就监视下 configClass： ![image.png](../assets/SpringMyBatis%20%E5%92%8C%20Spring%20%E6%95%B4%E5%90%88%E7%9A%84%E5%A5%A5%E7%A7%98-2.png)
+让我们就监视下 configClass： ![image.png](../assets/SpringMyBatis 和 Spring 整合的奥秘-2.png)
 可以看到我们写的 MyBeanDefinitionRegistrar 被放入了 importBeanDefinitionRegistrars ，我们需要记住这个集合，至于还有一个什么，这里不用关心，当然，聪明的小伙伴肯定知道这是什么了。
 
 我们写的 MyBeanDefinitionRegistrar 只是被放入了一个 Map，并没有执行，下面我们要找找它是在哪里执行的。

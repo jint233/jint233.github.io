@@ -2,7 +2,7 @@
 
 ## ① 什么是 Cache? Cache 的目标?
 
-- 在说这个之前我们先看下典型 Web 2.0 的一些架构演变(这里不用”演进”). 从简单的到复杂的通用架构.![Arch1](../assets/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA%20Cache-1.jpeg)![Arch2](../assets/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA%20Cache-2.jpeg)![Arch3](../assets/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA%20Cache-3.jpeg)![Arch4](../assets/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA%20Cache-4.jpeg)
+- 在说这个之前我们先看下典型 Web 2.0 的一些架构演变(这里不用”演进”). 从简单的到复杂的通用架构.![Arch1](../assets/深入浅出 Cache-1.jpeg)![Arch2](../assets/深入浅出 Cache-2.jpeg)![Arch3](../assets/深入浅出 Cache-3.jpeg)![Arch4](../assets/深入浅出 Cache-4.jpeg)
 - 首先, 诚然说 Cache 在互联网公司里,是一个好东西. Cache 化,可以显著地提高应用程序的性能和便于提供应用程序的伸缩性(可以消除不必要请求落到外在的不频繁改变数据的 DataSource 上). 那么 Cache 化目的非常明显, 就是有且只有一个: 提高应用程序的性能.
 - 再者, Cache 化, 以 in-memory 为组织形式, 作为外部的持久化系统的数据的副本(可能数据结构不同), 仅仅为了提高性能. 那么 Cache 化的数据应当是短暂停留在 Distributed Cache 中 — 它们可能(可以)随时的消失(即使断电不保证立马就有数据-这一点类似 CPU 的 L1/L2 Cache), 那么应用在用到 Cache 时候仅当 Cache 系统可用时候使用不应当完全依赖于 Cache 数据 — 就是说在 Distributed Cache 中个别的 Cache 实例失效,那么 DataSource(持久化)可以临时性完成数据被访问的工作.
 - 最后, 我们可以假定如果各种 DataSource 自有的系统性能非常高, 那么 Cache 所能解决的领域就变得非常的少.

@@ -6,7 +6,7 @@ PolarFS 的数据 IO 操作
 
 写操作
 
-![img](../assets/%E9%98%BF%E9%87%8C%E4%BA%91%20PolarDB%20%E5%8F%8A%E5%85%B6%E5%85%B1%E4%BA%AB%E5%AD%98%E5%82%A8%20PolarFS%20%E6%8A%80%E6%9C%AF%E5%AE%9E%E7%8E%B0%E5%88%86%E6%9E%90%EF%BC%88%E4%B8%8B%EF%BC%89-1.jpg)
+![img](../assets/阿里云 PolarDB 及其共享存储 PolarFS 技术实现分析（下）-1.jpg)
 
 一般情况下，写操作不会涉及到卷上文件系统的元数据更新，因为在写之前就已经通过 libpfs 的 pfs_posix_fallocate()这个 API 将 Block 预分配给文件，这就避免在读写 IO 路径上出现代价较高的文件系统元数据同步过程。上图是 PolarFS 的写操作流程图，每步操作解释如下：
 
@@ -29,7 +29,7 @@ PolarFS 的数据 IO 操作
 
 网络也是类似的情况。过去传统的以太网，网卡发一个报文到另一台机器，中间通过一跳交换机，大概需要一百到两百微秒。POLARDB 支持 ROCE 以太网，通过 RDMA 网络，直接将本机的内存写入另一台机器的内存地址，或者从另一台机器的内存读一块数据到本机，中间的通讯协议编解码、重传机制都由 RDMA 网卡来完成，不需要 CPU 参与，使性能获得极大提升，传输一个 4K 大小报文只需要 6、7 微秒的时间。
 
-![img](../assets/%E9%98%BF%E9%87%8C%E4%BA%91%20PolarDB%20%E5%8F%8A%E5%85%B6%E5%85%B1%E4%BA%AB%E5%AD%98%E5%82%A8%20PolarFS%20%E6%8A%80%E6%9C%AF%E5%AE%9E%E7%8E%B0%E5%88%86%E6%9E%90%EF%BC%88%E4%B8%8B%EF%BC%89-2.png)
+![img](../assets/阿里云 PolarDB 及其共享存储 PolarFS 技术实现分析（下）-2.png)
 
 如同内核的 IO 协议栈跟不上高速存储设备能力，内核的 TCP/IP 协议栈跟不上高速网络设备能力，也被 POLARDB 的用户态网络协议栈代替。这样就解决了 HDFS 和 Ceph 等目前的分布式文件系统存在的性能差、延迟大的问题。
 
@@ -41,7 +41,7 @@ PolarFS 的数据 IO 操作
 
 为了进一步优化性能，PolarFS 对 Raft 协议进行了改进。核心思想就是解除按序确认，按序提交的束缚。将其变为乱序确认，乱序提交和乱序应用。首先看看这样做的可行性，假设每个 raft 日志代表一个事务，多个事务能够并行提交说明其不存在冲突，对应到存储层往往意味着没有修改相同的数据，比如事务 T1 修改 File1 的 Block1，事务 T2 修改 File1 的 Block2。显然，先修改 Block1 还是 Block2 对于存储层还是数据库层都没有影响。这真是能够乱序的基础。下图为优化前后的性能表现：
 
-![img](../assets/%E9%98%BF%E9%87%8C%E4%BA%91%20PolarDB%20%E5%8F%8A%E5%85%B6%E5%85%B1%E4%BA%AB%E5%AD%98%E5%82%A8%20PolarFS%20%E6%8A%80%E6%9C%AF%E5%AE%9E%E7%8E%B0%E5%88%86%E6%9E%90%EF%BC%88%E4%B8%8B%EF%BC%89-3.png)
+![img](../assets/阿里云 PolarDB 及其共享存储 PolarFS 技术实现分析（下）-3.png)
 
 但 T1 和 T2 都修改了同一个表的数据，导致表的统计信息发生了变化，比如 T1 执行后表中有 10 条记录，T2 执行后变为 15 条（举例而已，不一定正确）。所以，他们都需要更新存储层的相同 BlockX，该更新操作就不能乱序了。
 
@@ -49,7 +49,7 @@ PolarFS 的数据 IO 操作
 
 另外，乱序意味着日志会有空洞。因此，Leader 选举阶段额外引入了一个 Merge 阶段，填补 Leader 中 raft 日志的空洞，能够有效保障协议的 Leader 日志的完整性。
 
-![img](../assets/%E9%98%BF%E9%87%8C%E4%BA%91%20PolarDB%20%E5%8F%8A%E5%85%B6%E5%85%B1%E4%BA%AB%E5%AD%98%E5%82%A8%20PolarFS%20%E6%8A%80%E6%9C%AF%E5%AE%9E%E7%8E%B0%E5%88%86%E6%9E%90%EF%BC%88%E4%B8%8B%EF%BC%89-4.png)
+![img](../assets/阿里云 PolarDB 及其共享存储 PolarFS 技术实现分析（下）-4.png)
 
 PolarFS 元数据管理与更新
 
@@ -69,7 +69,7 @@ PolarFS 的每个卷/文件系统实例都有相应的 Journal 文件和与之�
 
 下图展示了文件系统元数据更新和同步的过程：
 
-![img](../assets/%E9%98%BF%E9%87%8C%E4%BA%91%20PolarDB%20%E5%8F%8A%E5%85%B6%E5%85%B1%E4%BA%AB%E5%AD%98%E5%82%A8%20PolarFS%20%E6%8A%80%E6%9C%AF%E5%AE%9E%E7%8E%B0%E5%88%86%E6%9E%90%EF%BC%88%E4%B8%8B%EF%BC%89-5.png)
+![img](../assets/阿里云 PolarDB 及其共享存储 PolarFS 技术实现分析（下）-5.png)
 
 1. Node 1 是读写挂载点，其在 pfs_fallocate()调用中将卷的第 201 个 block 分配给 FileID 为 316 的文件后，通过 Paxos 文件请求互斥锁，并顺利获得锁。
 2. Node 1 开始记录事务至 journal 中。最后写入项标记为 pending tail。当所有的项记录之后，pending tail 变成 journal 的有效 tail。
@@ -95,7 +95,7 @@ PolarFS 的元速度更新机制非常适合 PolarDB 一写多读的典型应用
 
 PolarDB 采用的方法是基于 redolog 复制的节点间数据同步。可能我们会想到 Primary 节点通过网络将 redo 日志发送给 ReadOnly/Replica 节点，但其实并不是，现在采用的方案是 redo 采用非 ring buffer 模式，每个文件固定大小，大小达到后 Rotate 到新的文件，在写模式上走 Direct IO 模式，确保磁盘上的 redo 数据是最新的，在此基础上，Primary 节点通过网络通知其他节点可以读取的 redo 文件及偏移位置，让这些节点自主到共享存储上读取所需的 redo 信息，并进行回放。流程如下图所示：
 
-![img](../assets/%E9%98%BF%E9%87%8C%E4%BA%91%20PolarDB%20%E5%8F%8A%E5%85%B6%E5%85%B1%E4%BA%AB%E5%AD%98%E5%82%A8%20PolarFS%20%E6%8A%80%E6%9C%AF%E5%AE%9E%E7%8E%B0%E5%88%86%E6%9E%90%EF%BC%88%E4%B8%8B%EF%BC%89-6.png)
+![img](../assets/阿里云 PolarDB 及其共享存储 PolarFS 技术实现分析（下）-6.png)
 
 由于 StandBy 节点与读写节点不共享底层存储，所以需要走网络发送 redo 的内容。节点在回放 redo 时需区分是 ReadOnly 节点还是 StandBy 节点，对于 ReadOnly 节点，其仅回放对应的 Page 页已在 BP 中的 redo，未在 BP 中的 page 不会主动从共享存储上读取，且 BP 中 Apply 过的 Page 也不会回刷到共享存储。但对于 StandBy 节点，需要全量回放并回刷到底层存储上。
 
@@ -139,18 +139,18 @@ PolarFS 性能
 
 不同块大小的 IO 延迟
 
-![img](../assets/%E9%98%BF%E9%87%8C%E4%BA%91%20PolarDB%20%E5%8F%8A%E5%85%B6%E5%85%B1%E4%BA%AB%E5%AD%98%E5%82%A8%20PolarFS%20%E6%8A%80%E6%9C%AF%E5%AE%9E%E7%8E%B0%E5%88%86%E6%9E%90%EF%BC%88%E4%B8%8B%EF%BC%89-7.png)
+![img](../assets/阿里云 PolarDB 及其共享存储 PolarFS 技术实现分析（下）-7.png)
 
 4KB 大小的不同请求类型
 
-![img](../assets/%E9%98%BF%E9%87%8C%E4%BA%91%20PolarDB%20%E5%8F%8A%E5%85%B6%E5%85%B1%E4%BA%AB%E5%AD%98%E5%82%A8%20PolarFS%20%E6%8A%80%E6%9C%AF%E5%AE%9E%E7%8E%B0%E5%88%86%E6%9E%90%EF%BC%88%E4%B8%8B%EF%BC%89-8.png)
+![img](../assets/阿里云 PolarDB 及其共享存储 PolarFS 技术实现分析（下）-8.png)
 
 PolarDB 整体性能
 
-**使用不同底层存储时性能表现**![img](../assets/%E9%98%BF%E9%87%8C%E4%BA%91%20PolarDB%20%E5%8F%8A%E5%85%B6%E5%85%B1%E4%BA%AB%E5%AD%98%E5%82%A8%20PolarFS%20%E6%8A%80%E6%9C%AF%E5%AE%9E%E7%8E%B0%E5%88%86%E6%9E%90%EF%BC%88%E4%B8%8B%EF%BC%89-9.png)
+**使用不同底层存储时性能表现**![img](../assets/阿里云 PolarDB 及其共享存储 PolarFS 技术实现分析（下）-9.png)
 **对外展示的性能表现**
 
-![img](../assets/%E9%98%BF%E9%87%8C%E4%BA%91%20PolarDB%20%E5%8F%8A%E5%85%B6%E5%85%B1%E4%BA%AB%E5%AD%98%E5%82%A8%20PolarFS%20%E6%8A%80%E6%9C%AF%E5%AE%9E%E7%8E%B0%E5%88%86%E6%9E%90%EF%BC%88%E4%B8%8B%EF%BC%89-10.png)
+![img](../assets/阿里云 PolarDB 及其共享存储 PolarFS 技术实现分析（下）-10.png)
 
 与 Aurora 简单对比
 

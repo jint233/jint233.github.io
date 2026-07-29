@@ -28,11 +28,11 @@ mysql 复制是指从一个 mysql 服务器(MASTER)将数据 **通过日志的�
 
 站在 slave 的角度上看，过程如下：
 
-![img](../assets/MySQL%20%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6-1.png)
+![img](../assets/MySQL 主从复制-1.png)
 
 站在 master 的角度上看，过程如下(默认的异步复制模式，前提是设置了`sync_binlog=1`，否则 binlog 刷盘时间由操作系统决定)：
 
-![img](../assets/MySQL%20%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6-2.png)
+![img](../assets/MySQL 主从复制-2.png)
 
 所以，可以认为复制大致有三个步骤：
 
@@ -52,7 +52,7 @@ MySQL 5.7.17 则提出了组复制(MySQL Group Replication,MGR)的概念。像�
 
 围绕下面的拓扑图来分析：
 
-![img](../assets/MySQL%20%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6-3.png)
+![img](../assets/MySQL 主从复制-3.png)
 
 主要有以下几点好处： **1.提供了读写分离的能力。** replication 让所有的 slave 都和 master 保持数据一致，因此外界客户端可以从各个 slave 中读取数据，而写数据则从 master 上操作。也就是实现了读写分离。
 
@@ -77,7 +77,7 @@ MySQL 支持两种不同的复制方法：传统的复制方式和 GTID 复制�
 
 客户端发送 DDL/DML 语句给 master，master 执行完毕后还需要 **等待所有的 slave 都写完了 relay log 才认为此次 DDL/DML 成功，然后才会返回成功信息给客户端**。同步复制的问题是 master 必须等待，所以延迟较大，在 MySQL 中不使用这种复制方式。
 
-![img](../assets/MySQL%20%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6-4.png)
+![img](../assets/MySQL 主从复制-4.png)
 
 例如上图中描述的，只有 3 个 slave 全都写完 relay log 并返回 ACK 给 master 后，master 才会判断此次 DDL/DML 成功。
 
@@ -85,13 +85,13 @@ MySQL 支持两种不同的复制方法：传统的复制方式和 GTID 复制�
 
 客户端发送 DDL/DML 语句给 master，master 执行完毕后 **还要等待一个 slave 写完 relay log 并返回确认信息给 master，master 才认为此次 DDL/DML 语句是成功的，然后才会发送成功信息给客户端**。半同步复制只需等待一个 slave 的回应，且等待的超时时间可以设置，超时后会自动降级为异步复制，所以在局域网内(网络延迟很小)使用半同步复制是可行的。
 
-![img](../assets/MySQL%20%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6-5.png)
+![img](../assets/MySQL 主从复制-5.png)
 
 例如上图中，只有第一个 slave 返回成功，master 就判断此次 DDL/DML 成功，其他的 slave 无论复制进行到哪一个阶段都无关紧要。
 
 ## 3.3 异步复制
 
-客户端发送 DDL/DML 语句给 master，**master 执行完毕立即返回成功信息给客户端，而不管 slave 是否已经开始复制**。这样的复制方式导致的问题是，当 master 写完了 binlog，而 slave 还没有开始复制或者复制还没完成时，**slave 上和 master 上的数据暂时不一致，且此时 master 突然宕机，slave 将会丢失一部分数据。如果此时把 slave 提升为新的 master，那么整个数据库就永久丢失这部分数据。**![img](../assets/MySQL%20%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6-6.png)
+客户端发送 DDL/DML 语句给 master，**master 执行完毕立即返回成功信息给客户端，而不管 slave 是否已经开始复制**。这样的复制方式导致的问题是，当 master 写完了 binlog，而 slave 还没有开始复制或者复制还没完成时，**slave 上和 master 上的数据暂时不一致，且此时 master 突然宕机，slave 将会丢失一部分数据。如果此时把 slave 提升为新的 master，那么整个数据库就永久丢失这部分数据。**![img](../assets/MySQL 主从复制-6.png)
 
 ## 3.4 延迟复制
 
@@ -105,7 +105,7 @@ mysql 支持一主一从和一主多从。但是每个 slave 必须只能是一�
 
 以下是一主一从的结构图：
 
-![img](../assets/MySQL%20%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6-7.png)
+![img](../assets/MySQL 主从复制-7.png)
 
 在开始传统的复制(非 GTID 复制)前，需要完成以下几个关键点，**这几个关键点指导后续复制的所有步骤**。
 
@@ -123,7 +123,7 @@ mysql 支持一主一从和一主多从。但是每个 slave 必须只能是一�
 
 一主一从是最简单的主从复制结构。本节实验环境如下：
 
-![img](../assets/MySQL%20%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6-8.png)
+![img](../assets/MySQL 主从复制-8.png)
 
 1. **配置 master 和 slave 的配置文件。**
 
@@ -742,11 +742,11 @@ IO 线程每次从 master 复制日志要写入到 relay log 中，但是它是�
 
 以下是一主多从的结构图(和一主一从的配置方法完全一致)：
 
-![img](../assets/MySQL%20%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6-9.png)
+![img](../assets/MySQL 主从复制-9.png)
 
 以下是一主多从，但某 slave 是另一群 MySQL 实例的 master：
 
-![img](../assets/MySQL%20%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6-10.png)
+![img](../assets/MySQL 主从复制-10.png)
 
 配置一主多从时，需要考虑一件事：slave 上是否要开启 binlog? 如果不开启 slave 的 binlog，性能肯定要稍微好一点。但是开启了 binlog 后，可以通过 slave 来备份数据，也可以在 master 宕机时直接将 slave 切换为新的 master。此外，如果是上面第二种主从结构，这台 slave 必须开启 binlog。可以将某台或某几台 slave 开启 binlog，并在 mysql 动静分离的路由算法上稍微减少一点到这些 slave 上的访问权重。
 
@@ -773,7 +773,7 @@ IO 线程每次从 master 复制日志要写入到 relay log 中，但是它是�
 
 此处实现的一主多从是下面这种结构：
 
-![img](../assets/MySQL%20%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6-11.png)
+![img](../assets/MySQL 主从复制-11.png)
 
 这种结构对 MySQL 复制来说，是一个很好的提升性能的方式。对于只有一个 master 的主从复制结构，每多一个 slave，意味着 master 多发一部分 binlog，业务稍微繁忙一点时，这种压力会加剧。而这种一个主 master、一个或多个辅助 master 的主从结构，非常有助于 MySQL 集群的伸缩性，对压力的适应性也很强。
 
@@ -794,7 +794,7 @@ mysql> show variables like "read_only";
 
 1. 在 slave 上没有开启`log-slave-updates`和 binlog 选项时，重放 relay log 不会记录 binlog。**所以如果 slave2 要作为某些 slave 的 master，那么在 slave2 上必须要开启 log-slave-updates 和 binlog 选项。为了安全和数据一致性，在 slave2 上还应该启用 read-only 选项。** 环境如下：
 
-![img](../assets/MySQL%20%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6-12.png)
+![img](../assets/MySQL 主从复制-12.png)
 
 以下是 master、slave1 和 slave2 上配置文件内容。
 
@@ -971,7 +971,7 @@ mysql> show variables like "%parallel%";
 
 例如，初始时 slave 上的 processlist 如下：
 
-![img](../assets/MySQL%20%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6-13.png)
+![img](../assets/MySQL 主从复制-13.png)
 
 设置`slave_parallel_workers=2`。
 
@@ -982,7 +982,7 @@ msyql> start slave sql_thread;
 mysql> show full processlist;
 ```
 
-![img](../assets/MySQL%20%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6-14.png)
+![img](../assets/MySQL 主从复制-14.png)
 
 可见多出了两个线程，其状态信息是"Waiting for an event from Coordinator"。
 

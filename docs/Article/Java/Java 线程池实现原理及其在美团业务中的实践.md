@@ -53,7 +53,7 @@
 Java 中的线程池核心实现类是 ThreadPoolExecutor，本章基于 JDK 1.8 的源码来分析 Java 线程池的核心设计与实现。我们首先来看一下 ThreadPoolExecutor 的 UML 类图，了解下 ThreadPoolExecutor 的继承关系。
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-1.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-1.png)
   <figcaption> 图 1 ThreadPoolExecutor UML 类图 </figcaption>
 </figure>
 
@@ -71,7 +71,7 @@ AbstractExecutorService 则是上层的抽象类，将执行任务的流程串�
 ThreadPoolExecutor 是如何运行，如何同时维护线程和执行任务的呢？其运行机制如下图所示：
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-2.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-2.png)
   <figcaption> 图 2 ThreadPoolExecutor 运行流程 </figcaption>
 </figure>
 
@@ -119,12 +119,12 @@ private static int ctlOf (int rs, int wc) { return rs | wc; }   // 通过状态�
 
 ThreadPoolExecutor 的运行状态有 5 种，分别为：
 
-![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-3.png)
+![img](../assets/Java 线程池实现原理及其在美团业务中的实践-3.png)
 
 其生命周期转换如下入所示：
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-4.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-4.png)
   <figcaption> 图 3 线程池生命周期 </figcaption>
 </figure>
 
@@ -145,7 +145,7 @@ ThreadPoolExecutor 的运行状态有 5 种，分别为：
 其执行流程如下图所示：
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-5.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-5.png)
   <figcaption> 图 4 任务调度流程 </figcaption>
 </figure>
 
@@ -164,13 +164,13 @@ ThreadPoolExecutor 的运行状态有 5 种，分别为：
 下图中展示了线程 1 往阻塞队列中添加元素，而线程 2 从阻塞队列中移除元素：
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-6.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-6.png)
   <figcaption> 图 5 阻塞队列 </figcaption>
 </figure>
 
 使用不同的队列可以实现不一样的任务存取策略。在这里，我们可以再介绍下阻塞队列的成员：
 
-![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-7.png)
+![img](../assets/Java 线程池实现原理及其在美团业务中的实践-7.png)
 
 #### 2.3.3 任务申请
 
@@ -179,7 +179,7 @@ ThreadPoolExecutor 的运行状态有 5 种，分别为：
 线程需要从任务缓存模块中不断地取任务执行，帮助线程从阻塞队列中获取任务，实现线程管理模块和任务管理模块之间的通信。这部分策略由 getTask 方法实现，其执行流程如下图所示：
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-8.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-8.png)
   <figcaption> 图 6 获取任务流程图 </figcaption>
 </figure>
 
@@ -199,7 +199,7 @@ public interface RejectedExecutionHandler {
 
 用户可以通过实现这个接口去定制拒绝策略，也可以选择 JDK 提供的四种已有拒绝策略，其特点如下：
 
-![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-9.png)
+![img](../assets/Java 线程池实现原理及其在美团业务中的实践-9.png)
 
 ### 2.4 Worker 线程管理
 
@@ -219,7 +219,7 @@ Worker 这个工作线程，实现了 Runnable 接口，并持有一个线程 th
 Worker 执行任务的模型如下图所示：
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-10.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-10.png)
   <figcaption> 图 7 Worker 执行任务 </figcaption>
 </figure>
 
@@ -234,7 +234,7 @@ Worker 是通过继承 AQS，使用 AQS 来实现独占锁这个功能。没有�
 在线程回收过程中就使用到了这种特性，回收过程如下图所示：
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-11.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-11.png)
   <figcaption> 图 8 线程池回收过程  </figcaption>
 </figure>
 
@@ -243,7 +243,7 @@ Worker 是通过继承 AQS，使用 AQS 来实现独占锁这个功能。没有�
 增加线程是通过线程池中的 addWorker 方法，该方法的功能就是增加一个线程，该方法不考虑线程池是在哪个阶段增加的该线程，这个分配线程的策略是在上个步骤完成的，该步骤仅仅完成增加线程，并使它运行，最后返回是否成功这个结果。addWorker 方法有两个参数：firstTask、core。firstTask 参数用于指定新增的线程执行的第一个任务，该参数可以为空；core 参数为 true 表示在新增线程时会判断当前活动线程数是否少于 corePoolSize，false 表示新增线程前需要判断当前活动线程数是否少于 maximumPoolSize，其执行流程如下图所示：
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-12.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-12.png)
   <figcaption> 图 9 申请线程执行流程图   </figcaption>
 </figure>
 
@@ -264,7 +264,7 @@ try {
 线程回收的工作是在 processWorkerExit 方法完成的。
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-13.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-13.png)
   <figcaption> 图 10 线程销毁流程   </figcaption>
 </figure>
 
@@ -283,7 +283,7 @@ try {
 执行流程如下图所示：
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-14.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-14.png)
   <figcaption> 图 11 执行任务流程 </figcaption>
 </figure>
 
@@ -300,7 +300,7 @@ try {
 **分析** ：从用户体验角度看，这个结果响应的越快越好，如果一个页面半天都刷不出，用户可能就放弃查看这个商品了。而面向用户的功能聚合通常非常复杂，伴随着调用与调用之间的级联、多级级联等情况，业务开发同学往往会选择使用线程池这种简单的方式，将调用封装成任务并行的执行，缩短总体响应时间。另外，使用线程池也是有考量的，这种场景最重要的就是获取最大的响应速度去满足用户，所以应该不设置队列去缓冲并发任务，调高 corePoolSize 和 maxPoolSize 去尽可能创造多的线程快速执行任务。
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-15.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-15.png)
   <figcaption> 图 12 并行执行任务提升任务响应速度 </figcaption>
 </figure>
 
@@ -311,7 +311,7 @@ try {
 **分析** ：这种场景需要执行大量的任务，我们也会希望任务执行的越快越好。这种情况下，也应该使用多线程策略，并行计算。但与响应速度优先的场景区别在于，这类场景任务量巨大，并不需要瞬时的完成，而是关注如何使用有限的资源，尽可能在单位时间内处理更多的任务，也就是吞吐量优先的问题。所以应该设置队列去缓冲并发任务，调整合适的 corePoolSize 去设置处理任务的线程数。在这里，设置的线程数过多可能还会引发线程上下文切换频繁的问题，也会降低处理任务的速度，降低吞吐量。
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-16.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-16.png)
   <figcaption> 图 13 并行执行任务提升批量任务执行速度 </figcaption>
 </figure>
 
@@ -330,7 +330,7 @@ try {
 **事故原因** ：该服务展示接口内部逻辑使用线程池做并行计算，由于没有预估好调用的流量，导致最大核心数设置偏小，大量抛出 RejectedExecutionException，触发接口降级条件，示意图如下：
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-17.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-17.png)
   <figcaption> 图 14 线程数核心设置过小引发 RejectExecutionException </figcaption>
 </figure>
 
@@ -341,7 +341,7 @@ try {
 **事故原因** ：该服务处理请求内部逻辑使用线程池做资源隔离，由于队列设置过长，最大线程数设置失效，导致请求数量增加时，大量任务堆积在队列中，任务执行时间过长，最终导致下游服务的大量调用超时失败。示意图如下：
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-18.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-18.png)
   <figcaption> 图 15 线程池队列长度设置过长、corePoolSize 设置过小导致任务执行速度低 </figcaption>
 </figure>
 
@@ -351,7 +351,7 @@ try {
 
 回到最初的问题，业务使用线程池是为了获取并发性，对于获取并发性，是否可以有什么其他的方案呢替代？我们尝试进行了一些其他方案的调研：
 
-![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-19.png)
+![img](../assets/Java 线程池实现原理及其在美团业务中的实践-19.png)
 
 综合考虑，这些新的方案都能在某种情况下提升并行任务的性能，然而本次重点解决的问题是如何更简易、更安全地获得的并发性。另外，Actor 模型的应用实际上甚少，只在 Scala 中使用广泛，协程框架在 Java 中维护的也不成熟。这三者现阶段都不是足够的易用，也并不能解决业务上现阶段的问题。
 
@@ -361,7 +361,7 @@ try {
 
 带着这样的疑问，我们调研了业界的一些线程池参数配置方案：
 
-![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-20.png)
+![img](../assets/Java 线程池实现原理及其在美团业务中的实践-20.png)
 
 调研了以上业界方案后，我们并没有得出通用的线程池计算方式。并发任务的执行情况和任务类型相关，IO 密集型和 CPU 密集型的任务运行起来的情况差异非常大，但这种占比是较难合理预估的，这导致很难有一个简单有效的通用公式帮我们直接计算出结果。
 
@@ -370,7 +370,7 @@ try {
 尽管经过谨慎的评估，仍然不能够保证一次计算出来合适的参数，那么我们是否可以将修改线程池参数的成本降下来，这样至少可以发生故障的时候可以快速调整从而缩短故障恢复的时间呢？基于这个思考，我们是否可以将线程池的参数从代码中迁移到分布式配置中心上，实现线程池参数可动态配置和即时生效，线程池参数动态化前后的参数修改流程对比如下：
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-21.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-21.png)
   <figcaption> 图 16 动态修改线程池参数新旧流程对比 </figcaption>
 </figure>
 
@@ -387,7 +387,7 @@ try {
 3. 增加线程池监控：对某事物缺乏状态的观测，就对其改进无从下手。在线程池执行任务的生命周期添加监控能力，帮助开发同学了解线程池状态。
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-22.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-22.png)
   <figcaption> 图 17 动态化线程池整体设计 </figcaption>
 </figure>
 
@@ -408,14 +408,14 @@ try {
  **权限校验** ：只有应用开发负责人才能够修改应用的线程池参数。
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-23.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-23.png)
   <figcaption> 图 18 动态化线程池功能架构 </figcaption>
 </figure>
 
 **参数动态化** JDK 原生线程池 ThreadPoolExecutor 提供了如下几个 public 的 setter 方法，如下图所示：
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-24.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-24.png)
   <figcaption> 图 19 JDK 线程池参数设置接口 </figcaption>
 </figure>
 
@@ -426,14 +426,14 @@ JDK 允许线程池使用方通过 ThreadPoolExecutor 的实例来动态设置�
 - 对于当前值大于原始值且当前队列中有待执行任务，则线程池会创建新的 worker 线程来执行队列任务，setCorePoolSize 具体流程如下：
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-25.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-25.png)
   <figcaption> 图 20 setCorePoolSize 方法执行流程 </figcaption>
 </figure>
 
 线程池内部会处理好当前状态做到平滑修改，其他几个方法限于篇幅，这里不一一介绍。重点是基于这几个 public 方法，我们只需要维护 ThreadPoolExecutor 的实例，并且在需要修改的时候拿到实例修改其参数即可。基于以上的思路，我们实现了线程池参数的动态化、线程池参数在管理平台可配置可修改，其效果图如下图所示：
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-26.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-26.png)
   <figcaption> 图 21 可动态修改线程池参数 </figcaption>
 </figure>
 
@@ -454,7 +454,7 @@ JDK 允许线程池使用方通过 ThreadPoolExecutor 的实例来动态设置�
 事中，也可以从两方面来看线程池的过载判定条件，一个是发生了 Reject 异常，一个是队列中有等待任务（支持定制阈值）。以上两种情况发生了都会触发告警，告警信息会通过大象推送给服务所关联的负责人。
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-27.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-27.png)
   <figcaption> 图 22 大象告警通知 </figcaption>
 </figure>
 
@@ -463,7 +463,7 @@ JDK 允许线程池使用方通过 ThreadPoolExecutor 的实例来动态设置�
 在传统的线程池应用场景中，线程池中的任务执行情况对于用户来说是透明的。比如在一个具体的业务场景中，业务开发申请了一个线程池同时用于执行两种任务，一个是发消息任务、一个是发短信任务，这两类任务实际执行的频率和时长对于用户来说没有一个直观的感受，很可能这两类任务不适合共享一个线程池，但是由于用户无法感知，因此也无从优化。动态化线程池内部实现了任务级别的埋点，且允许为不同的业务任务指定具有业务含义的名称，线程池内部基于这个名称做 Transaction 打点，基于这个功能，用户可以看到线程池内部任务级别的执行情况，且区分业务，任务监控示意图如下图所示：
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-28.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-28.png)
   <figcaption> 图 23 线程池任务执行监控 </figcaption>
 </figure>
 
@@ -472,14 +472,14 @@ JDK 允许线程池使用方通过 ThreadPoolExecutor 的实例来动态设置�
 用户基于 JDK 原生线程池 ThreadPoolExecutor 提供的几个 public 的 getter 方法，可以读取到当前线程池的运行状态以及参数，如下图所示：
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-29.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-29.png)
   <figcaption> 图 24 线程池实时运行情况 </figcaption>
 </figure>
 
 动态化线程池基于这几个接口封装了运行时状态实时查看的功能，用户基于这个功能可以了解线程池的实时状态，比如当前有多少个工作线程，执行了多少个任务，队列中等待的任务数等等。效果如下图所示：
 
 <figure markdown="span">
-  ![img](../assets/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E5%8F%8A%E5%85%B6%E5%9C%A8%E7%BE%8E%E5%9B%A2%E4%B8%9A%E5%8A%A1%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5-30.png)
+  ![img](../assets/Java 线程池实现原理及其在美团业务中的实践-30.png)
   <figcaption> 图 25 线程池实时运行情况 </figcaption>
 </figure>
 

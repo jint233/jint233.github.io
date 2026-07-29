@@ -68,7 +68,7 @@ public class AuthorService {
 }
 ```
 
-启动后，令人恐惧的红色字体在控制台出现了： ![image.png](../assets/Spring%20%E5%B8%AE%E5%8A%A9%E4%BD%A0%E6%9B%B4%E5%A5%BD%E7%9A%84%E7%90%86%E8%A7%A3%20Spring%20%E7%8E%AF%E4%BE%9D%E8%B5%96-1.png)
+启动后，令人恐惧的红色字体在控制台出现了： ![image.png](../assets/Spring 帮助你更好的理解 Spring 环依赖-1.png)
 
 如果是构造参数注入的循环依赖，Spring 无法解决：
 
@@ -89,7 +89,7 @@ public class BookService {
 }
 ```
 
-还是讨厌的红色字体： ![image.png](../assets/Spring%20%E5%B8%AE%E5%8A%A9%E4%BD%A0%E6%9B%B4%E5%A5%BD%E7%9A%84%E7%90%86%E8%A7%A3%20Spring%20%E7%8E%AF%E4%BE%9D%E8%B5%96-2.png)
+还是讨厌的红色字体： ![image.png](../assets/Spring 帮助你更好的理解 Spring 环依赖-2.png)
 
 ### 循环依赖可以关闭吗
 
@@ -106,7 +106,7 @@ public class Main {
 }
 ```
 
-再次运行，就报错了： ![image.png](../assets/Spring%20%E5%B8%AE%E5%8A%A9%E4%BD%A0%E6%9B%B4%E5%A5%BD%E7%9A%84%E7%90%86%E8%A7%A3%20Spring%20%E7%8E%AF%E4%BE%9D%E8%B5%96-3.png)
+再次运行，就报错了： ![image.png](../assets/Spring 帮助你更好的理解 Spring 环依赖-3.png)
 
 需要注意的是，我们不能这么写：
 

@@ -26,7 +26,7 @@ Docker 构建系统中，默认情况下为了加快构建的速度，会将构�
 
 builder 就是上面提到的特定模块，也就是说构建内容 context 是由 Docker CLI 发送给 dockerd；并最终由 builder 完成构建。
 
-![enter image description here](../assets/%E8%BF%9B%E9%98%B6%EF%BC%9ADockerfile%20%E9%AB%98%E9%98%B6%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97%E5%8F%8A%E9%95%9C%E5%83%8F%E4%BC%98%E5%8C%96-1.jpg)
+![enter image description here](../assets/进阶：Dockerfile 高阶使用指南及镜像优化-1.jpg)
 
 在 `docker` 的顶级命令中，我们可以看到有一个 `builder` 的命令组。它有一个子命令 `prune` 用于清理所有构建过程中的缓存。
 
@@ -529,7 +529,7 @@ buildx 是 Docker 的一个 CLI 插件，默认安装完 19.03 后将会同时�
 
 关于 dive 这里不做过多介绍了，该项目的文档中介绍还是比较详细的，我们可以用它来分析下刚才我们构建成功的镜像：
 
-![enter image description here](../assets/%E8%BF%9B%E9%98%B6%EF%BC%9ADockerfile%20%E9%AB%98%E9%98%B6%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97%E5%8F%8A%E9%95%9C%E5%83%8F%E4%BC%98%E5%8C%96-2.jpg)
+![enter image description here](../assets/进阶：Dockerfile 高阶使用指南及镜像优化-2.jpg)
 
 第二种方法，则是比较一般的，通过之前介绍的 `docker image history` 来查看构建记录和每层的大小，以此来观察是否有非必要的操作之类的。
 

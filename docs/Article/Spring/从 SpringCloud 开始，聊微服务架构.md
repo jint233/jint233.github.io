@@ -4,7 +4,7 @@
 
 随着公司业务量的飞速发展，平台面临的挑战已经远远大于业务，需求量不断增加，技术人员数量增加，面临的复杂度也大大增加。在这个背景下，平台的技术架构也完成了从传统的单体应用到微服务化的演进。
 
-![enter image description here](../assets/%E4%BB%8E%20SpringCloud%20%E5%BC%80%E5%A7%8B%EF%BC%8C%E8%81%8A%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-1.png)
+![enter image description here](../assets/从 SpringCloud 开始，聊微服务架构-1.png)
 
 ## 系统架构的演进过程
 
@@ -12,7 +12,7 @@
 
 这是平台最开始的情况，当时流量小，为了节约成本,并将所有应用都打包放到一个应用里面，采用的架构为.net+sqlserver:
 
-![enter image description here](../assets/%E4%BB%8E%20SpringCloud%20%E5%BC%80%E5%A7%8B%EF%BC%8C%E8%81%8A%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-2.png)
+![enter image description here](../assets/从 SpringCloud 开始，聊微服务架构-2.png)
 
 > **表示层** 位于最外层（最上层），最接近用户。用于显示数据和接收用户输入的数 据，为用户提供一种交互式操作的界面，平台所使用的是基于.net 的 web 形式。
 >
@@ -31,7 +31,7 @@
 
 为了解决第一代架构面临的问题，团队制定了如下的策略，并形成了第二代应用架构(垂直应用架构)
 
-![enter image description here](../assets/%E4%BB%8E%20SpringCloud%20%E5%BC%80%E5%A7%8B%EF%BC%8C%E8%81%8A%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-3.png)
+![enter image description here](../assets/从 SpringCloud 开始，聊微服务架构-3.png)
 
 - 应用拆成独立的应用模块。
 - 各个应用模块独立部署，并在负载均衡通过 session 保持解决应用模块的水平扩展问题。
@@ -69,7 +69,7 @@
 
 并以此为基础进行了平台的第三代架构的重构工作。
 
-![enter image description here](../assets/%E4%BB%8E%20SpringCloud%20%E5%BC%80%E5%A7%8B%EF%BC%8C%E8%81%8A%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-4.png)
+![enter image description here](../assets/从 SpringCloud 开始，聊微服务架构-4.png)
 
 看第三代架构里面的组成，主要分为八个部分：
 
@@ -117,17 +117,17 @@
 
 - 按照业务边界进行了划分，在一个团队内全栈，让团队自治，按照这样的方式组建，将沟通的成本维持在系统内部，每个子系统就会更加内聚，彼此的依赖耦合能变弱，跨系统的沟通成本也就能降低
 
-![enter image description here](../assets/%E4%BB%8E%20SpringCloud%20%E5%BC%80%E5%A7%8B%EF%BC%8C%E8%81%8A%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-5.png)
+![enter image description here](../assets/从 SpringCloud 开始，聊微服务架构-5.png)
 
 - 专门建立了一个架构师部门来负责第三代架构的推行工作。通常对于一个的架构师团队有系统架构、应用架构、运维、DBA、敏捷专家五个角色组成是一个比较合理的结构。那么又如何控制好架构组的产出，保证架构工作的顺利推行呢？
 - 首先：打造持续改进的自组织文化是实施微服务的关键基石。只有持续改进，持续学习和反馈，持续打造这样一个文化氛围和团队，微服务架构才能持续发展下去，保持新鲜的生命力，从而实现我们的初衷。
 - 其次：架构组的产品要经过严格的流程，因为架构组推行的是通用的解决方案，为了保证方案的质量，我们从方案调研到评审再到实施都有一个严格的闭环。
 
-![enter image description here](../assets/%E4%BB%8E%20SpringCloud%20%E5%BC%80%E5%A7%8B%EF%BC%8C%E8%81%8A%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-6.png)
+![enter image description here](../assets/从 SpringCloud 开始，聊微服务架构-6.png)
 
 再谈谈整个团队的交付流程与开发模式，如果没有预先定义好，则很难让微服务架构发挥出真正的价值，下面我们先来看看微服务架构的交付流程。
 
-![enter image description here](../assets/%E4%BB%8E%20SpringCloud%20%E5%BC%80%E5%A7%8B%EF%BC%8C%E8%81%8A%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-7.png)
+![enter image description here](../assets/从 SpringCloud 开始，聊微服务架构-7.png)
 
 使用微服务架构开发应用程序，我们实际上是针对一个个微服务进行设计、开发、测试、部署，因为每个服务之间是没有彼此依赖的，大概的交付流程就像上图这样。
 
@@ -143,13 +143,13 @@
 
 - 实践"绞杀者模式"：
 
-![enter image description here](../assets/%E4%BB%8E%20SpringCloud%20%E5%BC%80%E5%A7%8B%EF%BC%8C%E8%81%8A%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-8.png)
+![enter image description here](../assets/从 SpringCloud 开始，聊微服务架构-8.png)
 
 由于第三代架构跨度较大，并且面临了无法修改的.net 遗留系统，我们采用绞杀者模式，在遗留系统外面增加新的 Proxy 代理微服务，并且在 LB 控制 upstream 的方式，而不是直接修改原有系统，逐步的实现对老系统的替换。
 
 - 开发规范
 
-![enter image description here](../assets/%E4%BB%8E%20SpringCloud%20%E5%BC%80%E5%A7%8B%EF%BC%8C%E8%81%8A%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-9.png)
+![enter image description here](../assets/从 SpringCloud 开始，聊微服务架构-9.png)
 
 经验表明，我们需要善用代码版本控制系统，我曾经遇到一个开发团队，由于分支没有规范，最后一个小版本上线合代码居然化了几个小时，最后开发人员自己都不知道合到哪个分支。拿 Gitlab 来说，它很好地支持了多分支代码版本，我们需要利用这个特性来提高开发效率，上图就是我们目前的分支管理规范。
 
@@ -189,7 +189,7 @@
 
 为了搭建好微服务架构，技术选型是一个非常重要的阶段，只有选择合适的"演员"，才能把这台戏演好。
 
-![enter image description here](../assets/%E4%BB%8E%20SpringCloud%20%E5%BC%80%E5%A7%8B%EF%BC%8C%E8%81%8A%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-10.png)
+![enter image description here](../assets/从 SpringCloud 开始，聊微服务架构-10.png)
 
 我们使用 Spring Cloud 作为微服务开发框架，Spring Boot 拥有嵌入式 Tomcat，可直接运行一个 jar 包来发布微服务，此外它还提供了一系列“开箱即用”的插件,例如：配置中心，服务注册与发现，熔断器，路由，代理，控制总线，一次性令牌，全局锁，leader 选举，分布式 会话，集群状态等，可大量提高我们的开发效率。
 
@@ -237,7 +237,7 @@ Bus
 
 Task
 
-**工程结构规范**![enter image description here](../assets/%E4%BB%8E%20SpringCloud%20%E5%BC%80%E5%A7%8B%EF%BC%8C%E8%81%8A%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-11.png)
+**工程结构规范**![enter image description here](../assets/从 SpringCloud 开始，聊微服务架构-11.png)
 
 上图是我们实践中每个服务应该具有的项目组成结构。
 
@@ -251,7 +251,7 @@ Task
 
    供上层 web 应用请求的入口，该服务中一般会调用底层微服务完成请求。**API 网关实践**
 
-![enter image description here](../assets/%E4%BB%8E%20SpringCloud%20%E5%BC%80%E5%A7%8B%EF%BC%8C%E8%81%8A%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-12.png)
+![enter image description here](../assets/从 SpringCloud 开始，聊微服务架构-12.png)
 
 API 网关作为后端所有微服务和 API 的访问入口， 对微服务和 API 进行审计，流控， 监控，计费等。常用的 API 网关解决方案有：
 
@@ -271,7 +271,7 @@ API 网关作为后端所有微服务和 API 的访问入口， 对微服务和 
 
   良好的 HTTP API 支持， 可以动态管理 upstreams， 这也意味着我们可以通过发布平台或者胶水系统无缝的实现服务注册和发现， 对服务的访问方透明。
 
-![enter image description here](../assets/%E4%BB%8E%20SpringCloud%20%E5%BC%80%E5%A7%8B%EF%BC%8C%E8%81%8A%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-13.png)
+![enter image description here](../assets/从 SpringCloud 开始，聊微服务架构-13.png)
 
 在以上的方案里：
 
@@ -327,17 +327,17 @@ Zipkin 的 java 应用端是通过一个叫 Brave 的组件来实现对应用内
 
   针对于微服务，我们在 spring cloud 基础上，对微服务架构进行了扩展，基于 Google Dapper 的概念，设计了一套基于微服务架构的分布式跟踪系统(WeAPM)。
 
-![enter image description here](../assets/%E4%BB%8E%20SpringCloud%20%E5%BC%80%E5%A7%8B%EF%BC%8C%E8%81%8A%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-14.png)
+![enter image description here](../assets/从 SpringCloud 开始，聊微服务架构-14.png)
 
 如上图所示，我们可以通过服务名、时间、日志类型、方法名、异常级别、接口耗时等参数查询响应的日志。在得到的 TrackID 可以查询到该请求的整个链路日志，为重现问题、分析日志提供了极大方便。
 
-![enter image description here](../assets/%E4%BB%8E%20SpringCloud%20%E5%BC%80%E5%A7%8B%EF%BC%8C%E8%81%8A%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-15.png)
+![enter image description here](../assets/从 SpringCloud 开始，聊微服务架构-15.png)
 
 - **断路器实践**
 
 在微服务架构中，我们将系统拆分成了一个个的微服务，这样就有可能因为网络原因或是依赖服务自身问题出现调用故障或延迟，而这些问题会直接导致调用方的对外服务也出现延迟，若此时调用方的请求不断增加，最后就会出现因等待出现故障的依赖方响应而形成任务积压，最终导致自身服务的瘫痪。为了解决这样的问题，因此产生了[断路器模式](http://microservices.io/patterns/reliability/circuit-breaker.html)
 
-![enter image description here](../assets/%E4%BB%8E%20SpringCloud%20%E5%BC%80%E5%A7%8B%EF%BC%8C%E8%81%8A%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-16.png)
+![enter image description here](../assets/从 SpringCloud 开始，聊微服务架构-16.png)
 
 我们在实践中使用了 Hystrix 来实现断路器的功能。Hystrix 是 Netflix 开源的微服务框架套件之一，该框架目标在于通过控制那些访问远程系统、服务和第三方库的节点，从而对延迟和故障提供更强大的容错能力。Hystrix 具备拥有回退机制和断路器功能的线程和信号隔离，请求缓存和请求打包，以及监控和配置等功能。
 
@@ -372,7 +372,7 @@ Zipkin 的 java 应用端是通过一个叫 Brave 的组件来实现对应用内
 
 配置文件
 
-![enter image description here](../assets/%E4%BB%8E%20SpringCloud%20%E5%BC%80%E5%A7%8B%EF%BC%8C%E8%81%8A%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-17.png)
+![enter image description here](../assets/从 SpringCloud 开始，聊微服务架构-17.png)
 
 - **资源控制实践**
 
@@ -405,7 +405,7 @@ libcgroup 使用流程：
     cat /etc/cgconfig.conf
 ```
 
-![enter image description here](../assets/%E4%BB%8E%20SpringCloud%20%E5%BC%80%E5%A7%8B%EF%BC%8C%E8%81%8A%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84-18.png)
+![enter image description here](../assets/从 SpringCloud 开始，聊微服务架构-18.png)
 
 看到 memory 子系统是挂载在目录/sys/fs/cgroup/memory 下，进入这个目录创建一个文件夹，就创建了一个 control group 了。
 

@@ -6,7 +6,7 @@
 
 ### 什么是 BeanDefinition
 
-![image.png](../assets/Spring%20%E4%B8%AD%E7%9C%BC%E8%8A%B1%E7%BC%AD%E4%B9%B1%E7%9A%84%20BeanDefinition-1.png)
+![image.png](../assets/Spring 中眼花缭乱的 BeanDefinition-1.png)
 Spring 官网中有详细的说明，我们来翻译下： SpringIoc 容器管理一个 Bean 或多个 Bean，这些 Bean 通过我们提供给容器的配置元数据被创建出来（例如，在 xml 中的定义） 在容器中，这些 Bean 的定义用 BeanDefinition 对象来表示，包含以下元数据：
 
 - 全限定类名， 通常是 Bean 的实际实现类；
@@ -16,15 +16,15 @@ Spring 官网中有详细的说明，我们来翻译下： SpringIoc 容器管�
 
 Spring 官网中对 BeanDefinition 的解释还是很详细的，但是不是那么通俗易懂，其实 BeanDefinition 是比较容易解释的：BeanDefinition 就是用来描述一个 Bean 或者 BeanDefinition 就是 Bean 的定义。
 
-创建一个 Java Bean，大概是下面这个酱紫： ![image.png](../assets/Spring%20%E4%B8%AD%E7%9C%BC%E8%8A%B1%E7%BC%AD%E4%B9%B1%E7%9A%84%20BeanDefinition-2.png)
+创建一个 Java Bean，大概是下面这个酱紫： ![image.png](../assets/Spring 中眼花缭乱的 BeanDefinition-2.png)
 我们写的 Java 文件，会编译为 Class 文件，运行程序，类加载器会加载 Class 文件，放入 JVM 的方法区，我们就可以愉快的 new 对象了。
 
-创建一个 Spring Bean，大概是下面这个酱紫： ![image.png](../assets/Spring%20%E4%B8%AD%E7%9C%BC%E8%8A%B1%E7%BC%AD%E4%B9%B1%E7%9A%84%20BeanDefinition-3.png)
+创建一个 Spring Bean，大概是下面这个酱紫： ![image.png](../assets/Spring 中眼花缭乱的 BeanDefinition-3.png)
 我们写的 Java 文件，会编译为 Class 文件，运行程序，类加载器会加载 Class 文件，放入 JVM 的方法区，这一步还是保持不变（当然这个也没办法变。。。） 下面就是 Spring 的事情了，Spring 会解析我们的配置类（配置文件），假设现在只配置了 A，解析后，Spring 会把 A 的 BeanDefinition 放到一个 map 中去，随后，由一个一个的 BeanPostProcessor 进行加工，最终把经历了完整的 Spring 生命周期的 Bean 放入了 singleObjects。
 
 #### BeanDefinition 类图鸟瞰
 
-![image.png](../assets/Spring%20%E4%B8%AD%E7%9C%BC%E8%8A%B1%E7%BC%AD%E4%B9%B1%E7%9A%84%20BeanDefinition-4.png)
+![image.png](../assets/Spring 中眼花缭乱的 BeanDefinition-4.png)
 大家可以看到，Spring 中 BeanDefinition 的类图还是相当复杂的，我刚开始读 Spring 源码的时候，觉得 BeanDefinition 应该是一个特别简单的东西，但是后面发觉并不是那么回事。
 
 下面我将对涉及到的类逐个进行解读。
@@ -266,9 +266,9 @@ GenericBeanDefinition 替代了低版本 Spring 的 ChildBeanDefinition，Generi
 
 在介绍 GenericBeanDefinition 的时候，写了两段代码。
 
-给第一个代码打上断点，观察下 mergedBeanDefinitions，会发现 parentBeanDefinition 和 childBeanDefinition 在 mergedBeanDefinitions 都变为了 RootBeanDefinition： ![image.png](../assets/Spring%20%E4%B8%AD%E7%9C%BC%E8%8A%B1%E7%BC%AD%E4%B9%B1%E7%9A%84%20BeanDefinition-5.png)
+给第一个代码打上断点，观察下 mergedBeanDefinitions，会发现 parentBeanDefinition 和 childBeanDefinition 在 mergedBeanDefinitions 都变为了 RootBeanDefinition： ![image.png](../assets/Spring 中眼花缭乱的 BeanDefinition-5.png)
 
-给第二个代码打上断点，也观察下 mergedBeanDefinitions，会发现 authorService 在 mergedBeanDefinitions 也变为了 RootBeanDefinition： ![image.png](../assets/Spring%20%E4%B8%AD%E7%9C%BC%E8%8A%B1%E7%BC%AD%E4%B9%B1%E7%9A%84%20BeanDefinition-6.png)
+给第二个代码打上断点，也观察下 mergedBeanDefinitions，会发现 authorService 在 mergedBeanDefinitions 也变为了 RootBeanDefinition： ![image.png](../assets/Spring 中眼花缭乱的 BeanDefinition-6.png)
 
 可以看到在 mergedBeanDefinitions 存放的都是 RootBeanDefinition。
 

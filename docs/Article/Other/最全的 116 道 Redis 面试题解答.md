@@ -493,7 +493,7 @@ struct sdshdr{
 
 SDS 的存储示例如下：
 
-![SDS 存储方式](../assets/%E6%9C%80%E5%85%A8%E7%9A%84%20116%20%E9%81%93%20Redis%20%E9%9D%A2%E8%AF%95%E9%A2%98%E8%A7%A3%E7%AD%94-1.jpg)
+![SDS 存储方式](../assets/最全的 116 道 Redis 面试题解答-1.jpg)
 
 #### 13. Redis 的链表数据结构的特征有哪些？
 
