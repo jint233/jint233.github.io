@@ -14,7 +14,6 @@
 mysql> FLUSH LOGS;
 shell> mysqladmin flush-logs
 shell> mysqladmin refresh
-
 ```
 
 ## 2. 错误日志
@@ -190,7 +189,6 @@ select sleep(10);
 Reading mysql slow query log from xuexi-slow.log
 Count: 1  Time=10.00s (10s)  Lock=0.00s (0s)  Rows=1.0 (1), root[root]@localhost
   select sleep(N)
-
 [root@xuexi data]#  mysqldumpslow -a xuexi-slow.log   
 Reading mysql slow query log from xuexi-slow.log
 Count: 1  Time=10.00s (10s)  Lock=0.00s (0s)  Rows=1.0 (1), root[root]@localhost
@@ -228,7 +226,6 @@ SET timestamp=1490752558;
 select sleep(10);
 ]]
 {{  select sleep(N)}}
-
 Count: 1  Time=10.00s (10s)  Lock=0.00s (0s)  Rows=1.0 (1), root[root]@localhost
   select sleep(N)
 ```
@@ -667,11 +664,8 @@ mysql> insert into student values(7,'xiaowoniu','female',now());
 [root@localhost data]# mysqlbinlog mysql-bin.000005
 ...前面固定部分省略...
 '/*!*/;
-
 # at 120
-
 # 170329  8:06:24 server id 1  end_log_pos 200 CRC32 0x0ac02649  Query   thread_id=1     exec_time=0     error_code=0
-
 SET TIMESTAMP=1490745984/*!*/;
 SET @@session.pseudo_thread_id=1/*!*/;
 SET @@session.foreign_key_checks=1, @@session.sql_auto_is_null=0, @@session.unique_checks=1, @@session.autocommit=1/*!*/;
@@ -684,25 +678,17 @@ SET @@session.lc_time_names=0/*!*/;
 SET @@session.collation_database=DEFAULT/*!*/;
 BEGIN
 /*!*/;
-
 # at 200
-
 # 170329  8:06:24 server id 1  end_log_pos 258 CRC32 0xb8cdfd09  Table_map: `test`.`student` mapped to number 94
-
 # at 258
-
 # 170329  8:06:24 server id 1  end_log_pos 314 CRC32 0x8ce6f72c  Write_rows: table id 94 flags: STMT_END_F
-
 BINLOG '
 gPraWBMBAAAAOgAAAAIBAAAAAF4AAAAAAAEABHRlc3QAB3N0dWRlbnQABAMP/hIFHgD3AQAMCf3N
 uA==
 gPraWB4BAAAAOAAAADoBAAAAAF4AAAAAAAEAAgAE//AHAAAACXhpYW93b25pdQGZnDqBmCz35ow=
 '/*!*/;
-
 # at 314
-
 # 170329  8:06:24 server id 1  end_log_pos 345 CRC32 0x7a48c057  Xid = 114
-
 COMMIT/*!*/;
 DELIMITER ;
 ...后面固定部分省略...
@@ -718,21 +704,13 @@ gPraWBMBAAAAOgAAAAIBAAAAAF4AAAAAAAEABHRlc3QAB3N0dWRlbnQABAMP/hIFHgD3AQAMCf3N
 uA==
 gPraWB4BAAAAOAAAADoBAAAAAF4AAAAAAAEAAgAE//AHAAAACXhpYW93b25pdQGZnDqBmCz35ow=
 '/*!*/;
-
 ### INSERT INTO `test`.`student`
-
 ### SET
-
 ### @1=7 /*INT meta=0 nullable=0 is_null=0*/
-
 ### @2='xiaowoniu' /*VARSTRING(30) meta=30 nullable=0 is_null=0*/
-
 ### @3=1 /*ENUM(1 byte) meta=63233 nullable=1 is_null=0*/
-
 ### @4='2017-03-29 08:06:24' /*DATETIME(0) meta=0 nullable=1 is_null=0*/
-
 # at 314
-
 ...后面省略...
 ```
 

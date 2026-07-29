@@ -34,7 +34,6 @@ mysql> select * from t1;
 |    3 | c      |
 +------+--------+
 3 rows in set (0.00 sec)
-
 ```
 
 会话 1，开启事务，更新 id=1 的数据：

@@ -20,7 +20,6 @@ mysql> show variables like "%uuid%";
 | server_uuid   | a126fcb6-3706-11e8-b1d5-000c294ebf0d |
 +---------------+--------------------------------------+
 1 row in set (0.00 sec)
-　
 mysql> \! cat /data/auto.cnf
 [auto]
 server-uuid=a126fcb6-3706-11e8-b1d5-000c294ebf0d
@@ -410,7 +409,6 @@ mysql> show global variables like '%gtid%';
 
 ```plaintext
 # slave2上执行
-
 mysql> reset master;
 mysql> set @@global.gtid_purged='a659234f-6aea-11e8-a361-000c29ed4cf4:1-54';
 ```
@@ -433,11 +431,8 @@ mysql> start slave user='repl' password='repl_password';
 
 ```plaintext
 # master上执行
-
 mysql> flush logs;    # flush之后滚动到新的日志master-bin.000006
-
 # 在确保所有slave都复制完000006之前的所有事务后，purge掉旧日志
-
 mysql> purge master logs to "master-bin.000006";
 ```
 
@@ -466,35 +461,22 @@ Auto_Position: 1
 /_!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=1_/;
 /_!50003 SET @@SESSION.COMPLETION_TYPE=0_/;
 DELIMITER /_!_/;
-
 # at 4
-
 # 180610  1:34:08 server id 100  end_log_pos 123 CRC32 0x4a6e9510        Start: binlog v 4, server v 5.7.22-log created 180610  1:34:08
-
 # Warning: this binlog is either in use or was not closed properly
-
 BINLOG '
 kA8cWw9kAAAAdwAAAHsAAAABAAQANS43LjIyLWxvZwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAEzgNAAgAEgAEBAQEEgAAXwAEGggAAAAICAgCAAAACgoKKioAEjQA
 ARCVbko=
 '/_!_/;
-
 # at 123
-
 # 180610  1:34:08 server id 100  end_log_pos 194 CRC32 0x0f6ba409        Previous-GTIDs
-
 # a659234f-6aea-11e8-a361-000c29ed4cf4:1-57         #### 注意行1
-
 # at 194
-
 # 180610  2:06:31 server id 100  end_log_pos 259 CRC32 0xfef9194e        GTID    last_committed=0        sequence_number=1       rbr_only=no  #### 注意行2
-
 SET @@SESSION.GTID_NEXT= 'a659234f-6aea-11e8-a361-000c29ed4cf4:58'/_!_/;   #### 注意行3
-
 # at 259
-
 # 180610  2:06:31 server id 100  end_log_pos 359 CRC32 0x5a561d94        Query   thread_id=2     exec_time=0     error_code=0
-
 use `backup`/_!_/;
 SET TIMESTAMP=1528567591/_!_/;
 SET @@session.pseudo_thread_id=2/_!_/;
@@ -507,25 +489,17 @@ SET @@session.lc_time_names=0/_!_/;
 SET @@session.collation_database=DEFAULT/_!_/;
 create table t1(n int)
 /_!_/;
-
 # at 359
-
 # 180610  2:09:36 server id 100  end_log_pos 424 CRC32 0x82564e69        GTID    last_committed=1        sequence_number=2       rbr_only=no     #### 注意行4
-
 SET @@SESSION.GTID_NEXT= 'a659234f-6aea-11e8-a361-000c29ed4cf4:59'/_!_/;  #### 注意行5
-
 # at 424
-
 # 180610  2:09:36 server id 100  end_log_pos 524 CRC32 0xbc21683a        Query   thread_id=2     exec_time=0     error_code=0
-
 SET TIMESTAMP=1528567776/_!_/;
 create table t2(n int)
 /_!_/;
 SET @@SESSION.GTID_NEXT= 'AUTOMATIC' /_added by mysqlbinlog _/ /_!_/;   #### 注意行6
 DELIMITER ;
-
 # End of log file
-
 /_!50003 SET @@SESSION.COMPLETION_TYPE_/;
 /_!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=0_/;
 ```
@@ -577,7 +551,6 @@ mysql> select * from mysql.gtid_executed;
 | a659234f-6aea-11e8-a361-000c29ed4cf4 |             58 |           58 |
 | a659234f-6aea-11e8-a361-000c29ed4cf4 |             59 |           59 |
 +--------------------------------------+----------------+--------------+
-
 ```
 
 ## 7. 一张图说明 GTID 复制

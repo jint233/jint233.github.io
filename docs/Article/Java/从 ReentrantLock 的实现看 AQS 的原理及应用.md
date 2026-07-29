@@ -324,7 +324,7 @@ private final boolean compareAndSetTail(Node expect, Node update) {
         throw new Error(ex); 
       }
     }
-    ```
+```
 
     从 AQS 的静态代码块可以看出，都是获取一个对象的属性相对于该对象在内存当中的偏移量，这样我们就可以根据这个偏移量在对象内存当中找到这个属性。tailOffset 指的是 tail 对应的偏移量，所以这个时候会将 new 出来的 Node 置为当前队列的尾节点。同时，由于是双向链表，也需要将前一个节点指向尾节点。
 
@@ -839,7 +839,6 @@ else if (current == getExclusiveOwnerThread()) {
  setState(nextc);
  return true;
 }
-
 ```
 
 非公平锁：
@@ -859,7 +858,6 @@ else if (current == getExclusiveOwnerThread()) {
  setState(nextc);
  return true;
 }
-
 ```
 
 从上面这两段都可以看到，有一个同步状态 State 来控制整体可重入的情况。State 是 Volatile 修饰的，用于保证一定的可见性和有序性。
@@ -867,7 +865,6 @@ else if (current == getExclusiveOwnerThread()) {
 ```java
 // java.util.concurrent.locks.AbstractQueuedSynchronizer
 private volatile int state;
-
 ```
 
 接下来看 State 这个字段主要的过程：
@@ -917,7 +914,6 @@ public class LeeLock  {
         sync.release(1);
     }
 }
-
 ```
 
 通过我们自己定义的 Lock 完成一定的同步功能。
@@ -951,7 +947,6 @@ public class LeeMain {
         System.out.println(count);
     }
 }
-
 ```
 
 上述代码每次运行结果都会是 20000。通过简单的几行代码就能实现同步功能，这就是 AQS 的强大之处。

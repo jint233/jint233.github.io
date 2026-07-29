@@ -21,7 +21,7 @@ ThreadLocal 是 JDK1.2 开始就提供的一个用来存储线程本地变量的
     public static synchronized String formatDate(Date date){
         return simpleDateFormat.format(date);
     }
-    ```
+```
 
 - **解决办法二**
 
@@ -32,7 +32,7 @@ ThreadLocal 是 JDK1.2 开始就提供的一个用来存储线程本地变量的
     public static String formatDate(Date date){
     return simpleDateFormatThreadLocal.get().format(date);
     }
-    ```
+```
 
 ## ThreadLocal 的原理
 

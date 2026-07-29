@@ -145,14 +145,14 @@ server-id=111
 
     ```shell
     service mysqld restart
-    ```
+```
 
 2. **在 master 上创建复制专用的用户。**
 
     ```shell
     create user 'repl'@'192.168.100.%' identified by 'P@ssword1!';
     grant REPLICATION SLAVE on *.* to 'repl'@'192.168.100.%';
-    ```
+```
 
 3. **将 slave 恢复到 master 上指定的坐标。** 这是备份恢复的内容，此处用一个小节来简述操作过程。详细内容见[MySQL 备份和恢复(一)、(二)、(三)](https://www.cnblogs.com/f-ck-need-u/p/9013458.html)。
 
@@ -171,9 +171,7 @@ server-id=111
 DROP DATABASE IF EXISTS backuptest;
 CREATE DATABASE backuptest;
 USE backuptest;
-
 # 创建myisam类型的数值辅助表和插入数据的存储过程
-
 CREATE TABLE num_isam (n INT NOT NULL PRIMARY KEY) ENGINE = MYISAM ;
 DROP PROCEDURE IF EXISTS proc_num1;
 DELIMITER $$
@@ -196,9 +194,7 @@ WHERE n + rn <= num;
 END ;
 $$
 DELIMITER ;
-
 # 创建innodb类型的数值辅助表和插入数据的存储过程
-
 CREATE TABLE num_innodb (n INT NOT NULL PRIMARY KEY) ENGINE = INNODB ;
 DROP PROCEDURE IF EXISTS proc_num2;
 DELIMITER $$
@@ -221,9 +217,7 @@ WHERE n + rn <= num ;
 END ;
 $$
 DELIMITER ;
-
 # 分别向两个数值辅助表中插入100W条数据
-
 CALL proc_num1 (1000000) ;
 CALL proc_num2 (1000000) ;
 ```
@@ -478,7 +472,6 @@ option:
 # 一次性启动、关闭
 start slave;
 stop slave;
-
 # 单独启动
 start slave io_thread;
 start slave sql_thread;
@@ -815,7 +808,6 @@ sync-binlog=1
 log_bin=master-bin
 log-error=/data/err.log
 pid-file=/data/mysqld.pid
-
 # slave1上的配置
 [mysqld]
 datadir=/data
@@ -824,11 +816,9 @@ server_id=111
 relay-log=slave-bin
 log-error=/data/err.log
 pid-file=/data/mysqld.pid
-
 log-slave-updates          # 新增配置
 log-bin=master-slave-bin   # 新增配置
 read-only=ON               # 新增配置
-
 # slave2上的配置
 [mysqld]
 datadir=/data
@@ -845,7 +835,6 @@ read-only=ON
 ```shell
 # 在slave2上执行
 shell> mysqladmin -uroot -p shutdown
-
 # 在slave1上执行：
 shell> mysqladmin -uroot -p shutdown
 shell> rsync -az --delete /data 192.168.100.19:/
@@ -872,7 +861,6 @@ hell> ls /data
 auto.cnf    ib_buffer_pool  ib_logfile1  performance_schema  slave-bin.000005
 backuptest  ibdata1         master.info  relay-log.info      slave-bin.index
 err.log     ib_logfile0     mysql        slave-bin.000004    sys            
-
 shell> rm -f /data/{master.info,relay-log.info,auto.conf,slave-bin*}
 shell> service mysqld start
 ```
@@ -1071,14 +1059,14 @@ START SLAVE SQL_THREAD;
     ```shell
     show slave status;
     show processlist;
-    ```
+```
 
 2. 停止 S1 上的 IO 线程和 SQL 线程，然后将 S1 的 binlog 清空(要求已启用 binlog)。
 
     ```shell
     mysql> stop slave;
     mysql> reset master;
-    ```
+```
 
 3. 在 S2 上停止 IO 线程和 SQL 线程，通过`change master to`修改 master 的指向为 S1，然后再启动 io 线程和 SQL 线程。
 
@@ -1086,7 +1074,7 @@ START SLAVE SQL_THREAD;
     mysql> stop slave;
     mysql> change master to master_host=S1,...
     mysql> start slave;
-    ```
+```
 
 4. 将应用程序原本指向 M 的请求修改为指向 S1，如修改 MySQL 代理的目标地址。一般会通过 MySQL Router、Amoeba、cobar 等数据库中间件来实现。
 5. 删除 S1 上的 master.info、relay-log.info 文件，否则下次 S1 重启服务器会继续以 slave 角色运行。

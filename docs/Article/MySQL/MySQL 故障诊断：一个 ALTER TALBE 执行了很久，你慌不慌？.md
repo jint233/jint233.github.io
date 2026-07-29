@@ -44,7 +44,6 @@ mysql> UPDATE performance_schema.setup_instruments
 
 ```plaintext
 Query OK, 0 rows affected (0.01 sec)
-
 Rows matched: 7  Changed: 0  Warnings: 0
 ```
 
@@ -58,7 +57,6 @@ mysql> UPDATE performance_schema.setup_consumers
 
 ```plaintext
 Query OK, 1 row affected (0.00 sec)
-
 Rows matched: 1  Changed: 1  Warnings: 0
 ```
 
@@ -70,7 +68,6 @@ mysql> UPDATE performance_schema.setup_consumers
 
 ```plaintext
 Query OK, 1 row affected (0.01 sec)
-
 Rows matched: 1  Changed: 1  Warnings: 0
 ```
 
@@ -82,7 +79,6 @@ mysql> UPDATE performance_schema.setup_consumers
 
 ```plaintext
 Query OK, 1 row affected (0.00 sec)
-
 Rows matched: 1  Changed: 1  Warnings: 0
 ```
 
@@ -94,23 +90,14 @@ Rows matched: 1  Changed: 1  Warnings: 0
 
 ```plaintext
 mysql> desc sbtest.sbtest1;
-
 +-------+-----------+------+-----+---------+----------------+
-
 | Field | Type      | Null | Key | Default | Extra          |
-
 +-------+-----------+------+-----+---------+----------------+
-
 | id    | int(11)   | NO   | PRI | NULL    | auto_increment |
-
 | k     | int(11)   | NO   | MUL | 0       |                |
-
 | c     | char(120) | NO   |     |         |                |
-
 | pad   | char(60)  | NO   |     |         |                |
-
 +-------+-----------+------+-----+---------+----------------+
-
 4 rows in set (0.00 sec)
 ```
 
@@ -118,17 +105,11 @@ mysql> desc sbtest.sbtest1;
 
 ```sql
 mysql> select count(\*) from  sbtest.sbtest1;
-
 +----------+
-
 | count(\*) |
-
 +----------+
-
 |  5000000 |
-
 +----------+
-
 1 row in set (0.67 sec)
 ```
 
@@ -142,7 +123,6 @@ mysql> alter table sbtest.sbtest1 add d char(20);
 
 ```sql
 mysql> select * from performance_schema.events_stages_current\\G;
-
 ****  ****  ****  ****  ****  ****  ***1. row**  ****  ****  ****  ****  ****  **** *
 ```
 
@@ -159,13 +139,10 @@ WORK_ESTIMATED: 302958
 
 ```sql
 NESTING_EVENT_ID: 13
-
 NESTING_EVENT_TYPE: STATEMENT
-
 1 row in set (0.00 sec)
 ......
 mysql> select * from performance_schema.events_stages_current\\G;
-
 ****  ****  ****  ****  ****  ****  ***1. row**  ****  ****  ****  ****  ****  **** *
 ```
 
@@ -182,9 +159,7 @@ WORK_ESTIMATED: 302958
 
 ```plaintext
 NESTING_EVENT_ID: 13
-
 NESTING_EVENT_TYPE: STATEMENT
-
 1 row in set (0.01 sec)
 ```
 
@@ -209,37 +184,25 @@ NESTING_EVENT_TYPE: STATEMENT
 
     ```sql
     mysql> SELECT pt.INFO, ec.THREAD_ID, ec.EVENT_NAME, ec.WORK_COMPLETED, ec.WORK_ESTIMATED, pt.STATE FROM performance_schema.events_stages_current ec left join performance_schema.threads th on ec.thread_id = th.thread_id left join information_schema.PROCESSLIST pt on th.PROCESSLIST_ID = pt.ID where pt.INFO like 'ALTER%';
-    
     +-------------------------------------------+-----------+------------------------------------------------------+----------------+----------------+----------------+
-    
     | INFO                                      | THREAD_ID | EVENT_NAME                                           | WORK_COMPLETED | WORK_ESTIMATED | STATE          |
-    
     +-------------------------------------------+-----------+------------------------------------------------------+----------------+----------------+----------------+
-    
     | alter table sbtest.sbtest1 add d char(20) |        28 | stage/innodb/alter table (read PK and internal sort) |         201496 |         308223 | altering table |
-    
     +-------------------------------------------+-----------+------------------------------------------------------+----------------+----------------+----------------+
-    
     1 row in set (0.25 sec)
-    ```
+```
 
 2. 查看任务完成事件：
 
     ```sql
     mysql> select stmt.sql_text as sql_text, concat(work_completed, '/' , work_estimated) as progress, (stage.timer_end - stmt.timer_start) / 1e12 as current_seconds, (stage.timer_end - stmt.timer_start) / 1e12 * (work_estimated-work_completed) / work_completed as remaining_seconds from performance_schema.events_stages_current stage, performance_schema.events_statements_current stmt where stage.thread_id = stmt.thread_id and stage.nesting_event_id = stmt.event_id;
-    
     +-------------------------------------------+---------------+-----------------+--------------------+
-    
     | sql_text                                  | progress      | current_seconds | remaining_seconds  |
-    
     +-------------------------------------------+---------------+-----------------+--------------------+
-    
     | alter table sbtest.sbtest1 add d char(20) | 135192/308223 |   102.461512532 | 131.13954949201502 |
-    
     +-------------------------------------------+---------------+-----------------+--------------------+
-    
     1 row in set (0.00 sec)
-    ```
+```
 
 ### 总结
 

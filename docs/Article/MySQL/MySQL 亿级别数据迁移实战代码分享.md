@@ -175,7 +175,6 @@ protected JobRepository createJobRepository() throws Exception {
 
 ```java
 /**
-
 - 数据读取 根据 id 查询保证性能 分页读取
   */
   @Bean
@@ -535,7 +534,7 @@ public LockProvider lockProvider(@Qualifier(value = "primaryDatasource") DataSou
         private Integer chunkSize;
         private Integer threadSize;
     }
-    ```
+```
 
 2. 在迁移之前 MySQL 要查看连接情况，设置缓冲池大小等指标，这个也是在迁移之前要考虑的点。
 
@@ -544,7 +543,7 @@ public LockProvider lockProvider(@Qualifier(value = "primaryDatasource") DataSou
     set global innodb_buffer_pool_size =  缓冲池大小；
     show variables like 'max_connections';
     set global max_connections= 最大连接数；
-    ```
+```
 
 3. 像上面提到的 Spring Batch 在迁移过程中会将任务的执行情况都初始化到数据库中，如果我们不想要这些数据持久化，那么我们可以选择内存数据库，这个会大大提升迁移的速度，更改数据源即可。
 

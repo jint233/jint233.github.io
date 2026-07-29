@@ -331,25 +331,15 @@ IMAGE               CREATED             CREATED BY                              
 
 ```shell
 ## (MoeLove) ➜  d docker build --no-cache --ssh=default -t local/ssh . [+] Building 11.9s (9/9) FINISHED => [internal] load .dockerignore                                                                    0.1s => => transferring context: 2B                                                                      0.0s => [internal] load build definition from Dockerfile                                                 0.1s => => transferring dockerfile: 96B                                                                  0.0s => resolve image config for docker.io/docker/dockerfile:experimental                                0.0s => CACHED docker-image://docker.io/docker/dockerfile:experimental                                   0.0s => [internal] load metadata for docker.io/library/alpine:latest                                     0.0s => CACHED [1/4] FROM docker.io/library/alpine                                                       0.0s => [2/4] RUN apk add --no-cache git openssh-client                                                  5.5s => [3/4] RUN mkdir -p -m 0700 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts                3.0s => ERROR [4/4] RUN --mount=type=ssh,required git clone git@github.com:tao12345666333/moe.git        2.9s
-
 > [4/4] RUN --mount=type=ssh,required git clone git@github.com:tao12345666333/moe.git         && cd moe         && git checkout -b release:
-
 # 9 0.691 Cloning into 'moe'
-
 # 9 1.923 Warning: Permanently added the RSA host key for IP address '192.30.253.112' to the list of known hosts
-
 # 9 2.842 git@github.com: Permission denied (publickey)
-
 # 9 2.843 fatal: Could not read from remote repository
-
 # 9 2.843
-
 # 9 2.843 Please make sure you have the correct access rights
-
 # 9 2.843 and the repository exists
-
 ______________________________________________________________________
-
 rpc error: code = Unknown desc = executor failed running [/bin/sh -c git clone git@github.com:tao12345666333/moe.git         && cd moe         && git checkout -b release]: exit code: 128
 ```
 
@@ -558,9 +548,7 @@ FROM builder AS dev
 RUN apk add --no-cache vim
 FROM openjdk:8-jre-alpine
 COPY --from=builder /app/target/gs-spring-boot-0.1.0.jar /
-
 # 增加两句完全没必要的操作，仅做演示
-
 COPY --from=builder /app/target/gs-spring-boot-0.1.0.jar /tmp/
 RUN rm /tmp/gs-spring-boot-0.1.0.jar
 CMD [ "java", "-jar", "/gs-spring-boot-0.1.0.jar" ]

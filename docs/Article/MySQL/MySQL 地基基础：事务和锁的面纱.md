@@ -35,7 +35,6 @@ update account set balance=balance-1000 where username='A';
 select balance from account where username='B';
 在 B 账户里加 1000 元
 update account set balance=balance+1000 where username='B';
-
 ```
 
 好了，一个简单事务基本就这样，我们开始分析分析这个事务是如何保证事务的 ACID 的。

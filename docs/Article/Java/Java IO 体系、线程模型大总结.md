@@ -189,7 +189,7 @@ public class FileCopy05 {
             fos.close();
         }
     }
-    ```
+```
 
 - transferTo 方式：
 
@@ -213,7 +213,7 @@ public class FileCopy05 {
             fos.close();
         }
     }
-    ```
+```
 
 ### Java NIO 2.0
 
@@ -436,14 +436,11 @@ public class Server4 {
         }
     }
 }
-
 class Handler implements Runnable {
     private Socket socket;
-
     public Handler(Socket socket) {
         this.socket = socket;
     }
-
     @Override
     public void run() {
         try {
@@ -507,14 +504,11 @@ public class Client5 {
         }
     }
 }
-
 class ClientHandler implements Runnable {
     private Socket socket;
-
     public ClientHandler(Socket socket) {
         this.socket = socket;
     }
-
     @Override
     public void run() {
         try {
@@ -537,7 +531,6 @@ class ClientHandler implements Runnable {
 ```java
 public class Server5 {
     public static List<Socket> socketList = new ArrayList<>();
-
     public static void main(String[] args) throws IOException {
         // 开启一个 TCP 服务端，占用一个本地端口
         ServerSocket serverSocket = new ServerSocket(6666);
@@ -558,16 +551,13 @@ public class Server5 {
         }
     }
 }
-
 class ServerHandler implements Runnable {
     private Socket socket;
     private BufferedReader socketBufferedReader;
-
     public ServerHandler(Socket socket) throws IOException {
         this.socket = socket;
         this.socketBufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
-
     @Override
     public void run() {
         try {
@@ -594,7 +584,6 @@ class ServerHandler implements Runnable {
             }
         }
     }
-
     private String readMsgFromClient() {
         try {
             return socketBufferedReader.readLine();
@@ -666,14 +655,11 @@ public class Client6 {
         }
     }
 }
-
 class ClientHandler6 implements Runnable {
     private Socket socket;
-
     public ClientHandler6(Socket socket) {
         this.socket = socket;
     }
-
     @Override
     public void run() {
         try {
@@ -694,7 +680,6 @@ class ClientHandler6 implements Runnable {
 ```java
 public class Server6 {
     public static Map<String, Socket> userConnectionInfo = new HashMap<>();
-
     public static void main(String[] args) throws IOException {
         // 开启一个 TCP 服务端，占用一个本地端口
         ServerSocket serverSocket = new ServerSocket(6666);
@@ -714,16 +699,13 @@ public class Server6 {
         }
     }
 }
-
 class ServerHandler6 implements Runnable {
     private Socket socket;
     private BufferedReader socketBufferedReader;
-
     public ServerHandler6(Socket socket) throws IOException {
         this.socket = socket;
         this.socketBufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
-
     @Override
     public void run() {
         try {
@@ -784,7 +766,6 @@ class ServerHandler6 implements Runnable {
             }
         }
     }
-
     private String getUname() {
         String uname = "";
         // 找出该 socket 对应的用户名
@@ -798,12 +779,10 @@ class ServerHandler6 implements Runnable {
         }
         return uname;
     }
-
     private void response(String msg) throws IOException {
         PrintWriter socketPrintWriter = new PrintWriter(socket.getOutputStream(), true);
         socketPrintWriter.println(msg);
     }
-
     private String readMsgFromClient() {
         try {
             return socketBufferedReader.readLine();
@@ -873,7 +852,7 @@ Java NIO 提供了支持阻塞 / 非阻塞 I/O 通信的类。下面介绍几个
 
     ```java
     serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT)
-    ```
+```
 
     ServerSocketChannel 只会发生一种事件，即 SelectionKey.OP_ACCEPT，接受连接就绪事件。该事件的发生表明至少有一个客户端连接了，服务端可以通过 accept () 去接受这个连接了。
 
@@ -887,7 +866,7 @@ Java NIO 提供了支持阻塞 / 非阻塞 I/O 通信的类。下面介绍几个
 
     ```java
     serverSocketChannel.configureBlocking(false);
-    ```
+```
 
     此外，前面已经介绍了 NIO 的 Buffer、Channel 相关概念，此处不再赘述。
 
@@ -904,7 +883,6 @@ public class NIOServer1 {
     private int port = 6666;
     private ServerSocketChannel serverSocketChannel;
     private ExecutorService executorService;
-
     public NIOServer1() throws IOException {
         executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 4);
         serverSocketChannel = ServerSocketChannel.open();
@@ -913,11 +891,9 @@ public class NIOServer1 {
         serverSocketChannel.socket().bind(new InetSocketAddress(port));
         System.out.println("server started...");
     }
-
     public static void main(String[] args) throws IOException {
         new NIOServer1().service();
     }
-
     private void service() {
         while (true) {
             SocketChannel socketChannel;
@@ -930,14 +906,11 @@ public class NIOServer1 {
         }
     }
 }
-
 class NioHandler1 implements Runnable {
     private SocketChannel socketChannel;
-
     public NioHandler1(SocketChannel socketChannel) {
         this.socketChannel = socketChannel;
     }
-
     @Override
     public void run() {
         Socket socket = socketChannel.socket();
@@ -957,7 +930,6 @@ class NioHandler1 implements Runnable {
             e.printStackTrace();
         }
     }
-
     private String genResponse(String msg) {
         return "服务器收到了您的消息：" + msg;
     }
@@ -969,7 +941,6 @@ class NioHandler1 implements Runnable {
 ```java
 public class NIOClient1 {
     private SocketChannel socketChannel;
-
     public NIOClient1() throws IOException {
         socketChannel = SocketChannel.open();
         InetAddress localHost = InetAddress.getLocalHost();
@@ -978,11 +949,9 @@ public class NIOClient1 {
         socketChannel.connect(socketAddress);
         System.out.println ("与服务端连接成功！");
     }
-
     public static void main(String[] args) throws IOException {
         new NIOClient1().chat();
     }
-
     public void chat() {
         Socket socket = socketChannel.socket();
         try {
@@ -1025,7 +994,6 @@ public class NIOServer2 {
     private final ServerSocketChannel serverSocketChannel;
     private final Selector selector;
     private final Charset charset = StandardCharsets.UTF_8;
-
     public NIOServer2() throws IOException {
         selector = Selector.open();
         serverSocketChannel = ServerSocketChannel.open();
@@ -1035,11 +1003,9 @@ public class NIOServer2 {
         serverSocketChannel.socket().bind(new InetSocketAddress(port));
         System.out.println("server started...");
     }
-
     public static void main(String[] args) throws IOException {
         new NIOServer2().service();
     }
-
     private void service() throws IOException {
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
         while (selector.select() > 0) {
@@ -1077,7 +1043,6 @@ public class NIOServer2 {
             }
         }
     }
-
     private void receiveMsg(SelectionKey key) throws IOException {
         ByteBuffer buffer = (ByteBuffer) key.attachment();
         SocketChannel socketChannel = (SocketChannel) key.channel();
@@ -1091,7 +1056,6 @@ public class NIOServer2 {
         // 因此需要将其每次读取的数据放到 buffer 中，当凑到一行数据时再回复客户端
         buffer.put(readBuffer);
     }
-
     private void sendMsg(SelectionKey key) throws IOException {
         ByteBuffer buffer = (ByteBuffer) key.attachment();
         SocketChannel socketChannel = (SocketChannel) key.channel();
@@ -1118,16 +1082,13 @@ public class NIOServer2 {
             System.out.println ("关闭与客户端" + socketChannel.socket ().getRemoteSocketAddress () + "的连接");
         }
     }
-
     private ByteBuffer encode(String msg) {
         return charset.encode (msg); // 转为字节
     }
-
     private String decode(ByteBuffer buffer) {
         CharBuffer charBuffer = charset.decode (buffer); // 转为字符
         return charBuffer.toString();
     }
-
     private void doAccept(SelectionKey key) throws IOException {
         ServerSocketChannel ssc = (ServerSocketChannel) key.channel();
         SocketChannel socketChannel = ssc.accept();
@@ -1139,7 +1100,6 @@ public class NIOServer2 {
         // 向 Selector 注册读、写就绪事件，并关联一个 buffer 附件
         socketChannel.register(selector, SelectionKey.OP_WRITE | SelectionKey.OP_READ, buffer);
     }
-
     private String genResponse(String msg) {
         return "服务器收到了您的消息：" + msg;
     }
@@ -1161,7 +1121,6 @@ public class NIOClient2 {
     private Charset charset = Charset.forName("UTF-8");
     private SocketChannel socketChannel;
     private Selector selector;
-
     public NIOClient2() throws IOException {
         socketChannel = SocketChannel.open();
         InetAddress localHost = InetAddress.getLocalHost();
@@ -1173,7 +1132,6 @@ public class NIOClient2 {
         System.out.println ("与服务端连接成功！");
         selector = Selector.open();
     }
-
     public static void main(String[] args) throws IOException {
         NIOClient2 nioClient2 = new NIOClient2();
         Thread inputThread = new Thread() {
@@ -1185,7 +1143,6 @@ public class NIOClient2 {
         inputThread.start();
         nioClient2.chat();
     }
-
     private void chat() throws IOException {
         // 接收和发送数据
         socketChannel.register(selector, SelectionKey.OP_WRITE | SelectionKey.OP_READ);
@@ -1219,7 +1176,6 @@ public class NIOClient2 {
             }
         }
     }
-
     private void receiveMsg(SelectionKey key) throws IOException {
         // 接收服务端发来的数据，放到 recvBuf 中，如满一行数据，就输出，然后从 recvBuf 中删除
         SocketChannel channel = (SocketChannel) key.channel();
@@ -1243,7 +1199,6 @@ public class NIOClient2 {
         // 删除已经输出的数据
         recvBuf.compact();
     }
-
     private void sendMsg(SelectionKey key) throws IOException {
         // 发送 sendBuf 中的数据
         SocketChannel channel = (SocketChannel) key.channel();
@@ -1256,7 +1211,6 @@ public class NIOClient2 {
             sendBuf.compact();
         }
     }
-
     private void receiveInput() {
         try {
             BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
@@ -1274,11 +1228,9 @@ public class NIOClient2 {
             e.printStackTrace();
         }
     }
-
     private ByteBuffer encode(String msg) {
         return charset.encode (msg); // 转为字节
     }
-
     private String decode(ByteBuffer buffer) {
         CharBuffer charBuffer = charset.decode (buffer); // 转为字符
         return charBuffer.toString();
@@ -1298,7 +1250,6 @@ public class NIOServer3 {
     private ServerSocketChannel serverSocketChannel;
     private Selector selector;
     private Charset charset = Charset.forName("UTF-8");
-
     public NIOServer3() throws IOException {
         selector = Selector.open();
         serverSocketChannel = ServerSocketChannel.open();
@@ -1308,11 +1259,9 @@ public class NIOServer3 {
         serverSocketChannel.socket().bind(new InetSocketAddress(port));
         System.out.println("server started...");
     }
-
     public static void main(String[] args) throws IOException {
         new NIOServer3().service();
     }
-
     private void service() throws IOException {
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
         while (selector.select() > 0) {
@@ -1376,7 +1325,6 @@ public class NIOClient3 {
     private Charset charset = Charset.forName("UTF-8");
     private SocketChannel socketChannel;
     private Selector selector;
-
     public NIOClient3() throws IOException {
         socketChannel = SocketChannel.open();
         InetAddress localHost = InetAddress.getLocalHost();
@@ -1388,7 +1336,6 @@ public class NIOClient3 {
         System.out.println ("与服务端连接成功！");
         selector = Selector.open();
     }
-
     public static void main(String[] args) throws IOException {
         NIOClient3 nioClient3 = new NIOClient3();
         Thread inputThread = new Thread() {
@@ -1400,7 +1347,6 @@ public class NIOClient3 {
         inputThread.start();
         nioClient3.receiveMsg();
     }
-
     private void receiveMsg() throws IOException {
         socketChannel.register(selector, SelectionKey.OP_READ);
         while (selector.select() > 0) {
@@ -1433,7 +1379,6 @@ public class NIOClient3 {
             }
         }
     }
-
     private void sendInputMsg() {
         // 接收键盘输入的消息并发送数据到服务器
         try {

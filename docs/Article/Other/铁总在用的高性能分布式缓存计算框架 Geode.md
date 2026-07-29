@@ -198,7 +198,7 @@ gfsh start server --name=${servername} --locators=${locators} --locator-wait-tim
     //重点关注这行
     Successfully connected to: JMX Manager [host=192.168.33.15, port=1099]
     Cluster configuration service is up and running.
-    ```
+```
 
     我们可以看到当我们启动的时候，打印的日志会告诉我们链接到了谁。
 
@@ -210,7 +210,7 @@ gfsh start server --name=${servername} --locators=${locators} --locator-wait-tim
     //请关注下边这行
     Connecting to Manager at [host=192.168.33.15, port=1099] ..
     Successfully connected to: [host=192.168.33.15, port=1099]
-    ```
+```
 
     我们可以看到，当我们链接 33.23 的时候，它会转到 manager 地址，这就是当前的 locator leader 了。
 
@@ -297,7 +297,6 @@ Cluster-254 gfsh>
 
 ```shell
 gfsh>create region --name=test --type=PARTITION_REDUNDANT_PERSISTENT_OVERFLOW --redundant-copies=1
-
 | Member                                                      | Status | Message                                  |
 | ----------------------------------------------------------- | ------ | ---------------------------------------- |
 | server_33_15                                                | OK     | Region "/test" created on "server_33_15" |
@@ -381,7 +380,6 @@ server_33_20
 server_33_23
 server_33_15
 Non-Default Attributes Shared By Hosting Members
-
 | Type   | Name | Value |
 | ------ | ---- | ----- |
 | Region | size | 1     |
@@ -459,7 +457,6 @@ Cluster configuration service is up and running.
 
 ```shell
 ## Cluster-254 gfsh>query --query="select * from /test" Result : true Limit  : 100 Rows   : 1 Result
-
 abc_v
 ```
 
@@ -511,7 +508,6 @@ Cluster-254 gfsh>deploy --jar /opt/geode-study.jar
 Deploying files: geode-study.jar
 Total file size is: 0.00MB
 Continue?  (Y/n): y
-
 | Member       | Deployed JAR    | Deployed JAR Location                           |
 | ------------ | --------------- | ----------------------------------------------- |
 | server_33_15 | geode-study.jar | /opt/geode_work/server_33_15/geode-study.v2.jar |
@@ -552,9 +548,7 @@ keySet、values、entries 跟我们的 map 中的属性是一样的。
 
 ```shell
 ## Cluster-254 gfsh>query --query="select * from /user.keySet limit 1" Result
-
 ## test.user.1574821108359 Cluster-254 gfsh>query --query="select *from /user.values limit 1" id       |  name  | age | createTime ------------- | ------ | --- | ------------- 1574821108359 | "xy27" | 27  | 1574821108359 Cluster-254 gfsh>query --query="select* from /user.entries limit 1" test.user.1574821108359
-
 {"id":1574821108359,"name":"xy27","age":27,"createTime":1574821108359}
 Cluster-254 gfsh>query --query="select * from /user limit 1 "
 id       |  name  | age | createTime
@@ -589,7 +583,6 @@ SELECT portfolio1.ID, portfolio2.status FROM /exampleRegion portfolio1,
 
 ```shell
 Cluster-254 gfsh>query --query="select name , name.length from /user t where t.name.endsWith('99') "
-
 | name | length |
 | ---- | ------ |
 | xy99 | 4      |
@@ -599,7 +592,6 @@ Cluster-254 gfsh>query --query="select name , name.length from /user t where t.n
 
 ```shell
 Cluster-254 gfsh>query --query="select age, count(\*), max(id)  from /user t where t.age > 90 group by t.age "
-
 | age | 0   | id            |
 | --- | --- | ------------- |
 | 96  | 1   | 1574821109547 |
@@ -696,7 +688,6 @@ Cluster-254 gfsh>query --query="select age, count(\*), max(id)  from /user t whe
              log.info("cq destroy {}, {}", key, user);
          }
      }
-
      //错误事件
      @Override
      public void onError(CqEvent aCqEvent) {
@@ -1115,7 +1106,7 @@ File saved to /opt/./cluster-config-back.zip
 
    ```shell
    ps -ef | grep geode //查看启动参数
-   ```
+```
 
 2. 第二个导出配置文件，是一些常规配置，以前修改过的，关于 region 等的一些配置。
 
@@ -1184,7 +1175,7 @@ rm -rf apache-geode-1.9.2.tgz
 
     ```shell
     export PATH=JAVA_HOME/bin:/opt/apache-geode-1.9.2/bin:PATH
-    ```
+```
 
 3. 执行生效 `source /etc/profile`
 
@@ -1202,7 +1193,7 @@ rm -rf apache-geode-1.9.2.tgz
     Source-Revision: 63c8058f036316618b6cd78e6727106b7ac0a888
     Native version: native code unavailable
     Running on: /192.168.33.15, 4 cpu(s), amd64 Linux 2.6.32-696.23.1.el6.x86_64
-    ```
+```
 
 ##### **启动新 locator**
 
@@ -1219,7 +1210,7 @@ rm -rf apache-geode-1.9.2.tgz
     Class-Path: /opt/apache-geode-1.9.2/lib/geode-core-1.9.2.jar:/opt/apache-geode-1.9.2/lib/geode-dependencies.jar
     Successfully connected to: JMX Manager [host=192.168.33.15, port=1099]
     Cluster configuration service is up and running.
-    ```
+```
 
 2. 校验新的 locator 是否正常。
 
@@ -1228,7 +1219,7 @@ rm -rf apache-geode-1.9.2.tgz
     Connecting to Manager at [host=192.168.33.15, port=1099] ..
     Successfully connected to: [host=192.168.33.15, port=1099]
     Cluster-254 gfsh>
-    ```
+```
 
 3. 按照如上步骤依次重启其他机器上的 locator。
 
@@ -1242,7 +1233,7 @@ rm -rf apache-geode-1.9.2.tgz
 
     ```shell
     stop server --name=server_33_15
-    ```
+```
 
 2. 如果 server 没有与 locator 在一起的话， 需要按上边的步骤进行版本更新。
 
@@ -1254,7 +1245,7 @@ rm -rf apache-geode-1.9.2.tgz
 
     ```shell
     sh start_server_33_15.sh
-    ```
+```
 
 4. 其他 server 依次执行重启。
 

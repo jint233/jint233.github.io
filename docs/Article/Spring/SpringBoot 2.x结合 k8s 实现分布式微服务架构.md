@@ -249,12 +249,10 @@ spring:
   <groupId>org.springframework.cloud</groupId>
   <artifactId>spring-cloud-kubernetes-core</artifactId>
 </dependency>
-
 <dependency>
   <groupId>org.springframework.cloud</groupId>
   <artifactId>spring-cloud-kubernetes-discovery</artifactId>
 </dependency>
-
 ```
 
 开启服务发现功能：
@@ -281,7 +279,6 @@ client:
     request:
       connectTimeout: 8000
       readTimeout: 3000
-
 backend:
   ribbon:
     eureka:
@@ -289,7 +286,6 @@ backend:
     client:
       enabled: true
     ServerListRefreshInterval: 5000
-
 ribbon:
   ConnectTimeout: 8000
   ReadTimeout: 3000
@@ -314,7 +310,6 @@ feign:
         connectTimeout: 8000 #客户端连接超时时间
         readTimeout: 3000 #客户端读超时设置
         loggerLevel: full
-
 ```
 
 其他的可以自定义负载均衡策略，这一点是基于 Ribbon 的，所以是一样的。
@@ -354,7 +349,6 @@ feign:
         </dependency>
     </dependencies>
 </dependencyManagement>
-
 <dependencies>
       <dependency>
         <groupId>org.springframework.boot</groupId>
@@ -486,7 +480,6 @@ logging: #日志路径设置
 spring:
   profiles:
     active: dev
-
 server:
   port: 2000
   undertow:
@@ -496,13 +489,11 @@ server:
   servlet:
     session:
       timeout: PT120M #session 超时时间
-
 client:
   http:
     request:
       connectTimeout: 8000
       readTimeout: 30000
-
 mybatis: #持久层配置
   mapperLocations: classpath:mapper/*.xml
   typeAliasesPackage: com.damon.*.model
@@ -541,13 +532,10 @@ public class CasApp {
 @Configuration
 @ConfigurationProperties(prefix = "greeting")
 public class EnvConfig {
-
     private String message = "This is a dummy message";
-
     public String getMessage() {
         return this.message;
     }
-
     public void setMessage(String message) {
         this.message = message;
     }
@@ -668,7 +656,6 @@ spec:
         <version>2.1.13.RELEASE</version>
         <relativePath/>
     </parent>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -682,7 +669,6 @@ spec:
         <springcloud.kubernetes.version>1.1.1.RELEASE</springcloud.kubernetes.version>
         <mysql.version>5.1.46</mysql.version>
     </properties>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -694,7 +680,6 @@ spec:
             </dependency>
         </dependencies>
     </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -710,80 +695,66 @@ spec:
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-undertow</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
         <!-- 配置加载依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-actuator</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-actuator-autoconfigure</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-kubernetes-config</artifactId>
             </dependency>
-
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-commons</artifactId>
         </dependency>
-
         <!-- 结合 k8s 实现服务发现 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-kubernetes-core</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-kubernetes-discovery</artifactId>
         </dependency>
-
         <!-- 负载均衡策略 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-kubernetes-ribbon</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
         </dependency>
-
         <!-- 熔断机制 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
         </dependency>
-
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
             <version>4.6.3</version>
         </dependency>
-
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>${fastjson.version}</version>
         </dependency>
-
         <dependency>
           <groupId>org.jsoup</groupId>
           <artifactId>jsoup</artifactId>
           <version>1.11.3</version>
         </dependency>
-
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
@@ -794,37 +765,31 @@ spec:
             <artifactId>springfox-swagger-ui</artifactId>
             <version>${swagger.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
-
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
             <version>3.2.2</version>
         </dependency>
-
         <!-- 数据库分页 -->
         <dependency>
           <groupId>com.github.pagehelper</groupId>
           <artifactId>pagehelper</artifactId>
           <version>${pageHelper.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
             <version>1.1.1</version>
         </dependency>
-
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.version}</version>
         </dependency>
-
         <!-- 数据库驱动 -->
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -846,7 +811,6 @@ backend:
     client:
       enabled: true
     ServerListRefreshInterval: 5000
-
 ribbon:
   ConnectTimeout: 3000
   ReadTimeout: 1000
@@ -857,7 +821,6 @@ ribbon:
   MaxAutoRetriesNextServer: 1 #要重试的下一个服务的最大数量（不包括第一个服务）
   OkToRetryOnAllOperations: true
   NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RoundRobinRule #负载均衡策略
-
 hystrix:
   command:
     BackendCall:
@@ -880,18 +843,15 @@ hystrix:
  * @date 2020 年 1 月 13 日 下午 9:23:06
  *
  */
-
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan(basePackages = {"com.damon"})
 @EnableConfigurationProperties(EnvConfig.class)
 @EnableDiscoveryClient
 public class AdminApp {
-
     public static void main(String[] args) {
         SpringApplication.run(AdminApp.class, args);
     }
-
 }
 ```
 

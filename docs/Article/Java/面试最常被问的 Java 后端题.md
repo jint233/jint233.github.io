@@ -44,14 +44,14 @@ Class Object is the root of the class hierarchy.Every class has Object as a supe
 
     ```java
     User user=new User();
-    ```
+```
 
 2. 反射方式创建对象，使用 newInstance ()，但是得处理两个异常 InstantiationException、IllegalAccessException：
 
     ```java
     User user=User.class.newInstance();
     Object object=(Object)Class.forName("java.lang.Object").newInstance()
-    ```
+```
 
 3. 使用 clone 方法，前面题目中 clone 是 Object 的方法，所以所有对象都有这个方法。
 
@@ -415,7 +415,7 @@ public class MyTest {
   -Xloggc:CATALINA_BASE/logs/gc.log
   -XX:+PrintGCDetails
   -XX:+PrintGCDateStamps
-  ```
+```
 
   记录 GC 日志并不会特别地影响 Java 程序性能，推荐你尽可能记录日志。
 
@@ -608,13 +608,13 @@ HTTP 协议的长连接和短连接，实质上是 TCP 协议的长连接和短�
 
     ```java
     Class.forName("com.mysql.jdbc.Driver"); 
-    ```
+```
 
 2. 建立 JDBC 和数据库之间的 Connection 连接：
 
     ```java
     Connection c = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/test?characterEncoding=UTF-8", "root", "123456");
-    ```
+```
 
 3. 创建 Statement 或者 PreparedStatement 接口，执行 SQL 语句：
 
@@ -650,7 +650,7 @@ HTTP 协议的长连接和短连接，实质上是 TCP 协议的长连接和短�
             }
              return userList;
         }
-    ```
+```
 
 4. 处理和显示结果。
 5. 释放资源。
@@ -1139,7 +1139,6 @@ public @interface SpringBootApplication {
     @AliasFor(annotation = ComponentScan.class,attribute = "basePackageClasses")
     Class<?>[] scanBasePackageClasses() default {};
 }
-
 ```
 
 这个注解主要由三个注解组合：
@@ -1606,14 +1605,14 @@ RejectedExecutionHandler handler // 当任务无法执行的时候的处理方�
 
     ```sql
     select id ,name from table_## where id='###'  for update;
-    ```
+```
 
     悲观锁使用时一般伴随事务一起使用，数据锁定时间可能会很长，根据实际情况选用（另外还要考虑 id 是否为主键，如果 id 不是主键或者不是 InnoDB 存储引擎，那么就会出现锁全表）。
 5. 乐观锁，给数据库表增加一个 version 字段，可以通过这个字段来判断是否已经被修改了。
 
     ```sql
     update table_xxx set name=##name##,version=version+1 where version=##version##
-    ```
+```
 
 6. 分布式锁，比如 Redis、ZooKeeper 的分布式锁。单号为 key，然后给 Key 设置有效期（防止支付失败后，锁一直不释放），来一个请求使用订单号生成一把锁，业务代码执行完成后再释放锁。
 7. 保底方案：先查询是否存在此单，不存在此支付单据（上锁），存在就直接返回支付结果。

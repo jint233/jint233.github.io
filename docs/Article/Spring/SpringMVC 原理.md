@@ -153,7 +153,7 @@ public WebApplicationContext initWebApplicationContext(ServletContext servletCon
       protected ApplicationContext loadParentContext(ServletContext servletContext) {
           return null;
       }
-    ```
+```
 
 这是一个让子类实现的方法。当然，子类 ContextLoaderListener 并没有重写该方法。所以，实际上，\<4.2> 处的逻辑，可以暂时忽略。
 
@@ -232,7 +232,6 @@ public WebApplicationContext initWebApplicationContext(ServletContext servletCon
 ```java
 // ContextLoader.java
   /**
-
 - Config param for the root WebApplicationContext id,
 - to be used as serialization id for the underlying BeanFactory: {@value}.
    */
@@ -292,7 +291,6 @@ public WebApplicationContext initWebApplicationContext(ServletContext servletCon
       <param-name>contextConfigLocation</param-name>
       <param-value>classpath:config/applicationContext.xml</param-value>
   </context-param>
-
 ```
 
   <4> 处，调用 #customizeContext(ServletContext sc, ConfigurableWebApplicationContext wac) 方法，执行自定义初始化 wac。 【关键】\<5> 处， 刷新 wac，执行初始化。此处，就会进行一些的 Spring 容器的初始化。
@@ -413,7 +411,6 @@ private static class ServletConfigPropertyValues extends MutablePropertyValues {
 ```java
 // HttpServletBean.java
 /**
-
 - Initialize the BeanWrapper for this HttpServletBean,
 - possibly with custom editors.
 - <p>This default implementation is empty.
@@ -512,7 +509,6 @@ protected final void initServletBean() throws ServletException {
 ```java
 // FrameworkServlet.java
 /**
-
 - This method will be invoked after any bean properties have been set and
 - the WebApplicationContext has been loaded. The default implementation is empty;
 - subclasses may override this method to perform any initialization they require.
@@ -591,7 +587,6 @@ protected WebApplicationContext initWebApplicationContext() {
 ```java
 / FrameworkServlet.java
 /**
-
 - Flag used to detect whether onRefresh has already been called.
 *
 - 标记是否接收到 ContextRefreshedEvent 事件。即 {@link #onApplicationEvent(ContextRefreshedEvent)}
@@ -605,7 +600,6 @@ private boolean refreshEventReceived = false;
 ```java
 // FrameworkServlet.java
 /**
-
 - Template method which can be overridden to add servlet-specific refresh work.
 - Called after successful context refresh.
 - <p>This implementation is empty.
@@ -622,7 +616,6 @@ protected void onRefresh(ApplicationContext context) {
 ```java
 // DispatcherServlet.java
 /**
-
 - This implementation calls {@link #initStrategies}.
  */
 @Override
@@ -632,7 +625,6 @@ protected void onRefresh(ApplicationContext context) {
 /**
 - Initialize the strategy objects that this servlet uses.
 - <p>May be overridden in subclasses in order to initialize further strategy objects.
-
  */
 protected void initStrategies(ApplicationContext context) {
     // 初始化 MultipartResolver
@@ -690,7 +682,6 @@ private FlashMapManager flashMapManager;
 @Nullable
 private List<ViewResolver> viewResolvers;
 /**
-
 - This implementation calls {@link #initStrategies}.
  */
 @Override
@@ -700,7 +691,6 @@ protected void onRefresh(ApplicationContext context) {
 /**
 - Initialize the strategy objects that this servlet uses.
 - <p>May be overridden in subclasses in order to initialize further strategy objects.
-
  */
 protected void initStrategies(ApplicationContext context) {
     // 初始化 MultipartResolver
@@ -815,7 +805,6 @@ public interface HandlerMapping {
 ```java
 // HandlerExecutionChain.java
 /**
-
 - 处理器
  */
 private final Object handler;
@@ -1064,7 +1053,6 @@ protected final void doDelete(HttpServletRequest request, HttpServletResponse re
 /** Should we dispatch an HTTP OPTIONS request to {@link #doService}?. */
 private boolean dispatchOptionsRequest = false;
 /**
-
 - Delegate OPTIONS requests to {@link #processRequest}, if desired.
 - <p>Applies HttpServlet's standard OPTIONS processing otherwise,
 - and also if there is still no 'Allow' header set after dispatching.
@@ -1106,7 +1094,6 @@ OPTIONS 请求方法，实际场景下用的少。
 /** Should we dispatch an HTTP TRACE request to {@link #doService}?. */
 private boolean dispatchTraceRequest = false;
 /**
-
 - Delegate TRACE requests to {@link #processRequest}, if desired.
 - <p>Applies HttpServlet's standard TRACE processing otherwise.
 - @see #doService

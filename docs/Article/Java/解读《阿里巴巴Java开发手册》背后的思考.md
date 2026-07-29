@@ -1594,7 +1594,6 @@ public static <K, V> HashMap<K, V> newHashMapWithExpectedSize(int expectedSize) 
     return new HashMap<K, V>(capacity(expectedSize));
 }
 /**
-
 - Returns a capacity that is sufficient to keep the map from being resized as long as it grows no
 - larger than expectedSize and the load factor is ≥ its default (0.75).
 */

@@ -75,7 +75,6 @@ mysql> select count(*) from titles;
 |   443308 |
 +----------+
 1 row in set (0.11 sec)
-
 ```
 
 接下来我们开始看看都有哪些碎片吧。这里介绍两种方式查看表碎片。

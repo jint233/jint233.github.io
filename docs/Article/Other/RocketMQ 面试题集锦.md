@@ -136,7 +136,6 @@ RocketMQ 会把消息持久化到 CommitLog 文件里面，并且在以下的几
 ```java
 MappedByteBuffer mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, position, fileSize)
 ize);
-
 ```
 
 上文提到了 MMAP 技术就是进行文件映射和内存映射，把磁盘里面的文件映射到用户态的虚拟内存，还有将 PageCache 映射到用户态的虚拟内存，从而减少内核态到用户态的 CPU 拷贝。

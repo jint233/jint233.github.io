@@ -131,7 +131,7 @@ public static final String FACTORIES_RESOURCE_LOCATION = "META-INF/spring.factor
                 <artifactId>spring-boot-starter-web</artifactId>
                 <scope>provided</scope>
             </dependency>
-    ```
+```
 
 2. 编写邮件发送模版类，这里我添加了一个是否启用的开关：
 
@@ -284,7 +284,7 @@ public static final String FACTORIES_RESOURCE_LOCATION = "META-INF/spring.factor
             return ReUtil.isMatch("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", email);
         }
     }
-    ```
+```
 
 3. 编写 SPI 配置文件，在 resources 下新建文件夹 META-INF，创建配置文件 spring.factories，内容如下：
 
@@ -292,7 +292,7 @@ public static final String FACTORIES_RESOURCE_LOCATION = "META-INF/spring.factor
     //替换成自己的路径
     org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
         com.dragon.boot.mail.service.MailSenderTemplate 
-    ```
+```
 
 4. 一个简单的 starter 模块就编写好了，使用时引入这个依赖， application.properties 属性文件里添加配置即可。
 
@@ -317,7 +317,7 @@ public static final String FACTORIES_RESOURCE_LOCATION = "META-INF/spring.factor
     spring.mail.maxInMemorySize=4096
     #启用email模块
     dragon.boot.email.enable=true
-    ```
+```
 
 这只是一个最简单的例子，如果严格按规范，可以将所有的 autoconfig 类，包括 Property 属性配置类和逻辑配置类都放到一个独立的模块中，再另起一个 starter 模块，引入这个独立的 autoconfig 模块。
 
