@@ -190,7 +190,7 @@ NESTING_EVENT_TYPE: STATEMENT
     | alter table sbtest.sbtest1 add d char(20) |        28 | stage/innodb/alter table (read PK and internal sort) |         201496 |         308223 | altering table |
     +-------------------------------------------+-----------+------------------------------------------------------+----------------+----------------+----------------+
     1 row in set (0.25 sec)
-```
+    ```
 
 2. 查看任务完成事件：
 

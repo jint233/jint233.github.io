@@ -234,8 +234,8 @@ public void migratePayRecord() throws Exception {
 }
 ```
 
-2. **`JdbcPagingItemReader`**：采用分页方式读取数据，保证大数据量下不会内存溢出。`sortKey` 用来保证分页顺序的唯一性，断点续传时靠此字段定位。
-3. **`pageSize` 与 `saveState`**：`pageSize` 用于控制每次分页读取的记录数，`saveState` 用于保存执行状态。
+1. **`JdbcPagingItemReader`**：采用分页方式读取数据，保证大数据量下不会内存溢出。`sortKey` 用来保证分页顺序的唯一性，断点续传时靠此字段定位。
+2. **`pageSize` 与 `saveState`**：`pageSize` 用于控制每次分页读取的记录数，`saveState` 用于保存执行状态。
 
 #### 4. 写入数据配置（Writer）
 
@@ -565,7 +565,7 @@ public class MigrateConfig {
 }
 ```
 
-2. **MySQL 参数调优**：迁移前调整连接数与缓冲池：
+1. **MySQL 参数调优**：迁移前调整连接数与缓冲池：
 
 ```sql
 SHOW PROCESSLIST;
@@ -574,7 +574,7 @@ SHOW VARIABLES LIKE 'max_connections';
 SET GLOBAL max_connections = 最大连接数;
 ```
 
-3. **内存数据库加速**：若无需持久化迁移记录，可使用 H2 / HSQLDB 等内存数据库替代 JobRepository 存储。
+1. **内存数据库加速**：若无需持久化迁移记录，可使用 H2 / HSQLDB 等内存数据库替代 JobRepository 存储。
 
 ## 五、Spring Cloud Data Flow 简介
 

@@ -8,7 +8,7 @@
 
 这里说的浏览器 ID 在业界早有研究，被称为 **浏览器指纹**（Browser Fingerprinting）。浏览器指纹是 EFF（电子前哨基金会）提出的一项追踪技术，通过浏览器对网站可见的公开配置来匿名识别浏览器。在 50 万份不同浏览器数据分析中，某些场景下 94% 的浏览器具有唯一的指纹。当时，EFF 通过提取浏览器的 8 个特征值：
 
-$$\{ 	ext{user agent}, 	ext{plugins}, 	ext{fonts}, 	ext{video}, 	ext{supercookies}, 	ext{http accept}, 	ext{timezone}, 	ext{cookie enabled} \}$$
+$$\{ \\text{user agent}, \\text{plugins}, \\text{fonts}, \\text{video}, \\text{supercookies}, \\text{http accept}, \\text{timezone}, \\text{cookie enabled} \}$$
 
 综合起来哈希生成一个指纹值。每项浏览器特征都包含不同 Bit 的信息熵，提取的八项特征共包含 18.1 Bits 的信息，这意味着在 286,777 个指纹中才会出现一个重复的浏览器指纹。
 
@@ -23,15 +23,19 @@ $$\{ 	ext{user agent}, 	ext{plugins}, 	ext{fonts}, 	ext{video}, 	ext{supercookie
 ### 2.1 一些参考维度
 
 #### 2.1.1 MAC 地址
+
 MAC 地址（物理地址/硬件地址）是网卡的唯一标识。如果能在浏览器端获取 MAC 地址，就能极高程度地保证唯一性与稳定性。然而在现代浏览器中出于安全隐私限制，网页 JavaScript **无法直接获取客户端 MAC 地址**；即使在服务端，HTTP 请求也只能拿到上一级路由器的 MAC 地址而非客户端本身。此外 MAC 地址在软件层面也是可被伪造的。
 
 #### 2.1.2 IP 地址
+
 设备连接网络时会被分配一个 IP 地址。服务端可从 HTTP 请求头中解析，浏览器端也可通过 WebRTC 的 `RTCPeerConnection` API 获取局域网 IP。但 IP 地址存在重复（同局域网共享公网 IP）和易变（频繁切换网络/代理）的问题。尽管如此，IP 地址碰撞率极低，可作为辅助维度提升指纹的区分度。
 
 #### 2.1.3 Cookie & LocalStorage
+
 Cookie 是存储在浏览器端的文本数据，常用于维持登录态。虽然 Cookie 本身易被清空或禁用（不能单独作为硬件指纹），但可作为辅助存储手段。当用户登录态失效或特征发生小幅抖动时，可优先从 Cookie/LocalStorage 读取历史生成的 ID 进行兜底。
 
 #### 2.1.4 User Agent
+
 `User-Agent`（UA）包含操作系统、CPU 架构、浏览器型号及版本等信息，提供约 5.34 Bits 的信息熵。UA 具有一定区分度但稳定性较差（浏览器升级会导致版本号变化）。可行策略是仅提取浏览器主型号而不包含小版本号，或结合其他特征共同计算。
 
 综上所述，单一维度无法兼顾唯一性与稳定性，更高效的策略是将多个维度组合形成 **综合指纹**。目前业界领先的开源指纹库是 **FingerprintJS**。
@@ -81,9 +85,9 @@ FingerprintJS（简称 FPJS）是一个高度精密的浏览器指纹库，提�
 1. **IP 变化对指纹的影响**：通过 VPN 切换 IP 后，FPJS 生成的指纹依然保持稳定。说明 IP 仅用于服务端的风险辅助校验，而不作为生成核心指纹的硬性因子；
 2. **指标伪造测试**：在普通模式下，修改部分参数后指纹并未改变。原因在于 Pro 版在 Cookie/LocalStorage 中保存了 Token，下一次优先读取 Cookie 进行历史匹配；
 
-![图解](../assets/生成浏览器唯一稳定 ID 的探索-9.jpg)
+   ![图解](../assets/生成浏览器唯一稳定 ID 的探索-9.jpg)
 
-![图解](../assets/生成浏览器唯一稳定 ID 的探索-10.jpg)
+   ![图解](../assets/生成浏览器唯一稳定 ID 的探索-10.jpg)
 
 3. **清除 Cookie 后的伪造测试**：清空存储并伪造指标后指纹会发生改变。验证了存储层历史记录对维持指纹稳定性的关键作用；
 4. **服务端智能矫正**：当故意将 `navigator.platform` 伪造为不匹配的值（如 Win10 上改成 `MacIntel`）时，指纹依然保持稳定，说明服务端模型识别出离群参数并进行了智能纠偏。
