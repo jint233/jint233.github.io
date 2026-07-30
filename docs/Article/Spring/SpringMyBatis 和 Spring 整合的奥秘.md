@@ -14,7 +14,7 @@ Spring 之所以是目前 Java 最受欢迎的框架，几乎所有的 Java 项�
 
 因为现在有了 SpringBoot，所以 Mybatis 和 Spring 的整合变得非常简单，但是如果没有 SpringBoot，该怎么整合呢？我翻阅了百度的前几页，不知道是不是搜索关键词问题，几乎全是用 XML 的方式去整合 Mybatis 和 Spring 的，零 XML 配置，它不香吗？
 
-代码结构： 
+代码结构：
 
 ![示意图](../assets/SpringMyBatis 和 Spring 整合的奥秘-1.png)
 

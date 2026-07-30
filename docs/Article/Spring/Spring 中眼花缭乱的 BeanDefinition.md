@@ -13,6 +13,7 @@ Spring 官网中有详细的说明，我们来翻译下：
 > Spring IoC 容器管理一个或多个 Bean，这些 Bean 通过我们提供给容器的配置元数据被创建出来（例如在 XML 中的定义）。
 >
 > 在容器中，这些 Bean 的定义用 `BeanDefinition` 对象来表示，包含以下元数据：
+>
 > - **全限定类名**：通常是 Bean 的实际实现类；
 > - **Bean 行为配置元素**：说明 Bean 在容器中的行为（作用域、生命周期回调等等）；
 > - **依赖项**：Bean 执行工作所需要的其他 Bean 的引用（协作者或依赖项）；
@@ -320,8 +321,8 @@ public static void main(String[] args) {
 
 ```text
 Exception in thread "main" java.lang.IllegalArgumentException: Root bean cannot be changed into a child bean with parent reference
-	at org.springframework.beans.factory.support.RootBeanDefinition.setParentName(RootBeanDefinition.java:260)
-	at com.codebear.springcycle.Main.main(Main.java:20)
+    at org.springframework.beans.factory.support.RootBeanDefinition.setParentName(RootBeanDefinition.java:260)
+    at com.codebear.springcycle.Main.main(Main.java:20)
 ```
 
 源码实现如下：

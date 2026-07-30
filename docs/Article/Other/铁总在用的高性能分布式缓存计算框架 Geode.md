@@ -1104,11 +1104,11 @@ File saved to /opt/./cluster-config-back.zip
 
 1. 查看 server 状态，实际上我们是想要备份下启动参数，但是我们前边对启动进行了脚本话，因此这里就没有必要在进行启动脚本备份了，如果你没有用脚本启动，最好还是备份下，另外一种查看方式就是：
 
-   ```shell
-   ps -ef | grep geode //查看启动参数
+```shell
+ps -ef | grep geode # 查看启动参数
 ```
 
-2. 第二个导出配置文件，是一些常规配置，以前修改过的，关于 region 等的一些配置。
+1. 第二个导出配置文件，是一些常规配置，以前修改过的，关于 region 等的一些配置。
 
 ![图解](../assets/铁总在用的高性能分布式缓存计算框架 Geode-9.png)
 
@@ -1171,28 +1171,28 @@ rm -rf apache-geode-1.9.2.tgz
 
 1. 执行 `vi /ect/profile`
 
-2. 修改文件将原来 1.8 的版本改为 1.9.2
+1. 修改文件将原来 1.8 的版本改为 1.9.2
 
-    ```shell
-    export PATH=JAVA_HOME/bin:/opt/apache-geode-1.9.2/bin:PATH
+```shell
+export PATH=JAVA_HOME/bin:/opt/apache-geode-1.9.2/bin:PATH
 ```
 
-3. 执行生效 `source /etc/profile`
+1. 执行生效 `source /etc/profile`
 
-4. 执行 `gfsh version --fule` 查看版本，确定是新版本生效
+1. 执行 `gfsh version --fule` 查看版本，确定是新版本生效
 
-    ```shell
-    Build-Date: 2019-10-15 06:08:13 -0700
-    Build-Id: jdeppe 0
-    Build-Java-Version: 1.8.0_221
-    Build-Platform: Mac OS X 10.14.6 x86_64
-    Product-Name: Apache Geode
-    Product-Version: 1.9.2
-    Source-Date: 2019-10-14 15:59:02 -0700
-    Source-Repository: release/1.9.2
-    Source-Revision: 63c8058f036316618b6cd78e6727106b7ac0a888
-    Native version: native code unavailable
-    Running on: /192.168.33.15, 4 cpu(s), amd64 Linux 2.6.32-696.23.1.el6.x86_64
+```text
+Build-Date: 2019-10-15 06:08:13 -0700
+Build-Id: jdeppe 0
+Build-Java-Version: 1.8.0_221
+Build-Platform: Mac OS X 10.14.6 x86_64
+Product-Name: Apache Geode
+Product-Version: 1.9.2
+Source-Date: 2019-10-14 15:59:02 -0700
+Source-Repository: release/1.9.2
+Source-Revision: 63c8058f036316618b6cd78e6727106b7ac0a888
+Native version: native code unavailable
+Running on: /192.168.33.15, 4 cpu(s), amd64 Linux 2.6.32-696.23.1.el6.x86_64
 ```
 
 ##### **启动新 locator**
@@ -1212,7 +1212,7 @@ rm -rf apache-geode-1.9.2.tgz
     Cluster configuration service is up and running.
    ```
 
-2. 校验新的 locator 是否正常。
+1. 校验新的 locator 是否正常。
 
     ```shell
     gfsh>connect --jmx-manager=192.168.33.15
@@ -1221,7 +1221,7 @@ rm -rf apache-geode-1.9.2.tgz
     Cluster-254 gfsh>
    ```
 
-3. 按照如上步骤依次重启其他机器上的 locator。
+1. 按照如上步骤依次重启其他机器上的 locator。
 
 #### 重启 server
 
@@ -1231,23 +1231,23 @@ rm -rf apache-geode-1.9.2.tgz
 
     注意：要在主 locator 节点上的 gfsh 里执行，现在我们的主是 33.20 因此我们上到这台机器并连接 JMX 进行管理。
 
-    ```shell
-    stop server --name=server_33_15
+```shell
+stop server --name=server_33_15
 ```
 
-2. 如果 server 没有与 locator 在一起的话， 需要按上边的步骤进行版本更新。
+1. 如果 server 没有与 locator 在一起的话， 需要按上边的步骤进行版本更新。
 
    - 上传新版版
    - 解压
    - 更改 /etc/profile 配置
 
-3. 去 33.15 机器上执行启动 server 的脚本。
+1. 去 33.15 机器上执行启动 server 的脚本。
 
-    ```shell
-    sh start_server_33_15.sh
+```shell
+sh start_server_33_15.sh
 ```
 
-4. 其他 server 依次执行重启。
+1. 其他 server 依次执行重启。
 
 #### 检查
 
@@ -1406,7 +1406,7 @@ pulse 中可以在不同维护查看数据。**1. 总览** 内存，成员数，
 
 ![图解](../assets/铁总在用的高性能分布式缓存计算框架 Geode-14.png)
 
-**3. region 维度**
+### 3. region 维度
 
 region 维度主要对 region 进行描述：
 

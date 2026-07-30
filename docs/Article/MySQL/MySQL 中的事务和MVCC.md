@@ -121,7 +121,7 @@ MVCC，全称是 Mutil-Version Concurrency Control，翻译成中文是多版本
 - transaction_id 必须，事务 Id，代表这一行数据是由哪个事务 id 创建的。
 - roll_pointer 必须，回滚指针，指向这行数据的上一个版本。
 
-如下图所示： 
+如下图所示：
 
 ![示意图](../assets/MySQL 中的事务和MVCC-5.png)
 
@@ -129,7 +129,7 @@ MVCC，全称是 Mutil-Version Concurrency Control，翻译成中文是多版本
 
 其中和 MVCC 紧密相关的是 transaction_id 和 roll_pointer 两个字段，在开发过程中，我们无需关心，但是要研究 MVCC，我们必须关心。
 
-如果有类似这样的一行数据： 
+如果有类似这样的一行数据：
 
 ![示意图](../assets/MySQL 中的事务和MVCC-6.png)
 
@@ -137,7 +137,7 @@ MVCC，全称是 Mutil-Version Concurrency Control，翻译成中文是多版本
 
 _实际上，roll_pointer 并不是空的，如果真要解释，需要绕一大圈，理解成空的，问题也不大。_
 
-当我们开启事务，对这条数据进行修改，会变成这样： 
+当我们开启事务，对这条数据进行修改，会变成这样：
 
 ![示意图](../assets/MySQL 中的事务和MVCC-7.png)
 
@@ -174,7 +174,7 @@ _实际上，roll_pointer 并不是空的，如果真要解释，需要绕一大
 
 看完上面的描述，是不是觉得“云里雾里”，“不知所云”，甚至“脑阔疼，整个人都不好了”。
 
-我们换个方法来解释，看会不会更容易理解点： 
+我们换个方法来解释，看会不会更容易理解点：
 
 ![示意图](../assets/MySQL 中的事务和MVCC-8.png)
 
@@ -190,7 +190,7 @@ _实际上，roll_pointer 并不是空的，如果真要解释，需要绕一大
 
 #### READ COMMITTED——每次读取数据都会创建 ReadView
 
-假设，现在系统只有一个活跃的事务 T，事务 id 是 100，事务中修改了数据，但是还没有提交，形成的版本链是这样的： 
+假设，现在系统只有一个活跃的事务 T，事务 id 是 100，事务中修改了数据，但是还没有提交，形成的版本链是这样的：
 
 ![示意图](../assets/MySQL 中的事务和MVCC-9.png)
 

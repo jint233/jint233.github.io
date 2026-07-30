@@ -154,7 +154,7 @@ public WebApplicationContext initWebApplicationContext(ServletContext servletCon
       protected ApplicationContext loadParentContext(ServletContext servletContext) {
           return null;
       }
-```
+    ```
 
 这是一个让子类实现的方法。当然，子类 ContextLoaderListener 并没有重写该方法。所以，实际上，\<4.2> 处的逻辑，可以暂时忽略。
 
@@ -936,13 +936,13 @@ public interface FlashMapManager {
 从整体流程图，我们看到请求首先是被 DispatcherServlet 所处理，但是实际上，FrameworkServlet 才是真正的入门。FrameworkServlet 会实现：
 
 ```java
-# doGet(HttpServletRequest request, HttpServletResponse response)
-# doPost(HttpServletRequest request, HttpServletResponse response)
-# doPut(HttpServletRequest request, HttpServletResponse response)
-# doDelete(HttpServletRequest request, HttpServletResponse response)
-# doOptions(HttpServletRequest request, HttpServletResponse response)
-# doTrace(HttpServletRequest request, HttpServletResponse response)
-# service(HttpServletRequest request, HttpServletResponse response)
+doGet(HttpServletRequest request, HttpServletResponse response)
+doPost(HttpServletRequest request, HttpServletResponse response)
+doPut(HttpServletRequest request, HttpServletResponse response)
+doDelete(HttpServletRequest request, HttpServletResponse response)
+doOptions(HttpServletRequest request, HttpServletResponse response)
+doTrace(HttpServletRequest request, HttpServletResponse response)
+service(HttpServletRequest request, HttpServletResponse response)
 ```
 
 等方法。而这些实现，最终会调用 `#processRequest(HttpServletRequest request, HttpServletResponse response)` 方法，处理请求。

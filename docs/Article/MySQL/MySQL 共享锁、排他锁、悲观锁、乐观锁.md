@@ -232,7 +232,7 @@ T2:begin tran
 
 2.间隙锁的产生 　　上面的文字很抽象，现在举个栗子，介绍间隙锁是怎么产生的：
 
-假设有以下表 t_student：（其中 id 为 PK，name 为非唯一索引） 
+假设有以下表 t_student：（其中 id 为 PK，name 为非唯一索引）
 
 ![示意图](../assets/MySQL 共享锁、排他锁、悲观锁、乐观锁-1.png)
 
