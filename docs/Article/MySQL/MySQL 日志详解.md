@@ -246,7 +246,7 @@ Count: 1  Time=10.00s (10s)  Lock=0.00s (0s)  Rows=1.0 (1), root[root]@localhost
 
 MariaDB/MySQL 默认没有启动二进制日志，要启用二进制日志使用 --log-bin=[on|off|file_name] 选项指定，如果没有给定 file_name，则默认为 datadir 下的主机名加"-bin"，并在后面跟上一串数字表示日志序列号，如果给定的日志文件中包含了后缀(logname.suffix)将忽略后缀部分。
 
-![img](../assets/MySQL 日志详解-1.png)
+![图解](../assets/MySQL 日志详解-1.png)
 
 或者在配置文件中的[mysqld]部分设置 log-bin 也可以。注意：对于 mysql 5.7，直接启动 binlog 可能会导致 mysql 服务启动失败，这时需要在配置文件中的 mysqld 为 mysql 实例分配 server_id。
 
@@ -387,7 +387,7 @@ ROLLBACK /* added by mysqlbinlog */;
 
 将上述信息整理为下图：其中 timestamp 记录的是从 1970-01-01 到现在的总秒数时间戳，可以使用 date -d '@1490736093' 转换。
 
-![img](../assets/MySQL 日志详解-2.png)
+![图解](../assets/MySQL 日志详解-2.png)
 
 - 位置 0-120 记录的是二进制日志的一些固定信息。
 - 位置 120-305 记录的是 use 和 create table 语句，语句的记录时间为 5:20:00。但注意，这里的 use 不是执行的 use 语句，而是 MySQL 发现要操作的数据库为 test，而自动进行的操作并记录下来。人为的 use 语句是不会记录的。
@@ -406,7 +406,7 @@ ROLLBACK /* added by mysqlbinlog */;
 
 比较这两个文件，看看简化的日志文件简化了哪些东西。
 
-![img](../assets/MySQL 日志详解-3.png)
+![图解](../assets/MySQL 日志详解-3.png)
 
 从上图中可以看出，使用-s 后，少了基于行的日志信息，也少了记录的位置和时间信息。
 
@@ -581,7 +581,7 @@ mysql> show binary logs;
 mysql> show binlog events in 'mysql-bin.000005';
 ```
 
-![img](../assets/MySQL 日志详解-4.png)
+![图解](../assets/MySQL 日志详解-4.png)
 
 可以指定起始位置。同样，起始位置必须指定正确，不能指定不存在的位置。
 
@@ -744,19 +744,19 @@ gPraWB4BAAAAOAAAADoBAAAAAF4AAAAAAAEAAgAE//AHAAAACXhpYW93b25pdQGZnDqBmCz35ow=
 只需指定二进制日志的起始位置（可指定终止位置）并将其保存到 sql 文件中，由 mysql 命令来载入恢复即可。当然直接通过管道送给 mysql 命令也可。
 至于是基于位置来恢复还是基于时间点来恢复，这两种行为都可以。选择时间点来恢复比较直观些，并且跨日志文件恢复时更方便。
 
-```plaintext
+```shell
 mysqlbinlog --stop-datetime="2014-7-2 15:27:48" /tmp/mysql-bin.000008 | mysql -u user -p password
 ```
 
 恢复多个二进制日志文件时：
 
-```plaintext
+```shell
 mysqlbinlog mysql-bin.[\*] | mysql -uroot -p password
 ```
 
 或者将它们导入到一个文件中后恢复。
 
-```plaintext
+```shell
 mysqlbinlog mysql-bin.000001 > /tmp/a.sql
 mysqlbinlog mysql-bin.000002 >>/tmp/a.sql
 mysql -u root -p password -e "source /tmp/a.sql"

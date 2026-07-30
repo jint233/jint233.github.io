@@ -20,7 +20,7 @@
 
 ### Snowflake
 
-![img](../assets/分布式唯一 ID 解析-1.png)
+![图解](../assets/分布式唯一 ID 解析-1.png)
 
 缺点：
 
@@ -48,7 +48,7 @@
 
 #### Leaf Segment
 
-![img](../assets/分布式唯一 ID 解析-2.png)
+![图解](../assets/分布式唯一 ID 解析-2.png)
 
 使用 DB 号段保证唯一，Leaf Node 启动时或者在号段快用完时会从 DB 重新申请一段号段。
 
@@ -60,7 +60,7 @@
 
 ##### Leaf Snowflake
 
-![img](../assets/分布式唯一 ID 解析-3.png)
+![图解](../assets/分布式唯一 ID 解析-3.png)
 
 ID 生成方式类似 Snowflake。
 
@@ -72,9 +72,9 @@ workerId 使用 Zookeeper 顺序结点的特性来实现，保证 workerId 唯�
 
 原文：[https://mp.weixin.qq.com/s/JqIJupVKUNuQYIDDxRtfqA](https://mp.weixin.qq.com/s/JqIJupVKUNuQYIDDxRtfqA)
 
-![img](../assets/分布式唯一 ID 解析-4.png)
+![图解](../assets/分布式唯一 ID 解析-4.png)
 
-![img](../assets/分布式唯一 ID 解析-5.png)
+![图解](../assets/分布式唯一 ID 解析-5.png)
 
 可以看出，微信序列号生成器是在用户级别趋势递增。像微信这么大的消息量，如果像美团 Leaf Segment 一样在业务级别递增的话，那么序列号生成器肯定会成为性能瓶颈；而且美团 Leaf Segment 并不能保证全局趋势递增，并不能适用 IM Timeline 模型。
 
@@ -93,11 +93,11 @@ workerId 使用 Zookeeper 顺序结点的特性来实现，保证 workerId 唯�
 
 基于 Snowflake
 
-![img](../assets/分布式唯一 ID 解析-6.png)
+![图解](../assets/分布式唯一 ID 解析-6.png)
 
 使用 RingBuffer 缓存 UID，并通过双 RingBuffer+CacheLine 补齐方式提高并发，解决了伪共享问题
 
-![img](../assets/分布式唯一 ID 解析-7.png)
+![图解](../assets/分布式唯一 ID 解析-7.png)
 
 workerId 由 MySQL 自增 Id 分配。
 
@@ -116,7 +116,7 @@ workerId 由 MySQL 自增 Id 分配。
 
 原文：[https://docs.mongodb.com/v3.2/reference/method/ObjectId/](https://docs.mongodb.com/v3.2/reference/method/ObjectId/)
 
-![img](../assets/分布式唯一 ID 解析-8.png)
+![图解](../assets/分布式唯一 ID 解析-8.png)
 
 - 1 ~ 4：时间戳
 - 5 ~ 7：机器 Host Name 的 MD5 值
@@ -136,7 +136,7 @@ workerId 由 MySQL 自增 Id 分配。
 
 使用 Snowflake，64bit 的 Id 设计如下：
 
-![img](../assets/分布式唯一 ID 解析-9.png)
+![图解](../assets/分布式唯一 ID 解析-9.png)
 
 因此，最多有 2^10 = 1024 个 workerId，分配 WorkerId 的 DB Schema 设计如下：
 

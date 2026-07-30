@@ -101,7 +101,7 @@ server.requestHandler(request -> {
 
 在大部分情况下，Vert.x 在一个线程里调用对应的 handlers，这个线程就叫做一个 **Event Loop**。
 
-![img](../assets/Vert.x 基础入门-2.png)
+![图解](../assets/Vert.x 基础入门-2.png)
 
 图片来自 Vert.x 官网：<https://vertx.io/docs/guide-for-java-devs/>
 
@@ -177,7 +177,7 @@ vertx.deployVerticle(blockWarningDemo, options);
 
 这样这个 Verticle 就不在 _Event Loop_ 上分配了，转而分配到 Vert.x 的内部工作线程池上。
 
-![img](../assets/Vert.x 基础入门-3.png)
+![图解](../assets/Vert.x 基础入门-3.png)
 
 图片来自 Vert.x 官网：<https://vertx.io/docs/guide-for-java-devs/>
 
@@ -318,6 +318,7 @@ public class HttpAndWsServer {
 通过访问 WebSocket 返回如下：
 
 ![http response](../assets/Vert.x 基础入门-5.png)
+
 同时，访问 HTTP 也不受影响，因为 WebSocket 协议的升级包也是 HTTP 协议。
 
 另外如果使用 Verticle 多实例部署，也可以共用一个端口，这样一个 Verticle 停用或者卸载了，也不影响其他 Verticle 的服务，体现了反应式宣言中的回弹性。
@@ -365,6 +366,7 @@ vertx run my-verticle.js
 需求：调用 MXBean 来获取 cpu 和内存，然后通过 eventbus 发送。另外一个接收 eventbus ，发送到页面进行展现。 最终效果如下图：
 
 ![dashboard](../assets/Vert.x 基础入门-6.png)
+
 最终完成的项目地址为：<https://github.com/roytrack/vertx-gitchat>
 
 #### 构建 Agent

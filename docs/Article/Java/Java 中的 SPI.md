@@ -17,7 +17,7 @@ SPI 全称 Service Provider Interface，字面意思是提供服务的接口，�
 
 还是举例说明吧。 我们创建一个项目，然后创建一个 module 叫 spi-interface。
 
-![img](../assets/Java 中的 SPI-1.png)
+![图解](../assets/Java 中的 SPI-1.png)
 
 在这个 module 中我们定义一个接口：
 
@@ -57,7 +57,7 @@ public class SpiOneService implements SpiInterfaceService {
 
 然后再 spi-service-one 的 resources 目录下创建目录 META-INF/services，在此目录下创建一个文件名称为 SpiInterfaceService 接口的全限定名称，文件内容写入 SpiOneService 这个实现类的全限定名称。 效果如下：
 
-![img](../assets/Java 中的 SPI-2.png)
+![图解](../assets/Java 中的 SPI-2.png)
 
 再创建一个 module，名称为：spi-service-one，也是依赖 spi-interface，并且定义一个实现类 SpiTwoService 来实现 SpiInterfaceService 接口。
 
@@ -82,11 +82,11 @@ public class SpiTwoService implements SpiInterfaceService {
 
 目录结构如下：
 
-![img](../assets/Java 中的 SPI-3.png)
+![图解](../assets/Java 中的 SPI-3.png)
 
 下面再创建一个用来测试的 module，名为：spi-app。
 
-![img](../assets/Java 中的 SPI-4.png)
+![图解](../assets/Java 中的 SPI-4.png)
 
 pom.xml 中依赖 `spi-service-one` 和 `spi-service-two`
 
@@ -132,7 +132,7 @@ public class SpiService {
 
 通过运行结果我们可以看到，已经将 SpiInterfaceService 接口的所有实现都加载到了当前项目中，并且执行了调用。
 
-![img](../assets/Java 中的 SPI-5.png)
+![图解](../assets/Java 中的 SPI-5.png)
 
 这整个代码结构我们可以看出 SPI 机制将模块的装配放到了程序外面，就是说，接口的实现可以在程序外面，只需要在使用的时候指定具体的实现。并且动态的加载到自己的项目中。
 
@@ -166,7 +166,7 @@ public static <S> ServiceLoader<S> load(Class<S> service) {
 
 在 ServiceLoader 里找到具体实现 hasNext () 的方法了，那么继续来看这个方法的实现。
 
-![img](../assets/Java 中的 SPI-6.png)
+![图解](../assets/Java 中的 SPI-6.png)
 
 hasNext () 方法又主要调用了 hasNextService () 方法。
 
@@ -206,7 +206,7 @@ private boolean hasNextService() {
 
 继续看迭代器是如何取出每一个实现对象的。那就要看 ServiceLoader 中实现了迭代器的 next () 方法了。
 
-![img](../assets/Java 中的 SPI-7.png)
+![图解](../assets/Java 中的 SPI-7.png)
 
 next () 方法主要是 nextService () 实现的，那么继续看 nextService () 方法。
 

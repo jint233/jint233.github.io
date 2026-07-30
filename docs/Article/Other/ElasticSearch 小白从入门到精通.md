@@ -90,11 +90,11 @@ docker restart es
 
 测试：
 
-![img](../assets/ElasticSearch 小白从入门到精通-1.png)
+![图解](../assets/ElasticSearch 小白从入门到精通-1.png)
 
 查看分词器是否安装上：
 
-![img](../assets/ElasticSearch 小白从入门到精通-2.png)
+![图解](../assets/ElasticSearch 小白从入门到精通-2.png)
 
 ### ES 查询
 
@@ -564,7 +564,7 @@ curl -X PUT "localhost:9200/my_index/_mapping/my_type?pretty" -H 'Content-Type: 
 
 创建 ES 集群：
 
-![img](../assets/ElasticSearch 小白从入门到精通-3.png)
+![图解](../assets/ElasticSearch 小白从入门到精通-3.png)
 
 连接 ES：
 
@@ -602,7 +602,7 @@ public class JavaEsTest {
 
 测试结果：
 
-![img](../assets/ElasticSearch 小白从入门到精通-4.png)
+![图解](../assets/ElasticSearch 小白从入门到精通-4.png)
 
 ### 总结
 

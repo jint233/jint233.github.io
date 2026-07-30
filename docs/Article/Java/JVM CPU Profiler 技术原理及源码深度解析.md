@@ -11,13 +11,13 @@
 在用 IDEA 打开需要诊断的 Java 项目后，在 "Preferences -> Build, Execution, Deployment -> Java Profiler" 界面添加一个 "CPU Profiler"，然后回到项目，单击右上角的 "Run with Profiler" 启动项目并开始 CPU Profiling 过程。一定时间后（推荐 5min），在 Profiler 界面点击 "Stop Profiling and Show Results"，即可看到 Profiling 的结果，包含火焰图和调用树，如下图所示：
 
 <figure markdown="span">
-  ![img](../assets/JVM CPU Profiler 技术原理及源码深度解析-1.png)
-  <figcaption>Intellij IDEA - 性能火焰图 </figcaption>
+  ![图解](../assets/JVM CPU Profiler 技术原理及源码深度解析-1.png)
+  <figcaption>Intellij IDEA - 性能火焰图</figcaption>
 </figure>
 
 <figure markdown="span">
-  ![img](../assets/JVM CPU Profiler 技术原理及源码深度解析-2.png)
-  <figcaption>Intellij IDEA - 调用堆栈树 </figcaption>
+  ![图解](../assets/JVM CPU Profiler 技术原理及源码深度解析-2.png)
+  <figcaption>Intellij IDEA - 调用堆栈树</figcaption>
 </figure>
 
 火焰图是根据调用栈的样本集生成的可视化性能分析图，《[如何读懂火焰图？](https://www.ruanyifeng.com/blog/2017/09/flame-graph.html)》一文对火焰图进行了不错的讲解，大家可以参考一下。简而言之，看火焰图时我们需要关注 "平顶"，因为那里就是我们程序的 CPU 热点。调用树是另一种可视化分析的手段，与火焰图一样，也是根据同一份样本集而生成，按需选择即可。
@@ -146,7 +146,7 @@ JVM-Profiler 的优点在于支持多种指标的 Profiling（StackTrace、CPUBu
         // ...
         return JNI_OK;
     }
-```
+    ```
 
 2. 开启一个线程定时循环，定时使用 jvmtiEnv 指针配合调用如下几个 JVMTI 函数：
 
@@ -162,7 +162,7 @@ JVM-Profiler 的优点在于支持多种指标的 Profiling（StackTrace、CPUBu
                             jint max_frame_count,
                             jvmtiFrameInfo *frame_buffer,
                             jint *count_ptr);
-```
+    ```
 
     主逻辑大致是：首先调用 GetAllThreads () 获取所有线程的 "句柄"jthread，然后遍历根据 jthread 调用 GetThreadInfo () 获取线程信息，按线程名过滤掉不需要的线程后，继续遍历根据 jthread 调用 GetStackTrace () 获取线程的调用栈。
 
@@ -226,7 +226,7 @@ void AsyncGetCallTrace(AGCT_CallTrace \*trace, jint depth, void \*ucontext);
         }
         agct_ptr = (AsyncGetCallTrace)dlsym(libjvm, "AsyncGetCallTrace");
     }
-```
+    ```
 
 2. 在 OnLoad 阶段，我们还需要做一件事，即注册 OnClassLoad 和 OnClassPrepare 这两个 Hook，原因是 jmethodID 是延迟分配的，使用 AGCT 获取 Traces 依赖预先分配好的数据。我们在 OnClassPrepare 的 CallBack 中尝试获取该 Class 的所有 Methods，这样就使 JVMTI 提前分配了所有方法的 jmethodID，如下所示：
 
@@ -245,7 +245,7 @@ void AsyncGetCallTrace(AGCT_CallTrace \*trace, jint depth, void \*ucontext);
     jvmti->SetEventCallbacks(&callbacks, sizeof(callbacks));
     jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_CLASS_LOAD, NULL);
     jvmti->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_CLASS_PREPARE, NULL);
-```
+    ```
 
 3. 利用 SIGPROF 信号来进行定时采样：
 
@@ -266,8 +266,8 @@ void AsyncGetCallTrace(AGCT_CallTrace \*trace, jint depth, void \*ucontext);
     long sec = interval / 1000000000;
     long usec = (interval % 1000000000) / 1000;
     struct itimerval tv = {{sec, usec}, {sec, usec}};
-        setitimer(ITIMER_PROF, &tv, NULL);
-```
+    setitimer(ITIMER_PROF, &tv, NULL);
+    ```
 
 4. 在 Buffer 中保存每一次的采样结果，最终生成必要的统计数据即可。
 
@@ -297,8 +297,8 @@ flamegraph.pl stacktraces.txt > stacktraces.svg
 效果如下图所示：
 
 <figure markdown="span">
-  ![img](../assets/JVM CPU Profiler 技术原理及源码深度解析-3.png)
-  <figcaption> 通过 flamegraph.pl 生成的火焰图 </figcaption>
+  ![图解](../assets/JVM CPU Profiler 技术原理及源码深度解析-3.png)
+  <figcaption>通过 flamegraph.pl 生成的火焰图</figcaption>
 </figure>
 
 ## HotSpot 的 Dynamic Attach 机制解析

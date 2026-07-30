@@ -2,29 +2,31 @@
 
 ## 导语
 
-熟悉 Spring Boot 的同学都知道，Spring Boot 提供了很多开箱即用的 starter，比如 spring-boot-starter-mail、spring-boot-starter-data-redis 等等，使用这些 starter 非常简单，引入依赖，再在配置文件中配置相关属性即可。本课程教您自己开发一个 starter，具备了这个技能后，您可以在工作中封装自己业务相关的各种 starter。
+熟悉 Spring Boot 的同学都知道，Spring Boot 提供了很多开箱即用的 starter，比如 `spring-boot-starter-mail`、`spring-boot-starter-data-redis` 等等。使用这些 starter 非常简单：引入依赖，再在配置文件中配置相关属性即可。
+
+本教程教您如何开发一个自定义的 starter。掌握了这个技能后，您可以在工作中将通用的业务组件或中间件封装为开箱即用的 starter。
 
 ## 如何开发一个自定义的 starter
 
-开发一个 starter 简单来说以下几步即可：
+开发一个 starter 简单来说分为以下几步：
 
-- 一个/多个自定义配置的属性配置类（可选）
-- 一个/多个自动配置类
-- 自动配置类写入到 Spring Boot 的 SPI 机制配置文件：spring.factories
+1. 创建一个/多个自定义配置的属性配置类（`@ConfigurationProperties`，可选）；
+2. 创建一个/多个自动配置类（`@Configuration`）；
+3. 将自动配置类写入到 Spring Boot 的 SPI 配置文件 `META-INF/spring.factories`（Spring Boot 3.0+ 为 `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`）。
 
 ## Java SPI 机制简介
 
-Spring Boot 的 starter 的核心其实就是通过 SPI 机制自动注入配置类，不过是它自己实现的一套 SPI 机制，我们先了解一下 Java 的 SPI 机制。
+Spring Boot 的 starter 核心就是通过 SPI 机制自动装配配置类。在学习 Spring Boot 的自动装配前，我们先了解一下 Java 标准的 SPI 机制。
 
-SPI 全称 Service Provider Interface，是 Java 提供的一套用来被第三方实现或者扩展的 API，它可以用来启用框架扩展和替换组件。
+SPI 全称 **Service Provider Interface**（服务提供者接口），是 Java 提供的一套用来被第三方实现或扩展的 API，它可以用来启用框架扩展和替换组件。
 
-SPI 的大概流程是：
+SPI 的大致调用流程为：
 
-> 调用方 –> 标准服务接口 –> 本地服务发现 (配置文件) –> 具体实现
+> 调用方 –> 标准服务接口 –> 本地服务发现（配置文件） –> 具体实现类
 
-所以 Java SPI 实际上 **是“基于接口的编程＋策略模式＋配置文件” 组合实现的动态加载机制**。
+因此，Java SPI 实际上是 **“基于接口的编程 ＋ 策略模式 ＋ 配置文件”** 组合实现的动态加载机制。
 
-一个 SPI 的典型案例就是 JDBC 的驱动，Java JDBC 定义接口规范（java.sql.Driver），各个数据库厂商（MySQL/Oracle/MS SQLServer 等）去完成具体的实现，然后通过 SPI 配置文件引入具体的实现类，如下图：
+一个典型的 SPI 案例就是 JDBC 驱动：Java JDBC 定义接口规范（`java.sql.Driver`），各个数据库厂商（MySQL / Oracle / SQL Server 等）完成具体的实现，然后通过 SPI 配置文件引入具体的实现类。流程如下图所示：
 
 ![jdbc spi](../assets/SpringBoot 教程：如何开发一个 starter-1.jpg)
 
@@ -32,22 +34,31 @@ SPI 的大概流程是：
 
 一个简单的 Java SPI 开发步骤：
 
-- 定义一个业务接口
-- 编写接口实现类
-- 创建 SPI 的配置文件，实现类路径写入配置文件中
-- 通过 Java SPI 机制调用
+1. 定义一个业务接口；
+2. 编写接口实现类；
+3. 创建 SPI 的配置文件，将实现类全限定名写入配置文件中；
+4. 通过 `java.util.ServiceLoader` 进行动态加载与调用。
 
 ![java spi 例子](../assets/SpringBoot 教程：如何开发一个 starter-2.jpg)
 
 ## Spring Boot SPI 机制底层实现
 
-了解了 Java 的 SPI 机制后，基本也能猜出 Spring Boot 的 SPI 实现了，基本流程是一样的：
+了解了 Java 的 SPI 机制后，Spring Boot 的自动装配原理就很好理解了，整体流程类似：
 
-> 读取配置文件 –> 将具体的实现类装配到 Spring Boot 的上下文环境中
+> 读取配置文件 –> 将具体的配置类装配到 Spring Boot 的上下文环境中
+
+Java 标准 SPI 与 Spring Boot 的 SPI 机制对比如下表所示：
+
+| 对比维度 | Java 标准 SPI | Spring Boot SPI 机制 |
+| --- | --- | --- |
+| **配置文件位置** | `META-INF/services/接口全限定名` | `META-INF/spring.factories` |
+| **配置内容格式** | 具体的实现类全限定名列表 | `Key-Value` 映射（`AutoConfiguration` = 自动配置类列表） |
+| **核心加载类** | `java.util.ServiceLoader` | `SpringFactoriesLoader` / `AutoConfigurationImportSelector` |
+| **条件装配支持** | 不支持（全量扫描并实例化） | 强大且高度灵活的 `@ConditionalOnXXX` 条件注解 |
 
 接下来我们从源码中查找答案。
 
-入口：Spring Boot 的启动类，@SpringBootApplication 注解，查看源码可以发现这是一个组合注解，包括 @SpringBootConfiguration、@EnableAutoConfiguration、@ComponentScan。
+启动类上的 `@SpringBootApplication` 是一个组合注解，包含 `@SpringBootConfiguration`、`@EnableAutoConfiguration` 和 `@ComponentScan`：
 
 ```java
 @Target(ElementType.TYPE)
@@ -58,14 +69,13 @@ SPI 的大概流程是：
 @EnableAutoConfiguration
 @ComponentScan(excludeFilters = {
         @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
-        @Filter(type = FilterType.CUSTOM,
-                classes = AutoConfigurationExcludeFilter.class) })
+        @Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) })
 public @interface SpringBootApplication {
     ...
 }
 ```
 
-@EnableAutoConfiguration，熟悉 Spring Boot 的同学应该知道 Spring Boot 有很多 @EnableXXX 注解，其实现就是通过 @Import(xxxSelector) 导入一个 xxxSelector 的实现类，来装载配置类：
+其中 `@EnableAutoConfiguration` 通过 `@Import(AutoConfigurationImportSelector.class)` 导入 selector 来加载自动配置类：
 
 ```java
 @Target(ElementType.TYPE)
@@ -79,270 +89,244 @@ public @interface EnableAutoConfiguration {
 }
 ```
 
-继续看 AutoConfigurationImportSelector 源码，我们关注下 selectImports 方法即可，该方法就是用来装配自动配置类的：
+继续看 `AutoConfigurationImportSelector.selectImports()` 源码，该方法就是用来装配自动配置类的：
 
 ```java
 @Override
-    public String[] selectImports(AnnotationMetadata annotationMetadata) {
-        if (!isEnabled(annotationMetadata)) {
-            return NO_IMPORTS;
-        }
-        //加载自动配置元数据配置文件，后面会解释
-        AutoConfigurationMetadata autoConfigurationMetadata = AutoConfigurationMetadataLoader
-                .loadMetadata(this.beanClassLoader);
-        //加载自动配置类，会合并上面的元数据配置文件中的配置类    
-        AutoConfigurationEntry autoConfigurationEntry = getAutoConfigurationEntry(
-                autoConfigurationMetadata, annotationMetadata);
-        return StringUtils.toStringArray(autoConfigurationEntry.getConfigurations());
+public String[] selectImports(AnnotationMetadata annotationMetadata) {
+    if (!isEnabled(annotationMetadata)) {
+        return NO_IMPORTS;
     }
+    // 加载自动配置元数据配置文件
+    AutoConfigurationMetadata autoConfigurationMetadata = AutoConfigurationMetadataLoader
+            .loadMetadata(this.beanClassLoader);
+    // 加载自动配置类，合并元数据
+    AutoConfigurationEntry autoConfigurationEntry = getAutoConfigurationEntry(
+            autoConfigurationMetadata, annotationMetadata);
+    return StringUtils.toStringArray(autoConfigurationEntry.getConfigurations());
+}
 ```
 
-继续跟踪源码：
+继续跟踪源码链路：
 
-> getAutoConfigurationEntry –> getCandidateConfigurations –>SpringFactoriesLoader.loadFactoryNames –> loadSpringFactories –> classLoader.getResources (FACTORIES_RESOURCE_LOCATION)
+> `getAutoConfigurationEntry` –> `getCandidateConfigurations` –> `SpringFactoriesLoader.loadFactoryNames` –> `loadSpringFactories` –> `classLoader.getResources(FACTORIES_RESOURCE_LOCATION)`
 
-终于找到了 SPI 的配置文件：FACTORIES_RESOURCE_LOCATION。
+找到关键常量：
 
 ```java
 public static final String FACTORIES_RESOURCE_LOCATION = "META-INF/spring.factories";
 ```
 
-到这基本就可以看到 Spring Boot 的装载流程了，在 META-INF/spring.factories 下定义的配置类会自动装配到 Spring Boot 的上下文。
+至此便清晰展示了 Spring Boot 的装配流程：在 `META-INF/spring.factories` 下定义的配置类会被自动读取并装配到 Spring 容器中。
 
-## 开发一个自定义 starter
+## 实战：开发一个自定义 Email Starter
 
-了解了上面 Spring Boot 的 SPI 加载机制后，我们来开发一个自定义的 starter，我这里写个简单的邮件发送的 starter，为简化代码，这里我还是依赖 Spring Boot 提供的 mail-starter， 在这个基础上进行一层封装：
+了解了自动装配机制后，我们来开发一个自定义的 Email Starter。这里对 Spring Boot 提供的 `spring-boot-starter-mail` 进行二次封装。
 
-1. 创建一个 module：email-spring-boot-starter，引入依赖。
+### 1. 创建模块并引入依赖
 
-    ```xml
+新建 `email-spring-boot-starter` 模块，在 `pom.xml` 中引入如下依赖：
+
+```xml
+<dependencies>
     <!-- 邮件发送支持 -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-mail</artifactId>
-            </dependency>
-            <!-- 模版邮件 -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-freemarker</artifactId>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-web</artifactId>
-                <scope>provided</scope>
-            </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-mail</artifactId>
+    </dependency>
+    <!-- 模板邮件 -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-freemarker</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+        <scope>provided</scope>
+    </dependency>
+</dependencies>
 ```
 
-2. 编写邮件发送模版类，这里我添加了一个是否启用的开关：
+### 2. 编写邮件发送模板工具类
 
-    ```java
-    @ConditionalOnProperty (name = "dragon.boot.email.enable", havingValue = "true")
-    @Slf4j
-    @Configuration
-    @ConditionalOnProperty(name = "dragon.boot.email.enable", havingValue = "true")
-    public class MailSenderTemplate {
-         //注入Spring Boot提供的mail中的邮件发送类
-        @Autowired
-        private JavaMailSender mailSender;
-        @Value("${spring.mail.from}")
-        private String from;
-        @Autowired
-        private FreeMarkerConfigurer freeMarkerConfigurer;
-        /**
-         * @MethodName: send
-         * @Author: pengl
-         * @Date: 2019-10-31 13:38
-         * @Description: 发送邮件
-         * @Version: 1.0
-         * @Param: [to, content, subject]
-         * @Return: com.dragon.boot.common.model.Result
-         **/
-        public Result send(String to, String content, String subject) {
-            return send(MailDto.builder().to(to).content(content).subject(subject).build());
-        }
-        /**
-         * @MethodName: send
-         * @Author: pengl
-         * @Date: 2019-10-31 13:39
-         * @Description: 发送邮件(抄送)
-         * @Version: 1.0
-         * @Param: [to, content, subject, cc]
-         * @Return: com.dragon.boot.common.model.Result
-         **/
-        public Result send(String to, String content, String subject, String cc) {
-            return send(MailDto.builder().to(to).content(content).subject(subject).cc(cc).build());
-        }
-        /**
-         * @MethodName: sendTemplate
-         * @Author: pengl
-         * @Date: 2019-10-31 13:39
-         * @Description: 发送模版邮件
-         * @Version: 1.0
-         * @Param: [to, model, template, subject]
-         * @Return: com.dragon.boot.common.model.Result
-         **/
-        public Result sendTemplate(String to, Map<String, Object> model, String template, String subject) {
-            return send(MailDto.builder().to(to).content(getTemplateStr(model, template)).subject(subject).build());
-        }
-        /**
-         * @MethodName: sendTemplate
-         * @Author: pengl
-         * @Date: 2019-10-31 13:39
-         * @Description: 发送模版邮件(带抄送)
-         * @Version: 1.0
-         * @Param: [to, model, template, subject, cc]
-         * @Return: com.dragon.boot.common.model.Result
-         **/
-        public Result sendTemplate(String to, Map<String, Object> model, String template, String subject, String cc) {
-            return send(MailDto.builder().to(to).content(getTemplateStr(model, template)).subject(subject).cc(cc).build());
-        }
-        /**
-         * @MethodName: getTemplateStr
-         * @Author: pengl
-         * @Date: 2019-10-31 13:38
-         * @Description: 解析freemark模版
-         * @Version: 1.0
-         * @Param: [model, template]
-         * @Return: java.lang.String
-         **/
-        private String getTemplateStr(Map<String, Object> model, String template) {
-            try {
-                return FreeMarkerTemplateUtils.processTemplateIntoString(freeMarkerConfigurer.getConfiguration().getTemplate(template), model);
-            } catch (Exception e) {
-                log.error("获取模版数据异常：{}", e.getMessage(), e);
-            }
-            return "";
-        }
-        /**
-         * @MethodName: send
-         * @Author: pengl
-         * @Date: 2019-10-31 13:34
-         * @Description: 发送邮件
-         * @Version: 1.0
-         * @Param: [mailDto]
-         * @Return: com.dragon.boot.common.model.Result
-         **/
-        public Result send(MailDto mailDto) {
-            if (StringUtils.isAnyBlank(mailDto.getTo(), mailDto.getContent())) {
-                return new Result(false, 1001, "接收人或邮件内容不能为空");
-            }
-            String[] tos = filterEmail(mailDto.getTo().split(","));
-            if (tos == null) {
-                log.error("邮件发送失败，接收人邮箱格式不正确：{}", mailDto.getTo());
-                return new Result(false, 1002, "");
-            }
-            MimeMessage mimeMessage = mailSender.createMimeMessage();
-            try {
-                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
-                helper.setFrom(from);
-                helper.setTo(tos);
-                helper.setText(mailDto.getContent(), true);
-                helper.setSubject(mailDto.getSubject());
-                //抄送
-                String[] ccs = filterEmail(mailDto.getCc().split(","));
-                if (ccs != null) {
-                    helper.setCc(ccs);
-                }
-                //秘抄
-                String[] bccs = filterEmail(mailDto.getBcc().split(","));
-                if (bccs != null) {
-                    helper.setBcc(bccs);
-                }
-                //定时发送
-                if (mailDto.getSendDate() != null) {
-                    helper.setSentDate(mailDto.getSendDate());
-                }
-                //附件
-                File[] files = mailDto.getFiles();
-                if (files != null && files.length > 0) {
-                    for (File file : files) {
-                        helper.addAttachment(file.getName(), file);
-                    }
-                }
-                mailSender.send(mimeMessage);
-            } catch (Exception e) {
-                log.error("邮件发送异常：{}", e.getMessage(), e);
-                return new Result(false, 1099, "邮件发送异常：" + e.getMessage());
-            }
-            return new Result();
-        }
-        /**
-         * 邮箱格式校验过滤
-         *
-         * @param emails
-         * @return
-         */
-        private String[] filterEmail(String[] emails) {
-            List<String> list = Arrays.asList(emails);
-            if (CollectionUtil.isEmpty(list)) {
-                return null;
-            }
-            list = list.stream().filter(e -> checkEmail(e)).collect(Collectors.toList());
-            return list.toArray(new String[list.size()]);
-        }
-        private boolean checkEmail(String email) {
-            return ReUtil.isMatch("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", email);
-        }
+添加开启开关 `@ConditionalOnProperty`：
+
+```java
+package com.dragon.boot.mail.service;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
+
+import javax.mail.internet.MimeMessage;
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Slf4j
+@Configuration
+@ConditionalOnProperty(name = "dragon.boot.email.enable", havingValue = "true")
+public class MailSenderTemplate {
+
+    @Autowired
+    private JavaMailSender mailSender;
+
+    @Value("${spring.mail.from}")
+    private String from;
+
+    @Autowired
+    private FreeMarkerConfigurer freeMarkerConfigurer;
+
+    public Result send(String to, String content, String subject) {
+        return send(MailDto.builder().to(to).content(content).subject(subject).build());
     }
+
+    public Result send(String to, String content, String subject, String cc) {
+        return send(MailDto.builder().to(to).content(content).subject(subject).cc(cc).build());
+    }
+
+    public Result sendTemplate(String to, Map<String, Object> model, String template, String subject) {
+        return send(MailDto.builder().to(to).content(getTemplateStr(model, template)).subject(subject).build());
+    }
+
+    public Result sendTemplate(String to, Map<String, Object> model, String template, String subject, String cc) {
+        return send(MailDto.builder().to(to).content(getTemplateStr(model, template)).subject(subject).cc(cc).build());
+    }
+
+    private String getTemplateStr(Map<String, Object> model, String template) {
+        try {
+            return FreeMarkerTemplateUtils.processTemplateIntoString(
+                    freeMarkerConfigurer.getConfiguration().getTemplate(template), model);
+        } catch (Exception e) {
+            log.error("获取模板数据异常：{}", e.getMessage(), e);
+        }
+        return "";
+    }
+
+    public Result send(MailDto mailDto) {
+        if (StringUtils.isAnyBlank(mailDto.getTo(), mailDto.getContent())) {
+            return new Result(false, 1001, "接收人或邮件内容不能为空");
+        }
+        String[] tos = filterEmail(mailDto.getTo().split(","));
+        if (tos == null) {
+            log.error("邮件发送失败，接收人邮箱格式不正确：{}", mailDto.getTo());
+            return new Result(false, 1002, "接收人邮箱格式不正确");
+        }
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
+            helper.setFrom(from);
+            helper.setTo(tos);
+            helper.setText(mailDto.getContent(), true);
+            helper.setSubject(mailDto.getSubject());
+            
+            // 抄送
+            String[] ccs = filterEmail(mailDto.getCc().split(","));
+            if (ccs != null) {
+                helper.setCc(ccs);
+            }
+            // 密送
+            String[] bccs = filterEmail(mailDto.getBcc().split(","));
+            if (bccs != null) {
+                helper.setBcc(bccs);
+            }
+            // 定时发送
+            if (mailDto.getSendDate() != null) {
+                helper.setSentDate(mailDto.getSendDate());
+            }
+            // 附件
+            File[] files = mailDto.getFiles();
+            if (files != null && files.length > 0) {
+                for (File file : files) {
+                    helper.addAttachment(file.getName(), file);
+                }
+            }
+            mailSender.send(mimeMessage);
+        } catch (Exception e) {
+            log.error("邮件发送异常：{}", e.getMessage(), e);
+            return new Result(false, 1099, "邮件发送异常：" + e.getMessage());
+        }
+        return new Result();
+    }
+
+    private String[] filterEmail(String[] emails) {
+        List<String> list = Arrays.asList(emails);
+        if (CollectionUtil.isEmpty(list)) {
+            return null;
+        }
+        list = list.stream().filter(this::checkEmail).collect(Collectors.toList());
+        return list.toArray(new String[0]);
+    }
+
+    private boolean checkEmail(String email) {
+        return ReUtil.isMatch("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$", email);
+    }
+}
 ```
 
-3. 编写 SPI 配置文件，在 resources 下新建文件夹 META-INF，创建配置文件 spring.factories，内容如下：
+### 3. 编写 SPI 配置文件
 
-    ```java
-    //替换成自己的路径
-    org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-        com.dragon.boot.mail.service.MailSenderTemplate 
+在 `src/main/resources` 下新建 `META-INF` 目录，创建 `spring.factories` 文件：
+
+```properties
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=  com.dragon.boot.mail.service.MailSenderTemplate
 ```
 
-4. 一个简单的 starter 模块就编写好了，使用时引入这个依赖， application.properties 属性文件里添加配置即可。
+### 4. 使用与测试
 
-    ```properties
-     # 邮件发送配置
-    spring.mail.host=mail.xxx.com
-    spring.mail.username=xx
-     spring.mail.password=xx
-    spring.mail.protocol=smtp
-    spring.mail.properties.mail.smtp.auth=true
-    spring.mail.properties.mail.smtp.port=465
-    spring.mail.properties.mail.smtp.from=sender@example.com
-    spring.mail.properties.mail.smtp.starttls.enable=true
-    spring.mail.properties.mail.smtp.starttls.required=true
-    spring.mail.properties.mail.smtp.ssl.enable=true
-    spring.mail.properties.mail.smtp.socketFactory.class=javax.net.ssl.SSLSocketFactory
-    spring.mail.properties.mail.smtp.socketFactory.fallback=false
-    spring.mail.default-encoding=utf-8
-    spring.mail.from=sender@example.com
-    # 所有附件最大长度（单位字节，默认100M）
-    spring.mail.maxUploadSize=104857600
-    spring.mail.maxInMemorySize=4096
-    #启用email模块
-    dragon.boot.email.enable=true
+在使用该 starter 的工程中直接引入依赖，并在 `application.properties` 中添加对应配置即可：
+
+```properties
+# 邮件发送配置
+spring.mail.host=mail.xxx.com
+spring.mail.username=xx
+spring.mail.password=xx
+spring.mail.protocol=smtp
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.port=465
+spring.mail.properties.mail.smtp.from=sender@example.com
+spring.mail.properties.mail.smtp.starttls.enable=true
+spring.mail.properties.mail.smtp.starttls.required=true
+spring.mail.properties.mail.smtp.ssl.enable=true
+spring.mail.properties.mail.smtp.socketFactory.class=javax.net.ssl.SSLSocketFactory
+spring.mail.properties.mail.smtp.socketFactory.fallback=false
+spring.mail.default-encoding=utf-8
+spring.mail.from=sender@example.com
+
+# 附件限制
+spring.mail.maxUploadSize=104857600
+spring.mail.maxInMemorySize=4096
+
+# 启用 email 模块
+dragon.boot.email.enable=true
 ```
 
-这只是一个最简单的例子，如果严格按规范，可以将所有的 autoconfig 类，包括 Property 属性配置类和逻辑配置类都放到一个独立的模块中，再另起一个 starter 模块，引入这个独立的 autoconfig 模块。
+## 自定义 starter 的高级优化技巧
 
-## 自定义 starter 优化
+### 1. 配置属性自动提示
 
-属性配置自动提示功能：使用 Spring Boot 官方提供的 starter 的时候，在 application.properties 中编写属性配置是有自动提示功能的，要实现这个也很简单，引入一下依赖即可，该插件引入后，打包时会检查 @ConfigurationProperties 下的类，自动生成 spring-configuration-metadata.json 文件用于编写属性提示：
+在使用官方 starter 时，IDE 输入配置项会有智能提示。要实现这个功能，只需引入 `spring-boot-configuration-processor` 依赖。打包时它会自动解析 `@ConfigurationProperties` 类生成 `META-INF/spring-configuration-metadata.json`：
 
 ```xml
 <dependency>
-  <groupId>org.springframework.boot</groupId>
-  <artifactId>spring-boot-configuration-processor</artifactId>
-  <optional>true</optional>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-configuration-processor</artifactId>
+    <optional>true</optional>
 </dependency>
 ```
 
-- 启动优化：前面有提到 Spring Boot 的 SPI 加载流程，会先加载自动配置元数据配置文件，引入以下依赖，该插件会自动生成 META-INF/spring-autoconfigure-metadata.properties，供 AutoConfigurationImportSelector 过滤加载，提升启动性能：
+### 2. 自动配置元数据提速
 
-```xml
-<dependency>
-  <groupId>org.springframework.boot</groupId>
-  <artifactId>spring-boot-configuration-processor</artifactId>
-  <optional>true</optional>
-</dependency>
-```
+引入该依赖插件还会在打包时生成 `META-INF/spring-autoconfigure-metadata.properties` 文件，供 `AutoConfigurationImportSelector` 在启动时快速过滤不满足条件的自动配置类，大幅提升应用启动速度。
 
 ## 总结
 
-依托 Spring Boot 强大的 AutoConfig 能力，我们可以封装各种自定义 starter，做到开箱即用，降低业务耦合，提高开发效率！
+依托 Spring Boot 强大的自动装配（AutoConfiguration）与条件装配（`@ConditionalOnXXX`）能力，我们可以轻松封装出各种通用的自定义 starter，实现组件的开箱即用与解耦！

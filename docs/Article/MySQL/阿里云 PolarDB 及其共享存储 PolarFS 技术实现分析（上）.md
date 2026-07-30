@@ -24,7 +24,7 @@ MySQL 云服务遇到的问题
 
 那么，跳出 MySQL，是否有解决方案呢，分析目前业界的数据库和存储领域技术，可以发现基于共享存储是个可选的方案，所谓数据库共享存储方案指的是 RDS 实例（一般指一主一从的高可用实例）和只读实例共享同一份数据，这样在实例故障或只读扩展时就无需拷贝数据了，只需简单得把故障节点重新拉起来，或者新建个只读计算节点即可，省时省力更省钱。共享存储可通过快照技术（snapshot/checkpoint）和写时拷贝（copy-on-write，COW）来解决数据备份和误操作恢复问题，将所需备份的数据量分摊到较长的一段时间内，而不需要瞬时完成，这样就不会导致多实例同时备份导致网络和 IO 数据风暴。下图就是一个典型的数据库共享存储方案，Primary 节点即数据库主节点，对外提供读写服务，Read Only 节点可以是 Primary 的灾备节点，也可以是对外提供只读服务的节点，他们共享一份底层数据。
 
-![img](../assets/阿里云 PolarDB 及其共享存储 PolarFS 技术实现分析（上）-1.jpg)
+![图解](../assets/阿里云 PolarDB 及其共享存储 PolarFS 技术实现分析（上）-1.jpg)
 
 理想很丰满，但现实却很骨感，目前可用的共享存储方案寥寥无几，比如在 Hadoop 生态圈占统治地位的 HDFS，以及在通用存储领域风生水起的 Ceph，只是如果将其作为在线数据处理（OLTP）服务的共享存储，最终对用户呈现的性能是不可接受的。除此之外，还存在大量与现有数据库实现整合适配等问题。
 
@@ -38,7 +38,7 @@ PolarDB 实现方案
 
 PolarDB 架构
 
-![img](../assets/阿里云 PolarDB 及其共享存储 PolarFS 技术实现分析（上）-2.png)
+![图解](../assets/阿里云 PolarDB 及其共享存储 PolarFS 技术实现分析（上）-2.png)
 
 上图为 PolarFS 视角看到的 PolarDB 实现架构。一套 PolarDB 至少包括 3 个部分，分别为最底层的共享存储，与用户交互的 MySQL 节点，还有用户进行系统管理的 PolarCtrl。而其中 PolarFS 又可进一步拆分为 libpfs、PolarSwitch 和 ChunkServer。下面进行简单说明：
 
@@ -52,7 +52,7 @@ PolarFS 的存储组织
 
 与大多数存储系统一样，PolarFS 对存储资源也进行了多层封装和管理，PolarFS 的存储层次包括：Volume、Chunk 和 Block，分别对应存储领域中的数据卷，数据区和数据块，在有些系统中 Chunk 又被成为 Extent，均表示一段连续的块组成的更大的区域，作为分配的基本单位。一张图可以大致表现各层的关系：
 
-![img](../assets/阿里云 PolarDB 及其共享存储 PolarFS 技术实现分析（上）-3.png)
+![图解](../assets/阿里云 PolarDB 及其共享存储 PolarFS 技术实现分析（上）-3.png)
 
 **Volume** 当用户申请创建 PolarDB 数据库实例时，系统就会为该实例创建一个 Volume（卷，本文后续将这两种表达混用），每个卷都有多个 Chunk 组成，其大小就是用户指定的数据库实例大小，PolarDB 支持用户创建的实例大小范围是 10GB 至 100TB，满足绝大部分云数据库实例的容量要求。
 
@@ -74,15 +74,15 @@ PolarFS 组件解析
 
 首先展示一张能够更加清晰描述与数据流相关的各个组件作用的示意图，并逐一对其进行解释。
 
-![img](../assets/阿里云 PolarDB 及其共享存储 PolarFS 技术实现分析（上）-4.png)
+![图解](../assets/阿里云 PolarDB 及其共享存储 PolarFS 技术实现分析（上）-4.png)
 
 **libpfs** libpfs 是一个用户空间文件系统（即上图 User Space File System）库，负责数据库 IO（File IO）接入。更直观点，libpfs 提供了供计算节点/PolarDB 访问底层存储的 API 接口，进行文件读写和元数据更新等操作，如下图所示：
 
-![img](../assets/阿里云 PolarDB 及其共享存储 PolarFS 技术实现分析（上）-5.png)
+![图解](../assets/阿里云 PolarDB 及其共享存储 PolarFS 技术实现分析（上）-5.png)
 
 pfs_mount()用于将指定卷上文件系统挂载到对应的数据库计算节点上，该操作会获取卷上的文件系统元数据信息，将其缓存在计算节点上，这些元数据信息包括目录树（the directory tree），文件映射表（the file mapping table）和块映射表（the block mapping table）等，其中目录树描述了文件目录层级结构信息，每个文件名对应的 inode 节点信息（目录项）。inode 节点信息就是文件系统中唯一标识一个文件的 FileID。文件映射表描述了该文件都有哪些 Block 组成。通过上图我们还发现了 pfs_mount_growfs()，该 API 可以让用户方便得进行数据库扩容，在对卷进行扩容后，通过调用该 API 将增加的空间映射到文件系统层。
 
-![img](../assets/阿里云 PolarDB 及其共享存储 PolarFS 技术实现分析（上）-6.png)
+![图解](../assets/阿里云 PolarDB 及其共享存储 PolarFS 技术实现分析（上）-6.png)
 
 上图右侧的表描述了目录树中的某个文件的前 3 个块分别对应的是卷的第 348,1500 和 201 这几个块。假如数据库操作需要回刷一个脏页，该页在该表所属文件的偏移位置 128KB 处，也就是说要写该文件偏移 128KB 开始的 16KB 数据，通过文件映射表知道该写操作其实写的是卷的第 201 个块。这就是 lipfs 发送给 PolarSwitch 的请求包含的内容：volumeid，offset 和 len。其中 offset 就是 201\*64KB，len 就是 16KB。
 

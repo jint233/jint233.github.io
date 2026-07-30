@@ -1,127 +1,113 @@
 # Kafka 源码阅读笔记
 
-作者：guolonglin，腾讯 IEG 后台开发工程师
+> **作者**：guolonglin，腾讯 IEG 后台开发工程师
 
 ## 一、Kafka 总览
 
-Kafka 集群由 broker 组成；每个 broker 都拥有一个 controller，基于 ZooKeeper 进行 controller leader 选举并存储集群核心元数据。leader controller 负责管理整个集群。
+Kafka 集群由 Broker 组成；每个 Broker 都拥有一个 Controller，基于 ZooKeeper 进行 Controller Leader 选举并存储集群核心元数据。Leader Controller 负责管理整个集群。
 
-2）以 Topic->partition-> replication 来存储生产者数据，每个 partition 为一个 Log，log 分段存储于文件中；
+1. 整体架构包含 Producer、Broker 集群、ZooKeeper 和 Consumer Group；
+2. 以 `Topic -> Partition -> Replication` 来存储生产者数据，每个 Partition 为一个 Log，Log 分段存储于文件中；
+3. Kafka 集群管理消费者信息和消费者消费记录，这些信息也以内部 Topic 形式存储；
+4. Kafka Broker 的整体结构如下图所示：
 
-3）kafka 集群管理消费者信息和消费者消费记录，这些信息也以内部 topic 形式存储；
+![图解](../assets/Kafka 源码阅读笔记-1.jpg)
 
-4）Kafka Broker 结构。
+## 二、Broker 结构
 
-![img](../assets/Kafka 源码阅读笔记-1.jpg)
+![图解](../assets/Kafka 源码阅读笔记-2.jpg)
 
-### **二、Broker 结构** 1）
+每个 Broker 进程都包含各个核心管理器：
 
-![img](../assets/Kafka 源码阅读笔记-2.jpg)
+- `SocketServer`：网络处理；
+- `ReplicaManager`：副本管理器；
+- `KafkaController`：集群管理器；
+- `GroupCoordinator`：消费者数据管理器；
+- `LogManager`：日志数据管理器；
+- `KafkaScheduler`：定时器；
+- `ZkClient`：与 ZooKeeper 通信管理器；
+- `TransactionCoordinator`：事务协调器。
 
-2）每个 borker 进程，都包含各个管理器，如 socketServer 网络处理，replicaManager 副本管理器，kafkaController 集群管理器，groupCoordinator 消息者数据管理器，LogManager 日志数据管理器，kafkaScheduler 定时器，zkClient 与 zookeeper 通信管理器，transactionCoordinator 事务协调器。
+## 三、通信框架
 
-### **三、通信框架** 1）
+![图解](../assets/Kafka 源码阅读笔记-3.jpg)
 
-![img](../assets/Kafka 源码阅读笔记-3.jpg)
+1. `SocketServer` 会启动一个 `Acceptor` 线程，用于接收和创建新 Socket，并轮询安排给 `Processor` 线程来处理后续的数据 I/O；
+2. `Processor` 接收到数据后包装成 Request 请求放入单例 `RequestQueue` 队列，并由多个 I/O 逻辑处理线程从 `RequestQueue` 中获取 Request 并处理；
+3. 根据 Request 类型调用 `KafkaApis` 完成业务逻辑处理；
 
-2）socketserver 会启动一个 acceptor 线程，用于接收和创建新 socket，并轮询安排给 processor thread 来处理后续的数据 io；
+   ![图解](../assets/Kafka 源码阅读笔记-4.jpg)
 
-3）processor 接收到数据后包装成 request 请求放入单个 requestQueue 队列，并由多个 io 逻辑处理 thread 从 requestQueue 中取 request 处理；
+4. 处理完请求后，封装成 Response，根据 `ProcessorID` 放入对应的 `ResponseQueue`，最后由对应的 `Processor` 线程完成网络回复。
 
-4）根据 request 类型调用 kafkaapi 完成处理；
+## 四、Log 结构
 
-5）
+### Topic、Partition 与 Replica 的关系
 
-![img](../assets/Kafka 源码阅读笔记-4.jpg)
+![图解](../assets/Kafka 源码阅读笔记-5.jpg)
 
-6）处理完请求后，封装成 reponse，根据 ProcessorID 放入对应的 responseQueue 由对应的 processor 线程完成回复。
+1. 每个 Topic 由多个 Partition 组成，通过 Key 的 Hash 值分配到不同的 Partition。每个 Partition 拥有多个副本（Replica）做主从模式，确保数据的安全性；
+2. 每个 Partition 或 Replica 由 Log 结构存储数据，Log 由 `LogSegment` 组成，每个 `LogSegment` 由索引文件和数据文件组成；
 
-### **四、log 结构** 1）Topic、partition 和 replica 关系
+   ![图解](../assets/Kafka 源码阅读笔记-6.jpg)
 
-2）
+   ![图解](../assets/Kafka 源码阅读笔记-7.jpg)
 
-![img](../assets/Kafka 源码阅读笔记-5.jpg)
+3. 当在 Log 中需要查找获取一条消息时，会根据 Offset 首先定位到处于哪个 `LogSegment` 文件，再根据索引文件定位。`LogSegment` 由跳跃表组成，便于快速搜索，最后再从数据文件读取实际消息；
 
-3）每个 topic 由很多个 partition 组成，由 key hash 值分配到不同的 partition，每个 partition 拥有多个副本 replica 做主从，确保数据的安全性。
+   ![图解](../assets/Kafka 源码阅读笔记-8.jpg)
 
-4）每个 partition 或者 replica 由 log 存储数据，log 由 logsegment 组成，每个 logsegment 由索引文件和数据文件组成。
+4. 索引文件由 `<K, V>` 组成：K 是相对文件中第几条消息，V 是文件中的绝对物理位置。索引文件可以用来做二分查找，从索引文件中找到位置之后，再从数据文件中顺序查找具体的字节数据。为了避免索引文件过大，会相隔一定字节才写入一条索引项；
+5. 每个 Partition 会有多个 Replica 进行同步（1 个 Leader + 多个 Follower），副本的主从地位由 Leader Controller 负责处理。只有 Leader Replica 才能处理读写请求，其它 Follower 仅同步数据。
 
-5）
+## 五、Controller
 
-![img](../assets/Kafka 源码阅读笔记-6.jpg)
+1. 每个 Broker 都拥有一个 `KafkaController`，Controller 主要负责管理整个集群，但是整个集群中只有一个 Leader Controller 有资格来管理集群；
+2. Leader Controller 借助 ZooKeeper 来竞选：每个 Controller 初始化时都会向 ZooKeeper 注册竞争成为 Leader 的路径监听，第一个成功写入 ZooKeeper 的 Controller 将成为 Leader，其它 Controller 收到通知后将自己设为 Follower；
+3. 当 Controller 成为 Leader 时，会向 ZooKeeper 注册相关监听（注册集群数据状态变化的监听，如增加 Topic、Partition、Replica 等）；
 
-6）
+   ![图解](../assets/Kafka 源码阅读笔记-9.jpg)
 
-![img](../assets/Kafka 源码阅读笔记-7.jpg)
+4. 当监听到集群数据发生变化，Leader Controller 就会得到通知并进行处理，处理完成后会同步相关元数据给其它 Follower Controller；
+5. Controller 以单工作线程的形式运行，其它请求通过封装为 Job 投递到 Controller 处理线程；
 
-7）当在 Log 中需要查找获取一条消息时，会根据偏移首先定位到处于哪个 logsegment 文件，再根据索引文件定位，Logsegment 是由跳跃表组成的，便于搜索，再从数据文件读取消息；
+   ![图解](../assets/Kafka 源码阅读笔记-10.jpg)
 
-8）
+6. Broker 上下线、副本增加重分配、Topic 增加等操作，均通过 ZooKeeper 通知并创建 Job 投入 Job 队列等待工作线程处理；
+7. 集群所有的元数据存放在 ZooKeeper 上。当 ZooKeeper 数据发生变化时，通知到 Leader Controller，Controller 处理数据并在内存中保存一份副本做差值更新。
 
-![img](../assets/Kafka 源码阅读笔记-8.jpg)
+## 六、Replica 管理
 
-9）索引文件由 K,V 组成，K 是相对文件中第几条消息，V 是文件中的绝对位置，索引文件可以用来做二分查找，从索引文件中找到位置之后，再从数据文件中顺序查找，具体那条消息数据，为了避免索引文件太大，会相隔一定字节才写入一条索引；
+1. 所有 Partition 都有多个 Replica 来管理，使得数据更安全、不容易丢失；
+2. Replica 的 Leader/Follower 地位由 Leader Controller 来统一调度管理；
+3. Replica 有三种状态类型：无效副本、已分配副本（正在同步但还没达到一致状态）和在线副本（正常同步状态）；
+4. Replica 数据的同步由 `ReplicaManager` 副本管理器处理，管理器会开启副本同步线程去 Leader Replica 抓取数据；
+5. 当 Replica 下线时，Leader Controller 收到 ZooKeeper 通知后进行处理；如果是 Leader Replica 下线，则会重新发起选举，根据不同状态采用对应的选举策略选出新 Leader；
+6. 选 Leader 的起因可能来自 Replica 下线、主动改变 Leader 或者为了负载均衡进行重分配。
 
-10）每个 partition 会有多个 replica 进行同步，一个 Leader 多个 follower，这些副本主从地位是由 leader controller 负责处理，只有 leader replica 才能处理请求，其它 follower 同步数据。
+## 七、GroupCoordinator 消费数据管理
 
-### **五、Controller** 1）每个 broker 都拥有一个 kafkacontroller，controller 主要负责管理整个集群，但是每个集群中都只有一个 leader controller 有资格来管理集群
+![图解](../assets/Kafka 源码阅读笔记-11.jpg)
 
-2）Leader controller 是借助 zookeeper 来选择的，每个 controller 初始化时都会向 zookeeper 注册竞争成为 leader 的路径的监听，第一个成功写入 zookeeper 的 controller 将会成为 leader，其它 controller 就会收到新 leader 的通知，将自己设为 follower；
+1. `GroupCoordinator` 提供访问消费者数据的接口，`GroupMetadataManager` 负责管理消费者组的数据，`GroupMetadata` 保存消费者组的数据，`MemberMetadata` 保存组内每个成员的数据；
+2. Kafka 提供了两种存储消费者数据的方式：一种是保存在 ZooKeeper 上，另一种是保存在 Kafka Log 系统中。由于 ZooKeeper 的频繁写性能较低，因此 Kafka 默认推荐保存在内部 Log 中；
+3. 当用户需要访问消费者数据时，会通过 Kafka Client 寻找一个相对空闲的 Broker，通过其 `GroupCoordinator` 找到 Leader 副本所在的地址并返回给 Client 连接。只有 Leader Replica 才提供服务；
+4. 消费者数据是通过内置的一个固定 Topic（`__consumer_offsets`）来管理，通过用户 `(Topic, Partition, Consumer Group)` 的组合计算哈希值，存储到对应的 Log 分区中；
+5. 当用户加入、新增或删除消费者组信息时，会将变更消息保存至 Log 中，并在内存中维护对应的组元数据结构。
 
-3）当 controller 成为 leader 时，会向 zookeeper 注册相关监听； 4）
+## 八、生产者发送数据
 
-![img](../assets/Kafka 源码阅读笔记-9.jpg)
+1. 生产者通过 Topic 和 Key 决定往哪个 Partition 写入数据；
+2. 生产者需要携带 `acks` 参数用来决定何时收到确认回复（`0`、`1`、`-1`）：
+   - 当 `acks=0` 时，表示不需要等待 Broker 回复；
+   - 当 `acks=1` 时，表示 Leader 副本写入成功即回复；
+   - 当 `acks=-1`（`all`）时，需要所有 ISR（正常同步的副本）都接收并确认后才能回复。接收数据后会存入延迟执行队列，当检测到其它 ISR 来抓取数据并更新进度后，检查是否满足条件并回复生产者。
 
-5）这些监听集群数据状态的变化，如 增加 topic partition replica 等，当监听到数据发生变化，leaderController 就会得到通知并处理，处理完成后会同步相关数据给其它 followerController；
+## 九、TransactionCoordinator 事务处理
 
-6）controller 是以单工作线程形式运行的，其它请求通过封装为 job 投递到 controller 处理线程； 7）
-
-![img](../assets/Kafka 源码阅读笔记-10.jpg)
-
-8）borker 上下线、副本增加重分配、topic 增加等，通过 zookeeper 通知并创建 job 投入 job 队列等待工作线程处理；
-
-9）集群所有的元数据是存放在 zookeeper 上，当 zookeeper 数据发生变化时，通过通知到 leaderController，controller 处理数据，并在内存中保存一份副本，做差值处理。
-
-### **六、replica 管理** 1）所有 partition 都有多个 replica 来管理，这样使数据更安全，不容易丢失
-
-2）replica 的 leader follower 地位是由 leaderController 来管理的；
-
-3）replica 有三种类型：无效的、已分配的（正在同步但是还没达到一致状态）和在线副本（正常同步的）；
-
-4）replica 数据的同步是由 replicaManager 副本管理器来处理的，管理器会开启副本同步线程去 leader replica 抓取数据；
-
-5）replica 下线时，leaderController 会收到 zookeeper 通知后会处理，如果是 leader replica 下线，则会重新选举，根据不同状态用不同选举策略选出新 Leader；
-
-6）选 leader 有可能来自 replica 下线、需要改变 leader 或者为了负载均衡进行重分配。
-
-### **七、groupCoordinator 消费数据管理** 1）
-
-![img](../assets/Kafka 源码阅读笔记-11.jpg)
-
-2）GroupCoordinator 提供访问消费者数据的接口，GroupMetadataManager 负责管理消费者组的数据，GroupMetadata 保存消费者组的数据，MemberMetadata 保存组里每个成员的数据；
-
-3）Kafka 提供了两种存储消费者数据方式，一种是保存在 zookeeper 上，另一种是保存在 kafka log 系统中，由于 zookeeper 的频繁写性能不是很好，所以 kafka 提供保存的选择，也是默认选择；
-
-4）用户需要访问消费者数据时，会通过 kafka client，随便找到一个比较空闲的 borker 通过其 GroupCoordinator，找到其 leader 副本所以在的地址，并返回给 client 去连接，只有 leader replica 才提供服务；
-
-5）消费者数据是通过内置的一个写死的 topic 来管理，通过用户的（topic，partition，消费者组）做为内置的 topic 分区 hash 来保存到 log 中；
-
-6）如用户加入、新增、删除消费者组信息时，会将创建消息保存致 Log 中，并在内存中运行生成数据存放于 2）中的数据结构。
-
-### **八、生产者发送数据** 1）生产者通过 topic 和 key 决定往哪个 partition 写入数据
-
-2）生产者需要携带 ack 用来决定应该什么时候回复，分别有 0,1,-1，当为 0 时说明不需要回复，当为 1 时表示集群接收了就回复，当为-1 时需要所有 isr（正常同步的）都接收确认了才能回复，接收数据后，会将这条消息存入延迟执行队列，当检测其它 isr 来抓取数据时，会更新并检查是否可以回复生产者。
-
-### **九、transactionCoordinator 事务处理**
-
-1）kafka 支持事务操作，并支持消费者设定 read_commited 和 read_uncommited 读取级别；
-
-2）用户提交的事务 log 会保存在内置写死的 topic 中，跟消费者数据相似的方法，依赖 replica 保证数据安全，执行的操作也会正常保存进消息 log（非事务 log），不过会有标志标示消息状态，如正在事务中还没提交，或者已经废弃还是提交了；
-
-3）消费者数据中会记录当前已经完成事务处理的 Log 最大偏移量叫 LSO，即此偏移量前的数据要么是已经事务提交的，要么是事务放弃的；
-
-4）通过 LSO 保证读已提交的消费者不会读到还没提交的事务数据；
-
-5）kafka 当用户回滚事务时，会记录回滚信息至放弃 Log 跟事务 Log 一样由 replica 管理，这里面记录的信息是一个 log 偏移区域内的 produceid 集合（由 kafka 生成的全局唯一 ID），在消费者抓取数据时，携带过去，消费者可以利用这个数据过滤掉放弃的事务；
-
-6）当用户提交事务时，事务协调器就会通知各个对应的 topic 所在的 borker 提交数据。
+1. Kafka 支持事务操作，并支持消费者设定 `read_committed` 和 `read_uncommitted` 读取隔离级别；
+2. 用户提交的事务 Log 会保存在内置固定的 Topic 中，使用与消费者数据类似的方法，依赖 Replica 保证数据安全。执行的操作也会正常保存进消息 Log（非事务 Log），并带有标志标示消息状态（如正在事务中未提交、已废弃或已提交）；
+3. 消费者数据中会记录当前已经完成事务处理的 Log 最大偏移量（LSO，Last Stable Offset），即此偏移量之前的数据要么是已提交的，要么是已撤销的；
+4. 通过 LSO 保证读取 `read_committed` 的消费者不会读到未提交的事务数据；
+5. 当用户回滚事务时，Kafka 会记录回滚信息至撤销 Log，同样由 Replica 管理。其中记录的信息是一个 Log 偏移区域内的 `producerId` 集合（由 Kafka 生成的全局唯一 ID），在消费者抓取数据时携带过去，消费者利用该数据过滤掉被放弃的事务消息；
+6. 当用户提交事务时，事务协调器（`TransactionCoordinator`）会通知各个对应 Topic 所在的 Broker 正式提交数据。

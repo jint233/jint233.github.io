@@ -559,7 +559,7 @@ mysql> select * from mysql.gtid_executed;
 
 用一张图来说明：
 
-![img](../assets/MySQL 主从复制基于 GTID 复制-1.png)
+![图解](../assets/MySQL 主从复制基于 GTID 复制-1.png)
 
 假如当前 master 的 gtid 为 A3，已经 purge 掉的 gtid 为"1-->A1"，备份到 slave 上的数据为 1-A2 部分。
 

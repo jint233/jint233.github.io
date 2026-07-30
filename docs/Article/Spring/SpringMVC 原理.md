@@ -1,12 +1,12 @@
 # Spring MVC 原理
 
-- ## 前言
+## 前言
 
 随着 Spring Boot 逐步全面覆盖到我们的项目之中，我们已经基本忘却当年经典的 Servlet + Spring MVC 的组合，那让人熟悉的 web.xml 配置。而本文，我们想先抛开 Spring Boot 到一旁，回到从前，一起来看看 Servlet 是怎么和 Spring MVC 集成，怎么来初始化 Spring 容器的。
 
 在看源码之前我们先看下 Spring MVC 在 Spring 中的架构依赖，它不是一个单独的项目，它有依赖的爸爸 spring-web 项目，也有两个兄弟 spring-webflux 和 spring-websocket 项目，本文只讲 Spring MVC，Spring Webflux 和 Spring WebSocket 日后会更新 Chat。
 
-![img](../assets/SpringMVC 原理-1.jpg)
+![图解](../assets/SpringMVC 原理-1.jpg)
 
 ## 一、上下文在 Web 容器中的启动
 
@@ -48,7 +48,8 @@
 ### 1.2 IOC 容器启动的基本过程
 
 先看下 ContextLoaderListener 的类图：
-![img](../assets/SpringMVC 原理-2.jpg)
+
+![图解](../assets/SpringMVC 原理-2.jpg)
 
 org.springframework.web.context.ContextLoaderListener，实现 ServletContextListener 接口，继承 ContextLoader 类，实现 Servlet 容器启动和关闭时，分别初始化和销毁 WebApplicationContext 容器。(注意，这个 ContextLoaderListener 类，是在 spring-web 项目中。)
 ContextLoaderListener 初始化 Root WebApplicationContext 的入口在 ContextLoaderListener#contextInitialized() 方法中，代码如下：
@@ -318,7 +319,8 @@ public WebApplicationContext initWebApplicationContext(ServletContext servletCon
 
 即， Servlet WebApplicationContext 容器的初始化，是在 DispatcherServlet 初始化的过程中执行。
 DispatcherServlet 的类图如下：
-![img](../assets/SpringMVC 原理-3.jpg)
+
+![图解](../assets/SpringMVC 原理-3.jpg)
 
 - HttpServletBean，负责将 ServletConfig 设置到当前 Servlet 对象中。
 
@@ -923,7 +925,9 @@ public interface FlashMapManager {
 ## 三、MVC 是怎么处理 HTTP 分发请求的
 
 一个用户的请求，是如何被 DispatcherServlet 处理的。如下图所示：
-![img](../assets/SpringMVC 原理-4.jpg)
+
+![图解](../assets/SpringMVC 原理-4.jpg)
+
 摘自《Spring MVC 原理探秘——一个请求的旅行过程》
 整体流程实际不复杂，但是涉及的全部代码会非常多，所以下面重点在于解析整体的流程。
 

@@ -21,7 +21,7 @@ ThreadLocal 是 JDK1.2 开始就提供的一个用来存储线程本地变量的
     public static synchronized String formatDate(Date date){
         return simpleDateFormat.format(date);
     }
-```
+    ```
 
 - **解决办法二**
 
@@ -30,9 +30,9 @@ ThreadLocal 是 JDK1.2 开始就提供的一个用来存储线程本地变量的
     ```java
     private static final ThreadLocal<SimpleDateFormat> simpleDateFormatThreadLocal = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
     public static String formatDate(Date date){
-    return simpleDateFormatThreadLocal.get().format(date);
+        return simpleDateFormatThreadLocal.get().format(date);
     }
-```
+    ```
 
 ## ThreadLocal 的原理
 
@@ -93,11 +93,11 @@ public class Thread implements Runnable {
 
 ThreadLocalMap 是 ThreadLocal 类里的一个内部类，虽然类的名字上带着 Map 但却没有实现 Map 接口，只是结构和 Map 类似而已。
 
-![img](../assets/Java 中的 ThreadLocal-1.png)
+![图解](../assets/Java 中的 ThreadLocal-1.png)
 
 ThreadLocalMap 内部其实是一个 Entry 数组，Entry 是 ThreadLocalMap 中的一个内部类，继承自 WeakReference，并将 ThreadLocal 类型的对象设置为了 Entry 的 Key，以及对 Key 设置成弱引用。 ThreadLocalMap 的内部数据结构，就大概是这样的 key,value 组成的 Entry 的数组集合。
 
-![img](../assets/Java 中的 ThreadLocal-2.png)
+![图解](../assets/Java 中的 ThreadLocal-2.png)
 
 和真正的 Map 还是有区别的，没有链表了，这样在解决 key 的 hash 冲突的时候措施肯定就和 HashMap 不一样了。一个线程中是可以创建多个 ThreadLocal 对象的，多个 ThreadLocal 对象就会存放多个数据，那么在 ThreadLocalMap 中就会以数组的形式存放这些数据。
 
@@ -221,7 +221,7 @@ if (inheritThreadLocals && parent.inheritableThreadLocals != null)
 
 上文我们也提到过，ThreadLocal 中的 ThreadLocalMap 里面的 Entry 对象是继承自 WeakReference 类的，说明 Entry 的 key 是一个弱引用。
 
-![img](../assets/Java 中的 ThreadLocal-3.png)
+![图解](../assets/Java 中的 ThreadLocal-3.png)
 
 !!! Note "弱引用"
     弱引用是用来描述那些非必须的对象，弱引用的对象，只能生存到下一次垃圾收集发生为止。当垃圾收集器开始工作，无论当前内存是否足够，都会回收掉只被弱引用关联的对象。

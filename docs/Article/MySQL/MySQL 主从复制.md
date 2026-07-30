@@ -28,11 +28,11 @@ mysql 复制是指从一个 mysql 服务器(MASTER)将数据 **通过日志的�
 
 站在 slave 的角度上看，过程如下：
 
-![img](../assets/MySQL 主从复制-1.png)
+![图解](../assets/MySQL 主从复制-1.png)
 
 站在 master 的角度上看，过程如下(默认的异步复制模式，前提是设置了`sync_binlog=1`，否则 binlog 刷盘时间由操作系统决定)：
 
-![img](../assets/MySQL 主从复制-2.png)
+![图解](../assets/MySQL 主从复制-2.png)
 
 所以，可以认为复制大致有三个步骤：
 
@@ -52,17 +52,24 @@ MySQL 5.7.17 则提出了组复制(MySQL Group Replication,MGR)的概念。像�
 
 围绕下面的拓扑图来分析：
 
-![img](../assets/MySQL 主从复制-3.png)
+![图解](../assets/MySQL 主从复制-3.png)
 
-主要有以下几点好处： **1.提供了读写分离的能力。** replication 让所有的 slave 都和 master 保持数据一致，因此外界客户端可以从各个 slave 中读取数据，而写数据则从 master 上操作。也就是实现了读写分离。
+主要有以下几点好处：
 
-需要注意的是，为了保证数据一致性，**写操作必须在 master 上进行**。
+1. **提供了读写分离的能力**
+   Replication 让所有的 Slave 都和 Master 保持数据一致，因此外部客户端可以从各个 Slave 中读取数据，而写数据则在 Master 上操作，实现了读写分离。注意：为了保证数据一致性，**写操作必须在 Master 上进行**。
 
-通常说到读写分离这个词，立刻就能意识到它会分散压力、提高性能。**2.为 MySQL 服务器提供了良好的伸缩(scale-out)能力。** 由于各个 slave 服务器上只提供数据检索而没有写操作，因此"随意地"增加 slave 服务器数量来提升整个 MySQL 群的性能，而不会对当前业务产生任何影响。
+2. **为 MySQL 服务器提供了良好的伸缩（Scale-out）能力**
+   由于各个 Slave 服务器上只提供数据检索而没有写操作，因此可以“随意”增加 Slave 服务器数量来提升整个 MySQL 集群的查询性能，而不会对当前写业务产生影响。（注：如果 Slave 数量过多，Master 传输日志的带宽与连接压力也会相应增大）。
 
-之所以"随意地"要加上双引号，是因为每个 slave 都要和 master 建立连接，传输数据。如果 slave 数量巨多，master 的压力就会增大，网络带宽的压力也会增大。**3.数据库备份时，对业务影响降到最低。** 由于 MySQL 服务器群中所有数据都是一致的(至少几乎是一致的)，所以在需要备份数据库的时候可以任意停止某一台 slave 的复制功能(甚至停止整个 mysql 服务)，然后从这台主机上进行备份，这样几乎不会影响整个业务(除非只有一台 slave，但既然只有一台 slave，说明业务压力并不大，短期内将这个压力分配给 master 也不会有什么影响)。**4.能提升数据的安全性。** 这是显然的，任意一台 mysql 服务器断开，都不会丢失数据。即使是 master 宕机，也只是丢失了那部分还没有传送的数据(异步复制时才会丢失这部分数据)。**5.数据分析不再影响业务。**
+3. **数据库备份时，对业务影响降到最低**
+   由于集群中所有 Slave 的数据都是一致的（或延时极小），在需要备份数据库时可以停止某一台 Slave 的复制功能进行备份，几乎不会对主库业务产生影响。
 
-需要进行数据分析的时候，直接划分一台或多台 slave 出来专门用于数据分析。这样 OLTP 和 OLAP 可以共存，且几乎不会影响业务处理性能。
+4. **提升数据的安全性**
+   任意一台 Slave 服务器断开均不会丢失数据。即使是 Master 宕机，也仅会丢失异步复制下尚未发送的这部分日志数据。
+
+5. **数据分析不再影响线上业务**
+   需要进行数据分析时，可直接划出一台或多台 Slave 专门用于数据处理，使 OLTP 与 OLAP 业务隔离开来。
 
 ## 3. 复制分类和它们的特性
 
@@ -77,7 +84,7 @@ MySQL 支持两种不同的复制方法：传统的复制方式和 GTID 复制�
 
 客户端发送 DDL/DML 语句给 master，master 执行完毕后还需要 **等待所有的 slave 都写完了 relay log 才认为此次 DDL/DML 成功，然后才会返回成功信息给客户端**。同步复制的问题是 master 必须等待，所以延迟较大，在 MySQL 中不使用这种复制方式。
 
-![img](../assets/MySQL 主从复制-4.png)
+![图解](../assets/MySQL 主从复制-4.png)
 
 例如上图中描述的，只有 3 个 slave 全都写完 relay log 并返回 ACK 给 master 后，master 才会判断此次 DDL/DML 成功。
 
@@ -85,13 +92,15 @@ MySQL 支持两种不同的复制方法：传统的复制方式和 GTID 复制�
 
 客户端发送 DDL/DML 语句给 master，master 执行完毕后 **还要等待一个 slave 写完 relay log 并返回确认信息给 master，master 才认为此次 DDL/DML 语句是成功的，然后才会发送成功信息给客户端**。半同步复制只需等待一个 slave 的回应，且等待的超时时间可以设置，超时后会自动降级为异步复制，所以在局域网内(网络延迟很小)使用半同步复制是可行的。
 
-![img](../assets/MySQL 主从复制-5.png)
+![图解](../assets/MySQL 主从复制-5.png)
 
 例如上图中，只有第一个 slave 返回成功，master 就判断此次 DDL/DML 成功，其他的 slave 无论复制进行到哪一个阶段都无关紧要。
 
 ## 3.3 异步复制
 
-客户端发送 DDL/DML 语句给 master，**master 执行完毕立即返回成功信息给客户端，而不管 slave 是否已经开始复制**。这样的复制方式导致的问题是，当 master 写完了 binlog，而 slave 还没有开始复制或者复制还没完成时，**slave 上和 master 上的数据暂时不一致，且此时 master 突然宕机，slave 将会丢失一部分数据。如果此时把 slave 提升为新的 master，那么整个数据库就永久丢失这部分数据。**![img](../assets/MySQL 主从复制-6.png)
+客户端发送 DDL/DML 语句给 master，**master 执行完毕立即返回成功信息给客户端，而不管 slave 是否已经开始复制**。这样的复制方式导致的问题是，当 master 写完了 binlog，而 slave 还没有开始复制或者复制还没完成时，**slave 上和 master 上的数据暂时不一致，且此时 master 突然宕机，slave 将会丢失一部分数据。如果此时把 slave 提升为新的 master，那么整个数据库就永久丢失这部分数据。**
+
+![示意图](../assets/MySQL 主从复制-6.png)
 
 ## 3.4 延迟复制
 
@@ -105,7 +114,7 @@ mysql 支持一主一从和一主多从。但是每个 slave 必须只能是一�
 
 以下是一主一从的结构图：
 
-![img](../assets/MySQL 主从复制-7.png)
+![图解](../assets/MySQL 主从复制-7.png)
 
 在开始传统的复制(非 GTID 复制)前，需要完成以下几个关键点，**这几个关键点指导后续复制的所有步骤**。
 
@@ -123,7 +132,7 @@ mysql 支持一主一从和一主多从。但是每个 slave 必须只能是一�
 
 一主一从是最简单的主从复制结构。本节实验环境如下：
 
-![img](../assets/MySQL 主从复制-8.png)
+![图解](../assets/MySQL 主从复制-8.png)
 
 1. **配置 master 和 slave 的配置文件。**
 
@@ -145,14 +154,14 @@ server-id=111
 
     ```shell
     service mysqld restart
-```
+    ```
 
 2. **在 master 上创建复制专用的用户。**
 
-    ```shell
+    ```sql
     create user 'repl'@'192.168.100.%' identified by 'P@ssword1!';
     grant REPLICATION SLAVE on *.* to 'repl'@'192.168.100.%';
-```
+    ```
 
 3. **将 slave 恢复到 master 上指定的坐标。** 这是备份恢复的内容，此处用一个小节来简述操作过程。详细内容见[MySQL 备份和恢复(一)、(二)、(三)](https://www.cnblogs.com/f-ck-need-u/p/9013458.html)。
 
@@ -742,11 +751,11 @@ IO 线程每次从 master 复制日志要写入到 relay log 中，但是它是�
 
 以下是一主多从的结构图(和一主一从的配置方法完全一致)：
 
-![img](../assets/MySQL 主从复制-9.png)
+![图解](../assets/MySQL 主从复制-9.png)
 
 以下是一主多从，但某 slave 是另一群 MySQL 实例的 master：
 
-![img](../assets/MySQL 主从复制-10.png)
+![图解](../assets/MySQL 主从复制-10.png)
 
 配置一主多从时，需要考虑一件事：slave 上是否要开启 binlog? 如果不开启 slave 的 binlog，性能肯定要稍微好一点。但是开启了 binlog 后，可以通过 slave 来备份数据，也可以在 master 宕机时直接将 slave 切换为新的 master。此外，如果是上面第二种主从结构，这台 slave 必须开启 binlog。可以将某台或某几台 slave 开启 binlog，并在 mysql 动静分离的路由算法上稍微减少一点到这些 slave 上的访问权重。
 
@@ -773,7 +782,7 @@ IO 线程每次从 master 复制日志要写入到 relay log 中，但是它是�
 
 此处实现的一主多从是下面这种结构：
 
-![img](../assets/MySQL 主从复制-11.png)
+![图解](../assets/MySQL 主从复制-11.png)
 
 这种结构对 MySQL 复制来说，是一个很好的提升性能的方式。对于只有一个 master 的主从复制结构，每多一个 slave，意味着 master 多发一部分 binlog，业务稍微繁忙一点时，这种压力会加剧。而这种一个主 master、一个或多个辅助 master 的主从结构，非常有助于 MySQL 集群的伸缩性，对压力的适应性也很强。
 
@@ -781,20 +790,24 @@ IO 线程每次从 master 复制日志要写入到 relay log 中，但是它是�
     1.  将不同数据库复制到不同 slave 上。
     2.  可以将 master 上的事务表(如 InnoDB)复制为 slave 上的非事务表(如 MyISAM)，这样 slave 上回放的速度加快，查询数据的速度在一定程度上也会提升。
 
-回到这种主从结构，它有些不同，master 只负责传送日志给 slave1、slave2 和 slave3，slave 2_1 和 slave 2_2 的日志由 slave2 负责传送，所以 slave2 上也必须要开启 binlog 选项。此外，还必须开启一个选项`--log-slave-updates`让 slave2 能够在重放 relay log 时也写自己的 binlog，否则 slave2 的 binlog 仅接受人为的写操作。**问：slave 能否进行写操作？重放 relay log 的操作是否会记录到 slave 的 binlog 中？** 1.  在 slave 上没有开启`read-only`选项(只读变量)时，任何有写权限的用户都可以进行写操作，这些操作都会记录到 binlog 中。注意，**read-only 选项对具有 super 权限的用户以及 SQL 线程执行的重放写操作无效**。默认这个选项是关闭的。
+回到这种主从结构，它有些不同，master 只负责传送日志给 slave1、slave2 和 slave3，slave 2_1 和 slave 2_2 的日志由 slave2 负责传送，所以 slave2 上也必须要开启 binlog 选项。此外，还必须开启一个选项`--log-slave-updates`让 slave2 能够在重放 relay log 时也写自己的 binlog，否则 slave2 的 binlog 仅接受人为的写操作。> **常见疑问**：Slave 能否进行写操作？重放 Relay Log 的操作是否会记录到 Slave 的 Binlog 中？
 
-```sql
-mysql> show variables like "read_only"; 
-+---------------+-------+
-| Variable_name | Value |
-+---------------+-------+
-| read_only     | OFF   |
-+---------------+-------+
-```
+1. 在 Slave 上没有开启 `read-only` 选项（只读变量）时，任何有写权限的用户都可以进行写操作，这些操作都会记录到 Binlog 中。注意：**`read-only` 选项对具有 `SUPER` 权限的用户以及 SQL 线程执行的重放写操作无效**。默认这个选项是关闭的：
 
-1. 在 slave 上没有开启`log-slave-updates`和 binlog 选项时，重放 relay log 不会记录 binlog。**所以如果 slave2 要作为某些 slave 的 master，那么在 slave2 上必须要开启 log-slave-updates 和 binlog 选项。为了安全和数据一致性，在 slave2 上还应该启用 read-only 选项。** 环境如下：
+    ```sql
+    mysql> show variables like "read_only";
+    +---------------+-------+
+    | Variable_name | Value |
+    +---------------+-------+
+    | read_only     | OFF   |
+    +---------------+-------+
+    ```
 
-![img](../assets/MySQL 主从复制-12.png)
+2. 在 Slave 上没有开启 `log-slave-updates` 和 Binlog 选项时，重放 Relay Log 不会记录到自己的 Binlog 中。**所以如果 Slave2 要作为其它 Slave 的 Master，那么在 Slave2 上必须要开启 `log-slave-updates` 和 `log-bin` 选项。为了安全和数据一致性，在 Slave2 上还应该启用 `read-only` 选项。**
+
+测试环境配置如下：
+
+![图解](../assets/MySQL 主从复制-12.png)
 
 以下是 master、slave1 和 slave2 上配置文件内容。
 
@@ -971,7 +984,7 @@ mysql> show variables like "%parallel%";
 
 例如，初始时 slave 上的 processlist 如下：
 
-![img](../assets/MySQL 主从复制-13.png)
+![图解](../assets/MySQL 主从复制-13.png)
 
 设置`slave_parallel_workers=2`。
 
@@ -982,7 +995,7 @@ msyql> start slave sql_thread;
 mysql> show full processlist;
 ```
 
-![img](../assets/MySQL 主从复制-14.png)
+![图解](../assets/MySQL 主从复制-14.png)
 
 可见多出了两个线程，其状态信息是"Waiting for an event from Coordinator"。
 
@@ -1056,25 +1069,25 @@ START SLAVE SQL_THREAD;
 
 1. 在将 S1 提升为 master 之前，需要保证 S1 已经将 relay log 中的事件已经 replay 完成。即下面两个状态查看语句中 SQL 线程的状态显示为："Slave has read all relay log; waiting for the slave I/O thread to update it"。
 
-    ```shell
+    ```sql
     show slave status;
     show processlist;
-```
+    ```
 
 2. 停止 S1 上的 IO 线程和 SQL 线程，然后将 S1 的 binlog 清空(要求已启用 binlog)。
 
-    ```shell
+    ```sql
     mysql> stop slave;
     mysql> reset master;
-```
+    ```
 
 3. 在 S2 上停止 IO 线程和 SQL 线程，通过`change master to`修改 master 的指向为 S1，然后再启动 io 线程和 SQL 线程。
 
-    ```shell
+    ```sql
     mysql> stop slave;
     mysql> change master to master_host=S1,...
     mysql> start slave;
-```
+    ```
 
 4. 将应用程序原本指向 M 的请求修改为指向 S1，如修改 MySQL 代理的目标地址。一般会通过 MySQL Router、Amoeba、cobar 等数据库中间件来实现。
 5. 删除 S1 上的 master.info、relay-log.info 文件，否则下次 S1 重启服务器会继续以 slave 角色运行。
@@ -1108,19 +1121,13 @@ mysql> set sql_log_bin=1;
 ## 6.7 主从高延迟的解决思路
 
 slave 通过 IO 线程获取 master 的 binlog，并通过 SQL 线程来应用获取到的日志。因为各个方面的原因，经常会出现 slave 的延迟(即`Seconds_Behind_Master`的值)非常高(动辄几天的延迟是常见的，几个小时的延迟已经算短的)，使得主从状态不一致。
-
 一个很容易理解的延迟示例是：假如 master 串行执行一个大事务需要 30 分钟，那么 slave 应用这个事务也大约要 30 分钟，从 master 提交的那一刻开始，slave 的延迟就是 30 分钟，更极端一点，由于 binlog 的记录时间点是在事务提交时，如果这个大事务的日志量很大，比如要传输 10 多分钟，那么很可能延迟要达到 40 分钟左右。而且更严重的是，这种延迟具有滚雪球的特性，从延迟开始，很容易导致后续加剧延迟。
-
 所以，第一个优化方式是不要在 mysql 中使用大事务，这是 mysql 主从优化的第一口诀。
-
 在回归正题，要解决 slave 的高延迟问题，先要知道`Second_Behind_Master`是如何计算延迟的：SQL 线程比 IO 线程慢多少(其本质是 NOW()减去`Exec_Master_Log_Pos`处设置的 TIMESTAMP)。在主从网络状态良好的情况下，IO 线程和 master 的 binlog 大多数时候都能保持一致(也即是 IO 线程没有多少延迟，除非事务非常大，导致二进制日志传输时间久，**但 mysql 优化的一个最基本口诀就是大事务切成小事务** )，所以在这种理想状态下，可以认为主从延迟说的是 slave 上的数据状态比 master 要延迟多少。它的计数单位是秒。
 
 1. **从产生 Binlog 的 master 上考虑，可以在 master 上应用 group commit 的功能，并设置参数 binlog_group_commit_sync_delay 和 binlog_group_commit_sync_no_delay_count，前者表示延迟多少秒才提交事务，后者表示要堆积多少个事务之后再提交。这样一来，事务的产生速度降低，slave 的 SQL 线程相对就得到缓解**。
-
 2. **再者从 slave 上考虑，可以在 slave 上开启多线程复制(MTS)功能，让多个 SQL 线程同时从一个 IO 线程中取事务进行应用，这对于多核 CPU 来说是非常有效的手段**。但是前面介绍多线程复制的时候说过，没有掌握多线程复制的方方面面之前，千万不要在生产环境中使用多线程复制，要是出现 gap 问题，很让人崩溃。
-
 3. 最后从架构上考虑。主从延迟是因为 slave 跟不上 master 的速度，那么可以考虑对 master 进行节流控制，让 master 的性能下降，从而变相提高 slave 的能力。这种方法肯定是没人用的，但确实是一种方法，提供了一种思路，比如 slave 使用性能比 master 更好的硬件。另一种比较可取的方式是加多个中间 slave 层(也就是 master->slaves->slaves)，让多个中间 slave 层专注于复制(也可作为非业务的他用，比如用于备份)。
-
 4. 使用组复制或者 Galera/PXC 的多写节点，此外还可以设置相关参数，让它们对延迟自行调整。但一般都不需要调整，因为有默认设置。
 
 还有比较细致的方面可以降低延迟，比如设置为 row 格式的 Binlog 要比 statement 要好，因为不需要额外执行语句，直接修改数据即可。比如 master 设置保证数据一致性的日志刷盘规则(sync_binlog/innodb_flush_log_at_trx_commit 设置为 1)，而 slave 关闭 binlog 或者设置性能优先于数据一致性的 binlog 刷盘规则。再比如设置 slave 的隔离级别使得 slave 的锁粒度放大，不会轻易锁表(多线程复制时避免使用此方法)。还有很多方面，选择好的磁盘，设计好分库分表的结构等等，这些都是直接全局的，实在没什么必要在这里多做解释。

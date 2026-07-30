@@ -75,7 +75,7 @@ mysql> select * from information_schema.collations;
 mysql> show variables like 'character%';
 ```
 
-![img](../assets/MySQL 地基基础：数据库字符集-1.png)
+![图解](../assets/MySQL 地基基础：数据库字符集-1.png)
 
 参数解释：
 
@@ -100,11 +100,11 @@ DML 字符集选择：
 
 查看字符集校对规则：
 
-```plaintext
+```shell
 mysql> show variables like 'collation%';
 ```
 
-![img](../assets/MySQL 地基基础：数据库字符集-2.png)
+![图解](../assets/MySQL 地基基础：数据库字符集-2.png)
 
 参数说明：
 
@@ -130,25 +130,25 @@ mysql> show variables like 'collation%';
 
 更改数据库字符集：
 
-```plaintext
+```shell
 alter database db1 default character set utf8;
 ```
 
 更改数据库表的字符集：
 
-```sql
+```shell
 alter table tab1 default character set utf8;
 ```
 
 把表默认的字符集和所有字符列改为新的字符集（例如 utf8）：
 
-```sql
+```shell
 alter table tab1 convert to character set utf8;
 ```
 
 前面的操作转换了字符集之间的列类型。如果有一列使用一种字符集（如 latin1），但是存储的值实际上使用了其它的字符集（如 utf8），这种情况不是你想要的，进行如下操作就可以解决你的问题。
 
-```sql
+```shell
 alter table tab1 change 字段 1 字段 2 类型；
 alter table tab1 change 字段 2 字段 2 类型 character set utf8;
 ```
@@ -161,14 +161,14 @@ MySQL 数据库字符集和校对规则有 4 个级别：服务器级、数据�
 
 **方式一** 在 MySQL 配置文件 my.cnf 中进行配置设置：
 
-```plaintext
+```shell
 [mysqld]
 default-character-set=gbk
 ```
 
 **方式二** 在启动 MySQL 时设置：
 
-```plaintext
+```shell
 mysqld --default-character-set=gbk
 ```
 
@@ -176,7 +176,7 @@ mysqld --default-character-set=gbk
 
 在源码编译时指定，如果未指定，默认使用 latin1：
 
-```plaintext
+```shell
 ./configure --with-charcter=gbk
 ```
 
@@ -229,13 +229,13 @@ create database db1 default character set utf8 collate utf8_bin;
 
 设置表字符集：
 
-```sql
+```shell
 create table tab1(column1 varchar(5)) default character set utf8;
 ```
 
 设置表校对规则：
 
-```sql
+```shell
 create table tab1(column1 varchar(5)) default character set utf8 collate utf8_bin;
 ```
 
@@ -249,13 +249,13 @@ create table tab1(column1 varchar(5)) default character set utf8 collate utf8_bi
 
 设置列字符集：
 
-```sql
+```shell
 create table tab1(column1 varchar(5) character SET utf8);
 ```
 
 设置列校对规则：
 
-```sql
+```shell
 create table tab1(column1 varchar(5) character set utf8 collate utf8_bin);
 ```
 
@@ -267,30 +267,30 @@ create table tab1(column1 varchar(5) character set utf8 collate utf8_bin);
 
 **4. 如何处理带数据的字符集** 当表中已经存在数据，直接更改字符集，不会更改既有的数据字符集，我们需要先将数据导出，调整字符集再导入。**第一步：导出表结构**
 
-```plaintext
+```shell
 mysqldump -uroot -p --default-character-set=gbk -d db1> createtab.sql
 ```
 
 **第二步：修改表字符集** 编辑修改 createtab.sql 文件，将表结构定义中的字符集改为新的字符集。**第三步：导出所有数据**
 
-```plaintext
+```shell
 mysqldump -uroot -p --quick --no-create-info --extended-insert --default-character-set=latin1 db1> data.sql
 ```
 
 **第四步：修改数据字符集** 编辑修改 data.sql，将 set names latin1 修改成 set names gbk。**第五步：创建数据库**
 
-```plaintext
+```shell
 create database db1 default charset gbk;
 ```
 
 #### 第六步：创建表
 
-```plaintext
+```shell
 mysql -uroot -p db1 < createtab.sql
 ```
 
 #### 第七步：导入数据
 
-```plaintext
-mysql -uroot -p db1 \< data.sql
+```shell
+mysql -uroot -p db1 < data.sql
 ```

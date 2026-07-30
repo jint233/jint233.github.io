@@ -21,17 +21,17 @@ Chat 内容：
 
 下面我通过漫画的形式来演示两种场景。首先准备两个本地客户端和一个代码仓库，两个客户端为了好记，姑且就叫熊大熊二吧（简称 A 和 B）。
 
-![img](../assets/漫画讲解 git rebase VS git merge-1.jpg)
+![图解](../assets/漫画讲解 git rebase VS git merge-1.jpg)
 
 码云（gitee.com）代码提交仓库网络图展现很好，后面将代码托管在码云上演示。
 
 我这里提前在码云创建一个`git-conflict-demo`的项目，此时里面暂时没有任何内容。
 
-![img](../assets/漫画讲解 git rebase VS git merge-2.png)
+![图解](../assets/漫画讲解 git rebase VS git merge-2.png)
 
 ### 本地仓库拉取远端仓库时产生
 
-![img](../assets/漫画讲解 git rebase VS git merge-3.png)
+![图解](../assets/漫画讲解 git rebase VS git merge-3.png)
 
 ```shell
 git clone https://gitee.com/chandler2code/git-conflict-demo.git
@@ -44,11 +44,11 @@ git push origin master
 
 熊大添加了一个`today-food-menu.txt`文件，并在里面填入了 apple，表示他今晚的食物想吃苹果。
 
-![img](../assets/漫画讲解 git rebase VS git merge-4.png)
+![图解](../assets/漫画讲解 git rebase VS git merge-4.png)
 
 于此同时，熊二也和他大哥一样的想法，但是他呢稍微慢了一步，此时熊大已经将代码提交到远端仓库，所以此时仓库里面已经有了`today-food-menu.txt`文件，并且里面的食物清单是苹果。
 
-![img](../assets/漫画讲解 git rebase VS git merge-5.png)
+![图解](../assets/漫画讲解 git rebase VS git merge-5.png)
 
 因为熊二不想吃苹果，所以他果断将`today-food-menu.txt`里面的内容改为了蜂蜜`honey`。
 
@@ -60,11 +60,11 @@ git commit -m 'update today-food-menu.txt'
 git push origin master
 ```
 
-![img](../assets/漫画讲解 git rebase VS git merge-6.png)
+![图解](../assets/漫画讲解 git rebase VS git merge-6.png)
 
 熊大在提交代码后就有点后悔了，他觉得昨天才吃过苹果，今天换换口味吃香蕉了。
 
-![img](../assets/漫画讲解 git rebase VS git merge-7.png)
+![图解](../assets/漫画讲解 git rebase VS git merge-7.png)
 
 于是他将食物清单改为香蕉后再次提交。
 
@@ -103,7 +103,7 @@ git commit -m 'merge conflic'
 git push origin master
 ```
 
-![img](../assets/漫画讲解 git rebase VS git merge-8.png)
+![图解](../assets/漫画讲解 git rebase VS git merge-8.png)
 
 **总结：这里我们可以看到，冲突的原因就是当本地的文件和远端的文件都做了修改时，本地拉取远端时首先会告知由于远端有变更，需要 git pull，执行 git pull 之后 Git 迷糊了，心想你们到底想要哪个内容呢，算了我不管了，直接给你们算冲突吧，你们自己决定保留哪些内容。**
 
@@ -111,7 +111,7 @@ git push origin master
 
 熊大在有了上次的本地拉取远端代码冲突时有了新的思考。
 
-![img](../assets/漫画讲解 git rebase VS git merge-9.png)
+![图解](../assets/漫画讲解 git rebase VS git merge-9.png)
 
 于是第二天在修改食物清单时，他选择自己先在本地创建分支，然后在自己的分支上修改，这样就可以时不时的切换到 master 分支拉取最新的代码。
 
@@ -127,7 +127,7 @@ git commit -m 'update today-food-menu.txt: eat apple'
 
 熊二今天依旧想吃蜂蜜，于是他将昨天的更新改拉取到本地后，将其更改为 honey。
 
-![img](../assets/漫画讲解 git rebase VS git merge-10.png)
+![图解](../assets/漫画讲解 git rebase VS git merge-10.png)
 
 ```shell
 git pull
@@ -137,7 +137,7 @@ git commit -m 'update today-food-menu.txt'
 git push origin master
 ```
 
-![img](../assets/漫画讲解 git rebase VS git merge-11.png)
+![图解](../assets/漫画讲解 git rebase VS git merge-11.png)
 
 熊大切换到 master 分支拉取，查看代码变化。
 
@@ -148,7 +148,7 @@ git pull
 
 熊大拉取代码后发现`today-food-menu.txt`被更改为了 honey。
 
-![img](../assets/漫画讲解 git rebase VS git merge-12.png)
+![图解](../assets/漫画讲解 git rebase VS git merge-12.png)
 
 熊大考虑到仓库的蜂蜜快坏了，所以他这下坚持要吃苹果，于是他将自己的 food 分支的更改合并到 master 分支。有两种方式可以做到，分别是`git merge`和`git rabase`，后面都会详细的做讲解。我这里先用`git merge`解决冲突。
 
@@ -178,7 +178,7 @@ git commit -m 'master merge food:eat apple'
 git push origin master
 ```
 
-## ![img](../assets/漫画讲解 git rebase VS git merge-13.png)
+## ![示意图](../assets/漫画讲解 git rebase VS git merge-13.png)
 
 **总结：在前面我们看到，如果 master 分支上开发。由于 master 分支时刻保持最新的发行代码，所以变动频繁，因此拉取 master 分支非常容易造成冲突。因此这里是将更改在本地分支上进行，在需要合并时，切换到 master 分支拉取最新代码后，根据拉取的内容，再去合并分支。同时这种方式也是更受大家推崇的。** 分析 git merge 合并分支代码的特点
 
@@ -186,13 +186,13 @@ git push origin master
 
 云端仓库查看 commit 记录
 
-![img](../assets/漫画讲解 git rebase VS git merge-14.png)
+![图解](../assets/漫画讲解 git rebase VS git merge-14.png)
 
 熊二将食物清单更新为 honey 并提交到远端仓库后，此时熊大在本地 commit，所以我们看到熊大的 commit 时间在熊二提交更新之前。熊二提交更新后，熊大切换到 master 分支，并更新代码到本地后，在合并分支时产生了冲突。为了合并冲突，多出了一次 merge 的 commit 记录。
 
 我们再来云端看一下提交结构图：
 
-![img](../assets/漫画讲解 git rebase VS git merge-15.png)
+![图解](../assets/漫画讲解 git rebase VS git merge-15.png)
 
 从图中可以看到，`master merge food: eat apple`这次 commit 将前面的两次提交进行了合并，因为前面的这两次 commit 的代码完全相同的点在`merge confilc`这次提交，所以从`merge confic`到`master merge food:eat apple`这里多出来一个分叉的历史记录（绿线）。
 
@@ -202,7 +202,7 @@ git push origin master
 
 熊大在本机创建 food2 分支，在本地分支上将内容修改为 honey。
 
-![img](../assets/漫画讲解 git rebase VS git merge-16.png)
+![图解](../assets/漫画讲解 git rebase VS git merge-16.png)
 
 ```shell
 git checkout -b food2
@@ -213,7 +213,7 @@ git commit -m 'update today-food-menu.txt:honey'
 
 在熊大还没有 push 到远端时，他想起之前答应了熊二要像请他喝咖啡，于是他又改变为喝咖啡了。
 
-![img](../assets/漫画讲解 git rebase VS git merge-17.png)
+![图解](../assets/漫画讲解 git rebase VS git merge-17.png)
 
 ```shell
 sed -i 's/honey/coffee/g' -i today-food-menu.txt
@@ -223,7 +223,7 @@ git commit -m 'update today-food-menu.txt:coffee'
 
 就在熊二还没有 push 到远端的时候，熊二本来计划吃蜂蜜的，但是想到蜂蜜不多了，决定留着过年吃，今天还是吃香蕉。于是将修改后的内容推送到了远端。
 
-![img](../assets/漫画讲解 git rebase VS git merge-18.png)
+![图解](../assets/漫画讲解 git rebase VS git merge-18.png)
 
 ```shell
 git pull
@@ -315,7 +315,7 @@ git rebase --continue
 
 此时没有提示任何的信息，所以 rebase 结束。其实版本高一点的 Git（2.22 及以上），是有 rebase 进度条展示的，可以看到 rebase 的进度，如图所示：
 
-![img](../assets/漫画讲解 git rebase VS git merge-19.png)
+![图解](../assets/漫画讲解 git rebase VS git merge-19.png)
 
 rebase 结束后切换到 master 分支合并分支代码，然后直接推送到远端即可（此时不用指定 commit）。
 
@@ -325,13 +325,13 @@ git merge food2
 git push origin master
 ```
 
-![img](../assets/漫画讲解 git rebase VS git merge-20.png)
+![图解](../assets/漫画讲解 git rebase VS git merge-20.png)
 
 可以看到，一共有 3 次 commit 记录，分别是熊大 2 次和熊二 1 次。没有多出来 merge 的 commit 记录。
 
 我们再来云端看一下提交结构图：
 
-![img](../assets/漫画讲解 git rebase VS git merge-21.png)
+![图解](../assets/漫画讲解 git rebase VS git merge-21.png)
 
 由于没有多出 merge 的 commit 记录，所以不会存在分叉的 commit 记录，代码记录都是以线性的方式，做代码审查一目了然。
 

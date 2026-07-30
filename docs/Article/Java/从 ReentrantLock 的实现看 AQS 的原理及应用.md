@@ -6,7 +6,7 @@ Java 中的大部分同步类（Lock、Semaphore、ReentrantLock 等）都是基
 
 下面列出本篇文章的大纲和思路，以便于大家更好地理解：
 
-![img](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-1.png)
+![图解](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-1.png)
 
 ## 1 ReentrantLock
 
@@ -14,7 +14,7 @@ Java 中的大部分同步类（Lock、Semaphore、ReentrantLock 等）都是基
 
 ReentrantLock 意思为可重入锁，指的是一个线程能够对一个临界资源重复加锁。为了帮助大家更好地理解 ReentrantLock 的特性，我们先将 ReentrantLock 跟常用的 Synchronized 进行比较，其特性如下（蓝色部分为本篇文章主要剖析的点）：
 
-![img](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-2.png)
+![图解](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-2.png)
 
 下面通过伪代码，进行更加直观的比较：
 
@@ -78,7 +78,6 @@ static final class NonfairSync extends Sync {
 某个线程获取锁失败的后续流程是什么呢？有以下两种可能：
 
 1. 将当前线程获锁结果设置为失败，获取锁流程结束。这种设计会极大降低系统的并发度，并不满足我们实际的需求。所以就需要下面这种流程，也就是 AQS 框架的处理流程。
-
 2. 存在某种排队等候机制，线程继续等待，仍然保留获取锁的可能，获取锁流程仍在继续。
 
 !!! Question "非公平锁的问题"
@@ -109,7 +108,7 @@ static final class FairSync extends Sync {
 
 首先，我们通过下面的架构图来整体了解一下 AQS 框架：
 
-![img](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-3.png)
+![图解](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-3.png)
 
 - 上图中有颜色的为 Method，无颜色的为 Attribution。
 - 总的来说，AQS 框架共分为五层，自上而下由浅入深，从 AQS 对外暴露的 API 到底层基础数据。
@@ -117,7 +116,7 @@ static final class FairSync extends Sync {
 
 下面我们会从整体到细节，从流程到方法逐一剖析 AQS 框架，主要分析过程如下：
 
-![img](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-4.png)
+![图解](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-4.png)
 
 ### 2.1 原理概览
 
@@ -127,7 +126,7 @@ CLH：Craig、Landin and Hagersten 队列，是单向链表，AQS 中的队列�
 
 主要原理图如下：
 
-![img](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-5.png)
+![图解](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-5.png)
 
 AQS 使用一个 Volatile 的 int 类型的成员变量来表示同步状态，通过内置的 FIFO 队列来完成资源获取的排队工作，通过 CAS 完成对 State 值的修改。
 
@@ -135,7 +134,7 @@ AQS 使用一个 Volatile 的 int 类型的成员变量来表示同步状态，�
 
 先来看下 AQS 中最基本的数据结构 ——Node，Node 即为上面 CLH 变体队列中的节点。
 
-![img](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-6.png)
+![图解](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-6.png)
 
 解释一下几个方法和属性值的含义：
 
@@ -184,9 +183,9 @@ private volatile int state;
 
 这几个方法都是 Final 修饰的，说明子类中无法重写它们。我们可以通过修改 State 字段表示的同步状态来实现多线程的独占模式和共享模式（加锁过程）。
 
-![img](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-7.png)
+![图解](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-7.png)
 
-![img](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-8.png)
+![图解](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-8.png)
 
 对于我们自定义的同步工具，需要自定义获取同步状态和释放状态的方式，也就是 AQS 架构图中的第一层：API 层。
 
@@ -208,11 +207,11 @@ AQS 也支持自定义同步器同时实现独占和共享两种方式，如 Ree
 
 以非公平锁为例，这里主要阐述一下非公平锁与 AQS 之间方法的关联之处，具体每一处核心方法的作用会在文章后面详细进行阐述。
 
-![img](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-9.png)
+![图解](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-9.png)
 
 为了帮助大家理解 ReentrantLock 和 AQS 之间方法的交互过程，以非公平锁为例，我们将加锁和解锁的交互流程单独拎出来强调一下，以便于对后续内容的理解。
 
-![img](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-10.png)
+![图解](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-10.png)
 
 加锁：
 
@@ -230,7 +229,7 @@ AQS 也支持自定义同步器同时实现独占和共享两种方式，如 Ree
 
 通过上面的描述，大概可以总结出 ReentrantLock 加锁解锁时 API 层核心方法的映射关系。
 
-![img](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-11.png)
+![图解](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-11.png)
 
 ## 2.3 通过 ReentrantLock 理解 AQS
 
@@ -324,30 +323,30 @@ private final boolean compareAndSetTail(Node expect, Node update) {
         throw new Error(ex); 
       }
     }
-```
+    ```
 
     从 AQS 的静态代码块可以看出，都是获取一个对象的属性相对于该对象在内存当中的偏移量，这样我们就可以根据这个偏移量在对象内存当中找到这个属性。tailOffset 指的是 tail 对应的偏移量，所以这个时候会将 new 出来的 Node 置为当前队列的尾节点。同时，由于是双向链表，也需要将前一个节点指向尾节点。
 
 - 如果 Pred 指针是 Null（说明等待队列中没有元素），或者当前 Pred 指针和 Tail 指向的位置不同（说明被别的线程已经修改），就需要看一下 Enq 的方法。
 
-```java
-// java.util.concurrent.locks.AbstractQueuedSynchronizer
-private Node enq(final Node node) {
- for (;;) {
-  Node t = tail;
-  if (t == null) { // Must initialize
-   if (compareAndSetHead(new Node()))
-    tail = head;
-  } else {
-   node.prev = t;
-   if (compareAndSetTail(t, node)) {
-    t.next = node;
-    return t;
-   }
-  }
- }
-}
-```
+    ```java
+    // java.util.concurrent.locks.AbstractQueuedSynchronizer
+    private Node enq(final Node node) {
+     for (;;) {
+      Node t = tail;
+      if (t == null) { // Must initialize
+       if (compareAndSetHead(new Node()))
+        tail = head;
+      } else {
+       node.prev = t;
+       if (compareAndSetTail(t, node)) {
+        t.next = node;
+        return t;
+       }
+      }
+     }
+    }
+    ```
 
 如果没有被初始化，需要进行初始化一个头结点出来。但请注意，初始化的头结点并不是当前线程节点，而是调用了无参构造函数的节点。如果经历了初始化或者并发导致队列中有元素，则与之前的方法相同。其实，addWaiter 就是一个在双端链表添加尾节点的操作，需要注意的是，双端链表的头结点是一个无参构造函数的头结点。
 
@@ -356,7 +355,7 @@ private Node enq(final Node node) {
 1. 当没有线程获取到锁时，线程 1 获取锁成功。
 2. 线程 2 申请锁，但是锁被线程 1 占有。
 
-    ![img](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-12.png)
+    ![图解](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-12.png)
 
 3. 如果再有线程要获取锁，依次在队列中往后排队即可。
 
@@ -380,16 +379,12 @@ public final boolean hasQueuedPredecessors() {
 !!! Note "解析"
 
     双向链表中，第一个节点为虚节点，其实并不存储任何信息，只是占位。真正的第一个有数据的节点，是在第二个节点开始的。
-
     当 h != t 时：
 
-      1. 如果 (s = h.next) == null，等待队列正在有线程进行初始化，但只是进行到了 Tail 指向 Head，没有将 Head 指向 Tail，此时队列中有元素，需要返回 True（这块具体见下边代码分析）。
-
-      2. 如果 (s = h.next) != null，说明此时队列中至少有一个有效节点。
-
-        2.1. 如果此时 s.thread == Thread.currentThread ()，说明等待队列的第一个有效节点中的线程与当前线程相同，那么当前线程是可以获取资源的；
-
-        2.2. 如果 s.thread != Thread.currentThread ()，说明等待队列的第一个有效节点线程与当前线程不同，当前线程必须加入进等待队列。
+    1. 如果 (s = h.next) == null，等待队列正在有线程进行初始化，但只是进行到了 Tail 指向 Head，没有将 Head 指向 Tail，此时队列中有元素，需要返回 True（这块具体见下边代码分析）。
+    2. 如果 (s = h.next) != null，说明此时队列中至少有一个有效节点。
+       1. 如果此时 s.thread == Thread.currentThread ()，说明等待队列的第一个有效节点中的线程与当前线程相同，那么当前线程是可以获取资源的；
+       2. 如果 s.thread != Thread.currentThread ()，说明等待队列的第一个有效节点线程与当前线程不同，当前线程必须加入进等待队列。
 
 ```java
 // java.util.concurrent.locks.AbstractQueuedSynchronizer#enq
@@ -500,11 +495,11 @@ private final boolean parkAndCheckInterrupt() {
 
 上述方法的流程图如下：
 
-![img](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-13.png)
+![图解](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-13.png)
 
 从上图可以看出，跳出当前循环的条件是当 “前置节点是头结点，且当前线程获取锁成功”。为了防止因死循环导致 CPU 资源被浪费，我们会判断前置节点的状态来决定是否要将当前线程挂起，具体挂起流程用流程图表示如下（shouldParkAfterFailedAcquire 流程）：
 
-![img](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-14.png)
+![图解](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-14.png)
 
 从队列中释放节点的疑虑打消了，那么又有新问题了：
 
@@ -580,34 +575,29 @@ private void cancelAcquire(Node node) {
 
 - 获取当前节点的前驱节点，如果前驱节点的状态是 CANCELLED，那就一直往前遍历，找到第一个 waitStatus \<= 0 的节点，将找到的 Pred 节点和当前 Node 关联，将当前 Node 设置为 CANCELLED。
 - 根据当前节点的位置，考虑以下三种情况：
-  
     (1) 当前节点是尾节点。
-
     (2) 当前节点是 Head 的后继节点。
-
     (3) 当前节点不是 Head 的后继节点，也不是尾节点。
 
 根据上述第二条，我们来分析每一种情况的流程。
 
 当前节点是尾节点。
 
-![img](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-15.png)
+![图解](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-15.png)
 
 当前节点是 Head 的后继节点。
 
-![img](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-16.png)
+![图解](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-16.png)
 
 当前节点不是 Head 的后继节点，也不是尾节点。
 
-![img](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-17.png)
+![图解](../assets/从 ReentrantLock 的实现看 AQS 的原理及应用-17.png)
 
 通过上面的流程，我们对于 CANCELLED 节点状态的产生和变化已经有了大致的了解，但是为什么所有的变化都是对 Next 指针进行了操作，而没有对 Prev 指针进行操作呢？什么情况下会对 Prev 指针进行操作？
 
 !!! Question "什么情况下会对 Prev 指针进行操作"
     执行 cancelAcquire 的时候，当前节点的前置节点可能已经从队列中出去了（已经执行过 Try 代码块中的 shouldParkAfterFailedAcquire 方法了），如果此时修改 Prev 指针，有可能会导致 Prev 指向另一个已经移除队列的 Node，因此这块变化 Prev 指针不安全。
-
     shouldParkAfterFailedAcquire 方法中，会执行下面的代码，其实就是在处理 Prev 指针。
-
     shouldParkAfterFailedAcquire 是获取锁失败的情况下才会执行，进入该方法后，说明共享资源已被获取，当前节点之前的节点都不会出现变化，因此这个时候变更 Prev 指针比较安全。
 
 ```java

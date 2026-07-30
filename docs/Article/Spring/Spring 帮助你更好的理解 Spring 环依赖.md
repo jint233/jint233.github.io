@@ -1,36 +1,39 @@
 # Spring 帮助你更好的理解 Spring 循环依赖
 
-网上关于 Spring 循环依赖的博客太多了，有很多都分析的很深入，写的很用心，甚至还画了时序图、流程图帮助读者理解，我看了后，感觉自己是懂了，但是闭上眼睛，总觉得还没有完全理解，总觉得还有一两个坎过不去，对我这种有点笨的人来说，真的好难。当时，我就在想，如果哪一天，我理解了 Spring 循环依赖，一定要用自己的方式写篇博客，帮助大家更好的理解，等我理解后，一直在构思，到底怎么应该写，才能更通俗易懂，就在前几天，我想通了，这么写应该更通俗易懂。在写本篇博客之前，我翻阅了好多关于 Spring 循环依赖的博客，网上应该还没有像我这样讲解的，现在就让我们开始把。
+网上关于 Spring 循环依赖的博客太多了，有很多都分析得很深入、写的很用心，甚至还画了时序图、流程图帮助读者理解。我看了后，感觉自己是懂了，但是闭上眼睛，总觉得还没有完全理解，总觉得还有一两个坎过不去。当时我就在想，如果哪一天我彻底理解了 Spring 循环依赖，一定要用自己的方式写篇博客，帮助大家更好的理解。在写本篇博客之前，我翻阅了好多关于 Spring 循环依赖的博客，网上应该还没有像我这样讲解的，现在就让我们开始吧。
 
-## 什么是循环依赖
+## 一、什么是循环依赖
 
-一言以蔽之：两者相互依赖。
+一言以蔽之：**两者相互依赖**。
 
-在开发中，可能经常出现这种情况，只是我们平时并没有注意到原来我们写的两个类、甚至多个类相互依赖了，为什么注意不到呢？当然是因为没有报错，而且一点问题都木有，如果报错了，或者产生了问题，我们还会注意不到吗？这一切都是 Spring 的功劳，它在后面默默的为我们解决了循环依赖的问题。
+在开发中，可能经常出现这种情况，只是我们平时并没有注意到原来我们写的两个类、甚至多个类相互依赖了。为什么注意不到呢？当然是因为没有报错，而且一点问题都没有。这一切都是 Spring 的功劳，它在后面默默地为我们解决了循环依赖的问题。
 
-如下所示：
+例如：
 
 ```java
 @Configuration
 @ComponentScan
 public class AppConfig {
 }
+
 @Service
 public class AuthorService {
     @Autowired
     BookService bookService;
 }
+
 @Service
 public class BookService {
     @Autowired
     AuthorService authorService;
 }
+
 public class Main {
     public static void main(String[] args) {
-        ApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(AppConfig.class);
-        BookService bookService = (BookService) annotationConfigApplicationContext.getBean("bookService");
+        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        BookService bookService = (BookService) context.getBean("bookService");
         System.out.println(bookService.authorService);
-        AuthorService authorService = (AuthorService) annotationConfigApplicationContext.getBean("authorService");
+        AuthorService authorService = (AuthorService) context.getBean("authorService");
         System.out.println(authorService.bookService);
     }
 }
@@ -38,20 +41,18 @@ public class Main {
 
 运行结果：
 
-```plaintext
+```text
 com.example.AuthorService@1a2b3c4d
 com.example.BookService@5e6f7a8b
 ```
 
-可以看到 BookService 中需要 AuthorService，AuthorService 中需要 BookService，类似于这样的就叫循环依赖，但是神奇的是竟然一点问题没有。
+可以看到 `BookService` 中需要 `AuthorService`，`AuthorService` 中需要 `BookService`，类似于这样的就叫循环依赖，但是神奇的是竟然一点问题没有。
 
-当然有些小伙伴可能 get 不到它的神奇之处，至于它的神奇之处在哪里，我们放到后面再说。
+### 1. 任何循环依赖，Spring 都能解决吗？
 
-### 任何循环依赖，Spring 都能解决吗
+**不行。**
 
-不行。
-
-如果是原型 bean 的循环依赖，Spring 无法解决：
+如果是原型（Prototype）Bean 的循环依赖，Spring 无法解决：
 
 ```java
 @Service
@@ -60,6 +61,7 @@ public class BookService {
     @Autowired
     AuthorService authorService;
 }
+
 @Service
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class AuthorService {
@@ -68,9 +70,11 @@ public class AuthorService {
 }
 ```
 
-启动后，令人恐惧的红色字体在控制台出现了： ![image.png](../assets/Spring 帮助你更好的理解 Spring 环依赖-1.png)
+启动后，控制台就会抛出循环依赖异常：
 
-如果是构造参数注入的循环依赖，Spring 无法解决：
+![示意图](../assets/Spring 帮助你更好的理解 Spring 环依赖-1.png)
+
+如果是构造参数注入的循环依赖，Spring 同样无法解决：
 
 ```java
 @Service
@@ -80,6 +84,7 @@ public class AuthorService {
         this.bookService = bookService;
     }
 }
+
 @Service
 public class BookService {
     AuthorService authorService;
@@ -89,11 +94,13 @@ public class BookService {
 }
 ```
 
-还是讨厌的红色字体： ![image.png](../assets/Spring 帮助你更好的理解 Spring 环依赖-2.png)
+运行后同样会抛出异常：
 
-### 循环依赖可以关闭吗
+![示意图](../assets/Spring 帮助你更好的理解 Spring 环依赖-2.png)
 
-可以，Spring 提供了这个功能，我们需要这么写：
+### 2. 循环依赖可以关闭吗？
+
+可以。Spring 提供了关闭循环依赖支持的功能：
 
 ```java
 public class Main {
@@ -106,115 +113,113 @@ public class Main {
 }
 ```
 
-再次运行，就报错了： ![image.png](../assets/Spring 帮助你更好的理解 Spring 环依赖-3.png)
+再次运行后就会直接报错：
 
-需要注意的是，我们不能这么写：
+![示意图](../assets/Spring 帮助你更好的理解 Spring 环依赖-3.png)
+
+> **注意**：不能写成 `new AnnotationConfigApplicationContext(AppConfig.class)` 后再调用 `setAllowCircularReferences(false)`。因为容器在构造时就已经完成初始化了，之后再设置将无法生效。
+
+### 3. 循环依赖的矛盾点在哪？
+
+当 Bean A 与 Bean B 产生循环依赖时，逻辑上的矛盾点在于：
+
+1. 创建 Bean A，发现依赖 Bean B；
+2. 创建 Bean B，发现依赖 Bean A；
+3. 创建 Bean A，发现依赖 Bean B；
+4. 创建 Bean B，发现依赖 Bean A……
+
+如此一来就陷入了死循环。循环依赖的矛盾点就在于：要创建 Bean A，需要先拿到 Bean B；而要创建 Bean B，又需要先拿到 Bean A，导致两个 Bean 都无法顺利创建。
+
+## 二、如何手写解决循环依赖
+
+如果你曾经看过 Spring 解决循环依赖的博客，应该知道它其中有好几个 Map，一个 Map 存放最完整的单例对象（称为 `singletonObjects`），一个 Map 存放提前暴露出来的对象（称为 `earlySingletonObjects`）。
+
+这两个概念的作用如下：
+- **`singletonObjects`（一级缓存 / 单例池）**：存放经历了 Spring 完整生命周期的 Bean，这里的 Bean 属性依赖都已经填充完毕；
+- **`earlySingletonObjects`（二级缓存）**：存放刚刚实例化出来、尚未经历完整生命周期（属性尚未填充完毕）的半成品 Bean。
+
+我们可以按照如下流程解决：
+
+1. 当创建完 Bean A 的实例后，先把半成品 A 放到 `earlySingletonObjects` 中，发现自己需要 Bean B，于是去创建 Bean B；
+2. 当创建完 Bean B 的实例后，把自己放到 `earlySingletonObjects` 中，发现自己需要 Bean A，去获取 Bean A；
+3. 获取 Bean A 时，先去 `earlySingletonObjects` 查看，发现半成品 A 已经存在，直接返回；
+4. Bean B 拿到了 Bean A 的引用，完成了属性填充与创建，将自己放入 `singletonObjects`；
+5. Bean A 拿到 Bean B，完成了属性填充与创建，将自己放入 `singletonObjects`。整个过程结束。
+
+下面我们手写代码来实现这个功能。首先自定义一个 `@CodeBearAutowired` 注解：
 
 ```java
-        AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(AppConfig.class);
-        applicationContext.setAllowCircularReferences(false);
-```
-
-如果你这么写，程序执行完第一行代码，整个 Spring 容器已经初始化完成了，你再设置不允许循环依赖，也于事无补了。
-
-### 可以循环依赖的神奇之处在哪
-
-有很多小伙伴可能并不觉得可以循环依赖有多么神奇，那是因为不知道矛盾点在哪，接下来就来说说这个问题： 当 beanA，beanB 循环依赖：
-
-1. 创建 beanA，发现依赖 beanB；
-2. 创建 beanB，发现依赖 beanA；
-3. 创建 beanA，发现依赖 beanB；
-4. 创建 beanB，发现依赖 beanA。 ... 好了，死循环了。
-
-循环依赖的矛盾点就在于要创建 beanA，它需要 beanB，而创建 beanB，又需要 beanA，然后两个 bean 都创建不出来。
-
-### 如何简单的解决循环依赖
-
-如果你曾经看过 Spring 解决循环依赖的博客，应该知道它其中有好几个 Map，一个 Map 放的是最完整的对象，称为 singletonObjects，一个 Map 放的是提前暴露出来的对象，称为 earlySingletonObjects。
-
-在这里，先要解释下这两个东西：
-
-- singletonObjects：单例池，其中存放的是经历了 Spring 完整生命周期的 bean，这里面的 bean 的依赖都已经填充完毕了。
-- earlySingletonObjects：提前暴露出来的对象的 map，其中存放的是刚刚创建出来的对象，没有经历 Spring 完整生命周期的 bean，这里面的 bean 的依赖还未填充完毕。
-
-我们可以这么做：
-
-1. 当我们创建完 beanA，就把自己放到 earlySingletonObjects，发现自己需要 beanB，然后就去屁颠屁颠创建 beanB；
-2. 当我们创建完 beanB，就把自己放到 earlySingletonObjects，发现自己需要 beanA，然后就去屁颠屁颠创建 beanA；
-3. 创建 beanA 前，先去 earlySingletonObjects 看一下，发现自己已经被创建出来了，把自己返回出去；
-4. beanB 拿到了 beanA，beanB 创建完毕，把自己放入 singletonObjects；
-5. beanA 可以去 singletonObjects 拿到 beanB 了，beanA 也创建完毕，把自己放到 singletonObjects。 整个过程结束。
-
-下面让我们来实现这个功能： 首先，自定义一个注解，字段上打上这个注解的，说明需要被 Autowired：
-
-```plaintext
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CodeBearAutowired {
 }
 ```
 
-再创建两个循环依赖的类：
+再创建两个相互依赖的类：
 
 ```java
 public class OrderService {
     @CodeBearAutowired
     public UserService userService;
 }
+
 public class UserService {
     @CodeBearAutowired
     public OrderService orderService;
 }
 ```
 
-然后就是核心，创建对象，填充属性，并解决 Spring 循环依赖的问题：
+编写核心容器与循环依赖解决逻辑：
 
 ```java
 public class Cycle {
-    // 单例池，里面放的是完整的bean，已完成填充属性
+    // 1. 单例池，里面放的是完整的 bean，已完成填充属性
     private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>();
-    // 存放的是提前暴露出来的bean，没有经历过spring完整的生命周期，没有填充属性
+    // 2. 存放提前暴露出来的 bean，未完成填充属性
     private final Map<String, Object> earlySingletonObjects = new HashMap<>();
-    // 在Spring中，这个map存放的是beanNam和beanDefinition的映射关系
+
     static Map<String, Class<?>> map = new HashMap<>();
     static {
         map.put("orderService", OrderService.class);
         map.put("userService", UserService.class);
     }
-    // 如果先调用init方法，就是预加载，如果直接调用getBean就是懒加载，两者的循环依赖问题都解决了
+
     public void init() {
         for (Map.Entry<String, Class<?>> stringClassEntry : map.entrySet()) {
             createBean(stringClassEntry.getKey());
         }
     }
+
     public Object getBean(String beanName) {
-        // 尝试从singletonObjects中取，
+        // 尝试从一级缓存 singletonObjects 中取
         Object singletonObject = this.singletonObjects.get(beanName);
         if (singletonObject != null) {
             return singletonObject;
         }
-        // 尝试从earlySingletonObjects取
+        // 尝试从二级缓存 earlySingletonObjects 中取
         singletonObject = this.earlySingletonObjects.get(beanName);
         if (singletonObject != null) {
             return singletonObject;
         }
         return createBean(beanName);
     }
+
     private Object createBean(String beanName) {
         Object singletonObject;
         try {
-            // 创建对象
+            // 实例化对象
             singletonObject = map.get(beanName).getConstructor().newInstance();
-            // 把没有完成填充属性的半成品 bean 放入earlySingletonObjects
+            // 把半成品放入二级缓存 earlySingletonObjects
             earlySingletonObjects.put(beanName, singletonObject);
-            // 填充属性
+            // 填充属性（注入依赖）
             populateBean(singletonObject);
-            // bean创建成功，放入singletonObjects
+            // 经历完整生命周期后，放入一级缓存 singletonObjects
             this.singletonObjects.put(beanName, singletonObject);
             return singletonObject;
         } catch (Exception ignore) {
         }
         return null;
     }
+
     private void populateBean(Object object) {
         Field[] fields = object.getClass().getDeclaredFields();
         for (Field field : fields) {
@@ -231,7 +236,7 @@ public class Cycle {
 }
 ```
 
-预加载调用：
+测试预加载模式：
 
 ```java
 public class Main {
@@ -246,14 +251,7 @@ public class Main {
 }
 ```
 
-运行结果：
-
-```plaintext
-com.example.OrderService@1a2b3c4d
-com.example.UserService@5e6f7a8b
-```
-
-懒加载调用：
+测试懒加载模式：
 
 ```java
 public class Main {
@@ -269,81 +267,53 @@ public class Main {
 
 运行结果：
 
-```plaintext
+```text
 com.example.OrderService@1a2b3c4d
 com.example.UserService@5e6f7a8b
 ```
 
-### 为什么无法解决原型、构造方法注入的循环依赖
+### 为什么无法解决原型（Prototype）与构造方法注入的循环依赖？
 
-在上面，我们自己手写了解决循环依赖的代码，可以看到，核心是利用一个 map，来解决这个问题的，这个 map 就相当于缓存。
+手写代码清楚地展示了核心是利用缓存解决问题的：
+- 我们的 Bean 是单例的（Singleton），且采用字段注入（Setter 注入）。单例意味着只需要创建一次对象，后续直接从缓存获取；字段注入意味着实例化与依赖填充可以分为两个阶段；
+- 如果是 **原型 Bean**，意味着每次获取都要重新创建对象，无法利用缓存；
+- 如果是 **构造方法注入**，意味着实例化时就必须拿到依赖，无法把“实例化”与“依赖注入”拆开，自然也无法提前暴露半成品对象。
 
-为什么可以这么做，因为我们的 bean 是单例的，而且是字段注入（setter 注入）的，单例意味着只需要创建一次对象，后面就可以从缓存中取出来，字段注入，意味着我们无需调用构造方法进行注入。
+## 三、如果引入 AOP 该怎么处理？
 
-- 如果是原型 bean，那么就意味着每次都要去创建对象，无法利用缓存；
-- 如果是构造方法注入，那么就意味着需要调用构造方法注入，也无法利用缓存。
+上面的方案虽然解决普通 Bean，但如果 Bean 需要进行 AOP 代理“加工”呢？如果 Bean A 和【Bean B 的代理对象】产生循环依赖，或者【Bean A 的代理对象】和【Bean B 的代理对象】循环依赖怎么办？
 
-### 需要 aop 怎么办？
+如果直接把原始对象放到二级缓存，最终 Bean A 注入的将是未代理的原始对象。
 
-我们上面的方案看起来很美好，但是还有一个问题，如果我们的 bean 创建出来，还要做一点加工，怎么办？也许，你没有理解这句话的意思，再说的明白点，如果 beanA 和【beanB 的代理对象】循环依赖，或者【beanA 的代理对象】和 beanB 循环依赖，再或者【beanA 的代理对象】和【beanB 的代理对象】循环依赖，怎么办？
+Spring 的初衷是希望在 Bean 生命周期的最后阶段才去执行 AOP 代理。如果为了处理循环依赖在实例化后就直接创建代理，就违背了生命周期的设计。
 
-_这里说的创建代理对象仅仅是“加工”的其中一种可能。_
+为此，Spring 引入了三级缓存：`Map<String, ObjectFactory<?>> singletonFactories`。
 
-遇到这种情况，我们总不能把创建完的对象直接扔到缓存把？我们这么做的话，如果【beanA 的代理对象】和【beanB 的代理对象】循环依赖，我们最终获取的 beanA 中的 beanB 还是 beanB，并非是 beanB 的代理对象。
+`ObjectFactory` 是一个函数式接口。当创建完原始对象后，将“生成该对象（或其代理对象）的工厂 lambda”放入三级缓存 `singletonFactories` 中。只有真正发生循环依赖时，才会触发该工厂方法去生成代理对象并放入二级缓存。
 
-聪明的你，一定在想，这还不简单吗： 我们创建完对象后，判断这个对象是否需要代理，如果需要代理，创建代理对象，然后把代理对象放到 earlySingletonObjects 不就 OJ8K 了？ 就像这样：
-
-```plaintext
-    private Object createBean(String beanName) {
-        Object singletonObject;
-        try {
-            // 创建对象
-            singletonObject = map.get(beanName).getConstructor().newInstance();
-            // 创建bean的代理对象
-            /**
-             * if( 需要代理){
-             *     singletonObject=创建代理对象;
-             *
-             * }
-             */
-            // 把没有完成填充属性的半成品 bean 放入earlySingletonObjects
-            earlySingletonObjects.put(beanName, singletonObject);
-            // 填充属性
-            populateBean(singletonObject);
-            // bean创建成功，放入singletonObjects
-            this.singletonObjects.put(beanName, singletonObject);
-            return singletonObject;
-        } catch (Exception ignore) {
-        }
-        return null;
-    }
-```
-
-这确实可以，但是，这违反了 Spring 的初衷，Spring 的初衷是希望在 bean 生命周期的最后几步才去 aop，如果像上面说的这么做，就意味着一旦创建完对象，Spring 就会去 aop 了，这就违反了 Spring 的初衷，所以 Spring 并没有这么做。
-
-但是如果真的出现了 aop bean 循环依赖，就没办法了，只能先去 aop，但是如果没有出现循环依赖，Spring 并不希望在这里就进行 aop，所以 Spring 引入了 Map\<String, ObjectFactory\<?>>，ObjectFactory 是一个函数式接口，可以理解为工厂方法，当创建完对象后，把【获得这个对象的工厂方法】放入这个 map，等真的发生循环依赖，就去执行这个【获得这个对象的工厂方法】，获取加工完成的对象。
-
-下面直接放出代码：
+改进后的完整代码实现如下：
 
 ```java
 public class Cycle {
-    // 单例池，里面放的是完整的bean，已完成填充属性
+    // 1. 一级缓存：单例池，存放完整的 Bean
     private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>();
-    // 存放的是 加工bean的工厂方法
+    // 2. 三级缓存：存放生成 Bean/代理对象的工厂 lambda
     private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>();
-    // 存放的是提前暴露出来的bean，没有经历过spring完整的生命周期，没有填充属性
+    // 3. 二级缓存：存放提前暴露出来的半成品/代理 Bean
     private final Map<String, Object> earlySingletonObjects = new HashMap<>();
-    private final Set<String> singletonsCurrentlyInCreation = new HashSet<>();
+
     static Map<String, Class<?>> map = new HashMap<>();
     static {
         map.put("orderService", OrderService.class);
         map.put("userService", UserService.class);
     }
+
     public void init() {
         for (Map.Entry<String, Class<?>> stringClassEntry : map.entrySet()) {
             createBean(stringClassEntry.getKey());
         }
     }
+
     private Object createBean(String beanName) {
         Object instance = null;
         try {
@@ -351,34 +321,40 @@ public class Cycle {
         } catch (Exception ex) {
         }
         Object finalInstance = instance;
+
+        // 放入三级缓存：延迟创建代理对象
         this.singletonFactories.put(beanName, () -> {
-            // 创建代理对象
+            // 此处可执行 AOP 代理创建逻辑
             return finalInstance;
         });
+
         populateBean(instance);
         this.singletonObjects.put(beanName, instance);
         return instance;
     }
+
     public Object getBean(String beanName) {
-        // 尝试从singletonObjects中取，
+        // 尝试从一级缓存获取
         Object singletonObject = this.singletonObjects.get(beanName);
         if (singletonObject != null) {
             return singletonObject;
         }
-        // 尝试从earlySingletonObjects取
+        // 尝试从二级缓存获取
         singletonObject = this.earlySingletonObjects.get(beanName);
         if (singletonObject != null) {
             return singletonObject;
         }
-        // 尝试从singletonFactories取出工厂方法
+        // 尝试从三级缓存获取工厂方法
         ObjectFactory<?> objectFactory = this.singletonFactories.get(beanName);
         if (objectFactory != null) {
             singletonObject = objectFactory.getObject();
+            // 提升到二级缓存
             this.earlySingletonObjects.put(beanName, singletonObject);
             return singletonObject;
         }
         return createBean(beanName);
     }
+
     private void populateBean(Object object) {
         Field[] fields = object.getClass().getDeclaredFields();
         for (Field field : fields) {
@@ -395,36 +371,29 @@ public class Cycle {
 }
 ```
 
-调用方法：
+测试调用：
 
 ```java
- public static void main(String[] args) {
+public class Main {
+    public static void main(String[] args) {
         Cycle cycle = new Cycle();
         cycle.init();
         System.out.println(((UserService) cycle.getBean("userService")).orderService);
         System.out.println(((OrderService) cycle.getBean("orderService")).userService);
     }
+}
 ```
 
 运行结果：
 
-```plaintext
+```text
 com.example.OrderService@1a2b3c4d
 com.example.UserService@5e6f7a8b
 ```
 
-### 二级缓存能不能解决循环依赖，三级循环到底有什么用？
+## 四、总结：二级缓存 vs 三级缓存
 
-我的观点可能和网上的主流观点有很大的出入，至于我的观点是对是错，请各位自行判断。
+1. **二级缓存完全可以解决简单的循环依赖**：只要在实例化之后把原始对象（或提前创建代理）存入二级缓存即可。
+2. **三级缓存的核心价值**：在于 **解耦与维持 Bean 生命周期规范**。它保证了在没有发生循环依赖时，AOP 代理依然在生命周期的最后阶段统一创建；只有发生循环依赖时，才通过三级缓存的 `ObjectFactory` 提前创建代理并提升至二级缓存。
 
-二级缓存可以解决循环依赖，哪怕 aop bean 循环依赖，上面我们已经提到了，我们可以创建完对象，直接创建代理对象，把代理对象放入二级缓存，这样我们从二级缓存获得的一定是 aop bean，并非是 bean 本身。
-
-三级缓存有什么用？网上的主流观点是为了解决循环依赖，还有就是为了效率，为了解决循环依赖，我们上面已经讨论过了，我的观点是二级缓存已经可以解决循环依赖了，下面就让我们想想，和效率是否有关系？
-
-我的观点是没有关系，理由如下： 我们把【获得对象的工厂方法】放入了 map
-
-- 如果没有循环依赖，这个 map 根本没有用到，和效率没有关系；
-- 如果是普通 bean 循环依赖，三级缓存直接返回了 bean，和效率还是没有关系；
-- 如果是 aop bean 循环依赖，如果没有三级缓存，直接创建代理对象，放入二级缓存，如果有三级缓存，还是需要创建代理对象，只是两者的时机不同，和效率还是没有关系。
-
-有了这篇博客的基础，当你再看其他关于 Spring 循环依赖的博客，应该会轻松的多，因为我们毕竟自己解决了循环依赖，Spring 的循环依赖只是在我们之上做了进一步的封装与改进。
+理解了手写 `Cycle` 类的三级缓存逻辑后，再去阅读 Spring 源码中 `AbstractBeanFactory.doGetBean()` 与 `DefaultSingletonBeanRegistry` 就会发现思路完全一致。

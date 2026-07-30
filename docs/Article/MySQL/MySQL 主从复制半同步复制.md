@@ -8,7 +8,7 @@
 
 半同步复制(semi-synchronous replication)是指 master 在将新生成的 binlog 发送给各 slave 时，只需等待一个(默认)slave 返回的 ack 信息就返回成功。
 
-![img](../assets/MySQL 主从复制半同步复制-1.png)
+![图解](../assets/MySQL 主从复制半同步复制-1.png)
 
 MySQL 5.7 对半同步复制作了大改进，新增了一个 master 线程。在 MySQL 5.7 以前，master 上的 binlog dump 线程负责两件事：dump 日志给 slave 的 io_thread；接收来自 slave 的 ack 消息。它们是串行方式工作的。在 MySQL 5.7 中，新增了一个专门负责接受 ack 消息的线程 ack collector thread。这样 master 上有两个线程独立工作，可以同时发送 binlog 到 slave 和接收 slave 的 ack。
 
@@ -25,9 +25,9 @@ MySQL 5.7 对半同步复制作了大改进，新增了一个 master 线程。�
 
 画图理解就很清晰。(前提：已经设置了`sync_binlog=1`，否则 binlog 刷盘时间由操作系统决定)
 
-![img](../assets/MySQL 主从复制半同步复制-2.png)
+![图解](../assets/MySQL 主从复制半同步复制-2.png)
 
-![img](../assets/MySQL 主从复制半同步复制-3.png)
+![图解](../assets/MySQL 主从复制半同步复制-3.png)
 
 再来分析下这两种模式的优缺点。
 
@@ -175,29 +175,18 @@ mysql> show global variables like "%semi%";
 下面还多给了两个和半同步相关的状态变量的解释，可以通过`show status like %semi%;`查看它们。
 
 1. master 相关的变量：
-
    - ①.`Rpl_semi_sync_master_clients`：(状态变量)master 所拥有的半同步复制 slave 的主机数量。
-
    - ②.`Rpl_semi_sync_master_status` ：(状态变量)master 当前是否以半同步复制状态工作(ON)，OFF 表示降级为了异步复制。
-
    - ③.`rpl_semi_sync_master_enabled`：master 上是否启用了半同步复制。
-
    - ④.`rpl_semi_sync_master_timeout`：等待 slave 的 ack 回复的超时时间，默认为 10 秒。
-
    - ⑤.`rpl_semi_sync_master_trace_level`：半同步复制时 master 的调试级别。
-
    - ⑥.`rpl_semi_sync_master_wait_for_slave_count`：master 在超时时间内需要收到多少个 ack 回复才认为此次 DML 成功，否则就降级为异步复制。该变量在 MySQL5.7.3 才提供，在此之前的版本都默认为收到 1 个 ack 则确认成功，且不可更改。MySQL 5.7.3 之后该变量的默认值也是 1。
-
    - ⑦.`rpl_semi_sync_master_wait_no_slave`：值为 ON(默认)或者 OFF。ON 表示 master 在超时时间内如果未收到指定数量的 ack 消息，则会一直等待下去直到收满 ack，即一直采用半同步复制方式，不会降级；OFF 表示如果在超时时间内未收到指定数量的 ack，则超时时间一过立即降级为异步复制。
-
      更官方的解释是：当设置为 ON 时，即使状态变量 Rpl_semi_sync_master_clients 中的值小于 rpl_semi_sync_master_wait_for_slave_count，Rpl_semi_sync_master_status 依旧为 ON；当设置为 OFF 时，如果 clients 的值小于 count 的值，则 Rpl_semi_sync_master_status 立即变为 OFF。通俗地讲，就是在超时时间内，如果 slave 宕机的数量超过了应该要收到的 ack 数量，master 是否降级为异步复制。
-
      该变量在 MySQL 5.7.3 之前似乎没有效果，因为默认设置为 ON 时，超时时间内收不到任何 ack 时仍然会降级为异步复制。
-
    - ⑧.`rpl_semi_sync_master_wait_point`：控制 master 上 commit、接收 ack、返回消息给客户端的时间点。值为 _AFTER_SYNC_ 和 _AFTER_COMMIT_ ，该选项是 MySQL5.7.2 后引入的，默认值为 _AFTER_SYNC_ ，在此版本之前，等价于使用了 _AFTER_COMMIT_ 模式。关于这两种模式，见前文对两种半同步类型的分析。
 
 2. slave 相关的变量：
-
    - ①.`rpl_semi_sync_slave_enabled`：slave 是否开启半同步复制。
    - ②.`rpl_semi_sync_slave_trace_level`：slave 的调试级别。
 
@@ -209,69 +198,16 @@ mysql> show global variables like "%semi%";
 
 本文实现如下拓扑图所示的半同步传统复制。如果要实现半同步 GTID 复制，也只是在 gtid 复制的基础上改改配置文件而已。
 
-![img](../assets/MySQL 主从复制半同步复制-4.png)
+![图解](../assets/MySQL 主从复制半同步复制-4.png)
 
-具体环境：
+具体环境如下表所示：
 
-称呼
-
-主机 IP
-
-MySQL 版本
-
-OS
-
-角色(master/slave)
-
-数据库状态
-
-master
-
-192.168.100.21
-
-MySQL 5.7.22
-
-CentOS 7.2
-
-master
-
-全新实例
-
-salve1
-
-192.168.100.22
-
-MySQL 5.7.22
-
-CentOS 7.2
-
-semi_slave for master semi_master for other slaves
-
-全新实例
-
-slave2
-
-192.168.100.23
-
-MySQL 5.7.22
-
-CentOS 7.2
-
-semi_slave for slave1
-
-全新实例
-
-slave3
-
-192.168.100.24
-
-MySQL 5.7.22
-
-CentOS 7.2
-
-semi_slave for slave1
-
-全新实例
+| 称呼   | 主机 IP        | MySQL 版本   | OS         | 角色 (master/slave)                                   | 数据库状态 |
+|--------|----------------|--------------|------------|-------------------------------------------------------|------------|
+| master | 192.168.100.21 | MySQL 5.7.22 | CentOS 7.2 | master                                                | 全新实例   |
+| slave1 | 192.168.100.22 | MySQL 5.7.22 | CentOS 7.2 | semi_slave for master<br>semi_master for other slaves | 全新实例   |
+| slave2 | 192.168.100.23 | MySQL 5.7.22 | CentOS 7.2 | semi_slave for slave1                                 | 全新实例   |
+| slave3 | 192.168.100.24 | MySQL 5.7.22 | CentOS 7.2 | semi_slave for slave1                                 | 全新实例   |
 
 因为都是全新的实例环境，所以无需考虑基准数据和 binlog 坐标的问题。如果开始测试前，已经在 master 上做了一些操作，或者创建了一些新数据，那么请将 master 上的数据恢复到各 slave 上，并获取 master binlog 的坐标，具体操作方法可参见前文：将 slave 恢复到 master 指定的坐标。
 
@@ -556,7 +492,7 @@ mysql> show status like "%semi%";
 
 此时查看 slave1 的错误日志。
 
-```plaintext
+```shell
 2018-06-11T03:43:21.765384Z 4 [Warning] Timeout waiting for reply of binlog (file: master-bin.000001, pos: 2535), semi-sync up to file master-bin.000001, position 2292.
 2018-06-11T03:43:21.765453Z 4 [Note] Semi-sync replication switched OFF.
 ```

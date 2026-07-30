@@ -295,7 +295,9 @@ defer response.Body.Close()
 #### 小结
 
 整个过程大致如下图：
+
 ![docker builder 处理流程](../assets/Docker 镜像构建原理及源码分析-2.jpg)
+
 从入口函数 `runBuild` 开始，经过判断是否支持 `buildkit` ，如果不支持 `buildkit` 则继续使用 v1 的 `builder`。接下来读取各类参数，按照不同的参数执行各类不同的处理逻辑。这里需要注意的就是 `Dockerfile` 及 `build context` 都可支持从文件或者 `stdin` 等读入，具体使用时，需要注意。
 另外 `.dockerignore` 文件可过滤掉 `build context` 中的一些文件，在使用时，可通过此方法进行构建效率的优化，当然也需要注意，在通过 URL 获取 `Dockerfile` 的时候，是不存在 `build context` 的，所以类似 `COPY` 这样的命令也就无法使用了。
 当所有的 `build context` 和参数都准备就绪后，接下来调用封装好的客户端，将这些请求按照本文开始之初介绍的 API 发送给 `dockerd` ，由其进行真正的构建逻辑。

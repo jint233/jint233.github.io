@@ -6,9 +6,9 @@ SnowFlake 雪花算法是 Twitter 开源的分布式唯一 ID 生成算法，其
 
 SnowFlake 的结构如下：
 
-![img](../assets/SnowFlake 雪花算法生成分布式 ID-1.png)
+![图解](../assets/SnowFlake 雪花算法生成分布式 ID-1.png)
 
-```plaintext
+```shell
 0 - 0000000000 0000000000 0000000000 0000000000 0 - 00000 - 00000 - 000000000000
 ```
 

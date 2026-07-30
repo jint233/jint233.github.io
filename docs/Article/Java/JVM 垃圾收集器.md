@@ -74,7 +74,7 @@ Java 语言最显著的特点就是引入了垃圾回收机制，它使 Java 程
 
 <figure markdown="span">
   ![img](../assets/JVM 垃圾收集器-1.png)
-  <figcaption> 复制算法 </figcaption>
+  <figcaption>复制算法</figcaption>
 </figure>
 
 为了解决标记 - 清除算法的效率不高的问题，产生了复制算法。
@@ -88,7 +88,7 @@ Java 语言最显著的特点就是引入了垃圾回收机制，它使 Java 程
 
 <figure markdown="span">
   ![img](../assets/JVM 垃圾收集器-2.png)
-  <figcaption> 复制算法的执行过程 </figcaption>
+  <figcaption>复制算法的执行过程</figcaption>
 </figure>
 
 ### 标记 - 整理算法
@@ -106,7 +106,7 @@ Java 语言最显著的特点就是引入了垃圾回收机制，它使 Java 程
 
 <figure markdown="span">
   ![img](../assets/JVM 垃圾收集器-3.png)
-  <figcaption> 标记 - 整理算法 </figcaption>
+  <figcaption>标记 - 整理算法</figcaption>
 </figure>
 
 ### 分代收集算法
@@ -115,7 +115,7 @@ Java 语言最显著的特点就是引入了垃圾回收机制，它使 Java 程
 
 <figure markdown="span">
   ![img](../assets/JVM 垃圾收集器-4.png)
-  <figcaption> 分代收集算法 </figcaption>
+  <figcaption>分代收集算法</figcaption>
 </figure>
 
 ## 10. 说一下 JVM 有哪些垃圾回收器？
@@ -139,6 +139,18 @@ Java 语言最显著的特点就是引入了垃圾回收机制，它使 Java 程
 - CMS (Concurrent Mark Sweep) 收集器（标记 - 清除算法）： 老年代并行收集器，以获取最短回收停顿时间为目标的收集器，具有高并发、低停顿的特点，追求最短 GC 回收停顿时间。
 
 - G1 (Garbage First) 收集器 (标记 - 整理算法)： Java 堆并行收集器，G1 收集器是 JDK1.7 提供的一个新收集器，G1 收集器基于 “标记 - 整理” 算法实现，也就是说不会产生内存碎片。此外，G1 收集器不同于之前的收集器的一个重要特点是：G1 回收的范围是整个 Java 堆 (包括新生代，老年代)，而前六种收集器回收的范围仅限于新生代或老年代。
+
+7 种主流垃圾收集器的特性对比说明如下表所示：
+
+| 收集器名称             | 作用分代     | 垃圾回收算法    | 线程模式 / 核心特性 | 适用场景                                                            |
+|------------------------|--------------|-----------------|---------------------|---------------------------------------------------------------------|
+| **Serial**             | 新生代       | 复制算法        | 单线程              | 简单高效，单 CPU 环境下无线程切换开销，适合 Client 模式             |
+| **ParNew**             | 新生代       | 复制算法        | 多线程并行          | Serial 的多线程版本，多核 CPU 环境性能更佳，常与 CMS 配合           |
+| **Parallel Scavenge**  | 新生代       | 复制算法        | 多线程并行          | 追求高吞吐量 `用户线程时间/(用户线程时间+GC时间)`，适合后台数据计算 |
+| **Serial Old**         | 老年代       | 标记 - 整理算法 | 单线程              | Serial 的老年代版本，亦作为 CMS 的后备降级方案                      |
+| **Parallel Old**       | 老年代       | 标记 - 整理算法 | 多线程并行          | 吞吐量优先，Parallel Scavenge 的老年代版本                          |
+| **CMS**                | 老年代       | 标记 - 清除算法 | 多线程并发          | 追求最短 GC 回收停顿时间（Low Latency），适合 Web 实时响应应用      |
+| **G1 (Garbage-First)** | 整个 Java 堆 | 标记 - 整理算法 | 多线程并发          | 基于 Region 堆划分，化整为零，不产生碎片，提供可预测的停顿          |
 
 ## 11. 详细介绍一下 CMS 垃圾回收器？
 
