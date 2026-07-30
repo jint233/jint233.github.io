@@ -27,7 +27,7 @@ add_module() {
   changed_modules+=("$module")
 }
 
-while IFS= read -r file; do
+while IFS= read -r -d '' file; do
   case "$file" in
     docs/index.md|docs/assets/*|overrides/home.html|overrides/assets/*|overrides/stylesheets/*|overrides/javascripts/*)
       portal_changed=true
@@ -47,7 +47,7 @@ while IFS= read -r file; do
       fi
       ;;
   esac
-done < <(git diff --name-only "$1" "$2")
+done < <(git diff --name-only -z "$1" "$2")
 
 if [[ "$global_changed" == true ]]; then
   printf 'all\n'
