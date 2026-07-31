@@ -178,7 +178,7 @@ git commit -m 'master merge food:eat apple'
 git push origin master
 ```
 
-## ![示意图](../assets/漫画讲解 git rebase VS git merge-13.png)
+![示意图](../assets/漫画讲解 git rebase VS git merge-13.png)
 
 **总结：在前面我们看到，如果 master 分支上开发。由于 master 分支时刻保持最新的发行代码，所以变动频繁，因此拉取 master 分支非常容易造成冲突。因此这里是将更改在本地分支上进行，在需要合并时，切换到 master 分支拉取最新代码后，根据拉取的内容，再去合并分支。同时这种方式也是更受大家推崇的。** 分析 git merge 合并分支代码的特点
 
