@@ -29,10 +29,12 @@ first_module_url() {
     exit 2
   }
 
-  if [[ -f "$docs_dir/$first_module/index.md" ]]; then
+  # A module index is a section landing page, not the first article. Use the
+  # first real article for the homepage CTA and keep the index as a fallback
+  # for modules that contain no other Markdown files.
+  first_page="$(find "$docs_dir/$first_module" -type f -name '*.md' ! -name 'index.md' | LC_ALL=C sort | head -n 1)"
+  if [[ -z "$first_page" && -f "$docs_dir/$first_module/index.md" ]]; then
     first_page="$docs_dir/$first_module/index.md"
-  else
-    first_page="$(find "$docs_dir/$first_module" -type f -name '*.md' | LC_ALL=C sort | head -n 1)"
   fi
   [[ -n "$first_page" ]] || {
     printf '模块 %s 下未找到 Markdown 文档\n' "$first_module" >&2
