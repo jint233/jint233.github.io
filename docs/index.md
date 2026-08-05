@@ -6,4 +6,6 @@ social:
     title: 技术文章摘抄
 ---
 
+# Home
+
 Welcome to [https://jint233.github.io/](https://jint233.github.io/)
