@@ -6,14 +6,16 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: pages-deploy
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -24,38 +26,27 @@ jobs:
         with:
           python-version: '3.12'
 
-      - id: changes
-        name: Detect affected modules
-        shell: bash
-        run: |
-          base_ref='${{ github.event.before }}'
-          if [[ "$base_ref" =~ ^0+$ ]] || ! git cat-file -e "$base_ref^{commit}" 2>/dev/null; then
-            modules=all
-          else
-            modules="$(./scripts/changed-modules.sh "$base_ref" HEAD)"
-          fi
-          echo "modules=$modules" >> "$GITHUB_OUTPUT"
-
       - name: Install dependencies
-        if: steps.changes.outputs.modules != 'none'
         run: pip install --no-cache-dir -r requirements.txt
 
-      - name: Restore published modules
-        if: steps.changes.outputs.modules != 'none' && steps.changes.outputs.modules != 'all'
-        shell: bash
-        run: |
-          mkdir -p site
-          git fetch origin gh-pages --depth=1
-          git archive origin/gh-pages | tar -x -C site
+      - name: Build documentation
+        run: ./scripts/build-modules.sh all
 
-      - name: Build affected modules
-        if: steps.changes.outputs.modules != 'none'
-        run: ./scripts/build-modules.sh '${{ steps.changes.outputs.modules }}'
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
 
-      - name: Deploy to GitHub Pages
-        if: steps.changes.outputs.modules != 'none'
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: ./site
+          path: ./site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
