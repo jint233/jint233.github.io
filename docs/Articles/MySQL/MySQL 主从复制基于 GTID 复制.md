@@ -130,14 +130,14 @@ gtid_mode=on                      # 必须项
 
 重启 master 和 slave 后，在 master 上创建一个用于复制的用户`repl`。
 
-```mysql
+```sql
 # master上执行
 mysql> grant replication slave on *.* to 'repl'@'192.168.100.%' identified by 'repl_password';
 ```
 
 因为 master 上的 binlog 没有删除过，所以在 slave 上直接`change master to`配置连接参数。
 
-```mysql
+```sql
 # slave上执行
 mysql> change master to 
         master_host='192.168.100.21',
@@ -149,7 +149,7 @@ mysql> change master to
 
 现在启动 slave 上的两个复制线程。
 
-```mysql
+```sql
 # slave上执行
 mysql> start slave user='repl' password='repl_password';
 ```
@@ -515,12 +515,7 @@ DELIMITER ;
 
 - `gtid_mode`：是否开启 gtid 复制模式。只允许 on/off 类的布尔值，不允许其他类型(如 1/0)的布尔值，实际上这个变量是枚举类型的。要设置 _gtid_mode=on_ ，必须同时设置 _enforce_gtid_consistency_ 开。在 MySQL 5.6 中，还必须开启 _log_slave_updates_ ，即使是 master 也要开启。
 
--
-
-```enforce_gtid_consistency
-```
-
-    ：强制要求只允许复制事务安全的事务。
+- `enforce_gtid_consistency`：强制要求只允许复制事务安全的事务。
 
     gtid_mode=on 时必须显式设置该项，如果不给定值，则默认为 on。应该尽量将该选项放在 gtid_mode 的前面，减少启动 mysqld 时的检查。
 

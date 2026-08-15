@@ -85,8 +85,9 @@ ZK 的文件结构类似于 Linux 系统的树状结构，注册服务时，即�
 
 ![Nacos 架构图](../assets/服务注册与发现原理剖析（Eureka、Zookeeper、Nacos）-5.png)
 
-主要功能点
------ **服务注册与发现** 类似 Eureka、ZooKeeper、Consul 等组件，既可以支持 HTTP、https 的服务注册和发现，也可以支持 RPC 的服务注册和发现，比如 Dubbo，也是出自于阿里，完全可以替代 Eureka、ZooKeeper、Consul。**动态配置服务**
+### 主要功能点
+
+**服务注册与发现** 类似 Eureka、ZooKeeper、Consul 等组件，既可以支持 HTTP、https 的服务注册和发现，也可以支持 RPC 的服务注册和发现，比如 Dubbo，也是出自于阿里，完全可以替代 Eureka、ZooKeeper、Consul。**动态配置服务**
 
 类似 Spring Cloud Config + Bus、Apollo 等组件。提供了后台管理界面来统一管理所有的服务和应用的配置，后台修改公共配置后不需重启应用程序即可生效。
 

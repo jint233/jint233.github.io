@@ -136,7 +136,9 @@ GET /_search
 }
 ```
 
-##### **查询语句的结构** 一个查询的典型结构
+##### 查询语句的结构
+
+一个查询的典型结构
 
 ```shell
 {
@@ -174,7 +176,9 @@ curl -X GET "localhost:9200/_search?pretty" -H 'Content-Type: application/json' 
 '
 ```
 
-##### **合并查询** 分为叶子语句，被用于将查询字符串和字段进行对比，复合语句用于合并其他查询语句
+##### 合并查询
+
+分为叶子语句，被用于将查询字符串和字段进行对比，复合语句用于合并其他查询语句
 
 例如下面语句：找出信件正文包含 business opportunity 的星标邮件，或者在邮件正文包含 business opportunity 的非垃圾邮件：
 
@@ -196,19 +200,25 @@ curl -X GET "localhost:9200/_search?pretty" -H 'Content-Type: application/json' 
 
 #### 常用查询
 
-##### **match_all 查询** 该查询匹配所有文档
+##### match_all 查询
+
+该查询匹配所有文档
 
 ```shell
 { "match_all": {}}
 ```
 
-##### **match 查询** 用于使用分词器进行查询
+##### match 查询
+
+用于使用分词器进行查询
 
 ```shell
 { "match": { "tweet": "About Search" }}
 ```
 
-##### **multi_match 查询** 用于在多个字段上执行相同更多 match 查询
+##### multi_match 查询
+
+用于在多个字段上执行相同更多 match 查询
 
 ```shell
 {
@@ -219,7 +229,9 @@ curl -X GET "localhost:9200/_search?pretty" -H 'Content-Type: application/json' 
 }
 ```
 
-##### **range 查询** 用于找出在指定区间内的数字或者时间
+##### range 查询
+
+用于找出在指定区间内的数字或者时间
 
 ```shell
 {
@@ -232,7 +244,9 @@ curl -X GET "localhost:9200/_search?pretty" -H 'Content-Type: application/json' 
 }
 ```
 
-##### **term 查询** 用于进行精确匹配
+##### term 查询
+
+用于进行精确匹配
 
 ```shell
 { "term": { "age":    26           }}
@@ -241,13 +255,15 @@ curl -X GET "localhost:9200/_search?pretty" -H 'Content-Type: application/json' 
 { "term": { "tag":    "full_text"  }}
 ```
 
-##### **terms 查询** 用于进行多值匹配
+##### terms 查询
+
+用于进行多值匹配
 
 ```shell
 { "terms": { "tag": [ "search", "full_text", "nosql" ] }}
 ```
 
-##### **exists 查询和 missing 查询**
+##### exists 查询和 missing 查询
 
 用于查询在指定字段中有值或者无值的文档：
 
@@ -466,9 +482,13 @@ curl -X PUT "localhost:9200/my_index/_mapping/my_type?pretty" -H 'Content-Type: 
 
 #### 类型和映射
 
-##### **Lucene 如何处理文档** 在 Lucene 中一个文档由键值对组成。在索引文档的时候，每个字段的值都会添加到相关字段的倒排序中
+##### Lucene 如何处理文档
 
-##### **类型如何实现** 每个文档的类型名称将会保存在 _type 字段上，当要检索字段的时候，ES 会自动在_type 字段上检索
+在 Lucene 中一个文档由键值对组成。在索引文档的时候，每个字段的值都会添加到相关字段的倒排序中
+
+##### 类型如何实现
+
+每个文档的类型名称将会保存在 _type 字段上，当要检索字段的时候，ES 会自动在_type 字段上检索
 
 例如在 User 类型中，name 字段会映射声明为 string 类型，并索引到 name 的倒排序中，需要使用 whitespace 分词器分析。
 
@@ -479,7 +499,7 @@ curl -X PUT "localhost:9200/my_index/_mapping/my_type?pretty" -H 'Content-Type: 
 }
 ```
 
-##### **Lucene 索引的每个字段都包含一个单一的扁平的模式**
+##### Lucene 索引的每个字段都包含一个单一的扁平的模式
 
 在 Lucene 中，一个特定的字段可以映射到 string 类型或者是 number 类型，但是不能两者兼具。因为 ES 添加的优于 lucene 的额外机制（以元数据 _type 字段的形式。）在 ES 中所有类型都最终共享相同的映射。
 

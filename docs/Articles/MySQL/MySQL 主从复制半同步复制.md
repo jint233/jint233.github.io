@@ -79,7 +79,7 @@ UNINSTALL PLUGIN plugin_name
 
 例如，使用 INSTALL 语句在 master 上安装 _semisync_master.so_ 插件。
 
-```mysql
+```sql
 mysql> install plugin rpl_semi_sync_master soname 'semisync_master.so';
 ```
 
@@ -106,7 +106,7 @@ plugin-load="rpl_semi_sync_master=semisync_master.so;rpl_sync_slave=semisync_sla
 
 安装插件后，应该使用`show plugins`来查看插件是否真的激活。
 
-```mysql
+```sql
 mysql> show plugins;
 +----------------------+--------+-------------+--------------------+---------+
 | Name                 | Status | Type        | Library            | License |

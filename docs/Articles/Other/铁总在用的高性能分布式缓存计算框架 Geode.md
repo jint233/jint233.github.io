@@ -1108,7 +1108,7 @@ File saved to /opt/./cluster-config-back.zip
 ps -ef | grep geode # 查看启动参数
 ```
 
-1. 第二个导出配置文件，是一些常规配置，以前修改过的，关于 region 等的一些配置。
+2. 第二个导出配置文件，是一些常规配置，以前修改过的，关于 region 等的一些配置。
 
 ![图解](../assets/铁总在用的高性能分布式缓存计算框架 Geode-9.png)
 
@@ -1136,10 +1136,12 @@ rm -rf apache-geode-1.9.2.tgz
 
 #### 重启 locator
 
-##### **停止旧的主 locator** 1.  链接上管理器
+##### 停止旧的主 locator
 
-1. 找到主 locator 的 name
-2. 执行 `stop locator --name=locator_33_15`
+1. 链接上管理器
+
+2. 找到主 locator 的 name
+3. 执行 `stop locator --name=locator_33_15`
 
 停止主 locator 要特别注意，经常停止不了，要用 ps 来查看 `ps -ef | grep geode`，如果不能正常停止就用 `kill -9 {locator的PID}` 来强行停止。
 
@@ -1167,19 +1169,19 @@ rm -rf apache-geode-1.9.2.tgz
  gfsh>
 ```
 
-##### **修改 /etc/profile 更改环境变量**
+##### 修改 /etc/profile 更改环境变量
 
 1. 执行 `vi /ect/profile`
 
-1. 修改文件将原来 1.8 的版本改为 1.9.2
+2. 修改文件将原来 1.8 的版本改为 1.9.2
 
 ```shell
 export PATH=JAVA_HOME/bin:/opt/apache-geode-1.9.2/bin:PATH
 ```
 
-1. 执行生效 `source /etc/profile`
+3. 执行生效 `source /etc/profile`
 
-1. 执行 `gfsh version --fule` 查看版本，确定是新版本生效
+4. 执行 `gfsh version --fule` 查看版本，确定是新版本生效
 
 ```text
 Build-Date: 2019-10-15 06:08:13 -0700
@@ -1195,7 +1197,7 @@ Native version: native code unavailable
 Running on: /192.168.33.15, 4 cpu(s), amd64 Linux 2.6.32-696.23.1.el6.x86_64
 ```
 
-##### **启动新 locator**
+##### 启动新 locator
 
 1. 启动新的主 locator，执行启动脚本 start_locator_33_15.sh
 
@@ -1212,7 +1214,7 @@ Running on: /192.168.33.15, 4 cpu(s), amd64 Linux 2.6.32-696.23.1.el6.x86_64
     Cluster configuration service is up and running.
    ```
 
-1. 校验新的 locator 是否正常。
+2. 校验新的 locator 是否正常。
 
     ```shell
     gfsh>connect --jmx-manager=192.168.33.15
@@ -1221,11 +1223,11 @@ Running on: /192.168.33.15, 4 cpu(s), amd64 Linux 2.6.32-696.23.1.el6.x86_64
     Cluster-254 gfsh>
    ```
 
-1. 按照如上步骤依次重启其他机器上的 locator。
+3. 按照如上步骤依次重启其他机器上的 locator。
 
 #### 重启 server
 
-##### **重启旧版本的 server**
+##### 重启旧版本的 server
 
 1. 停止 server
 
@@ -1235,19 +1237,19 @@ Running on: /192.168.33.15, 4 cpu(s), amd64 Linux 2.6.32-696.23.1.el6.x86_64
 stop server --name=server_33_15
 ```
 
-1. 如果 server 没有与 locator 在一起的话， 需要按上边的步骤进行版本更新。
+2. 如果 server 没有与 locator 在一起的话， 需要按上边的步骤进行版本更新。
 
    - 上传新版版
    - 解压
    - 更改 /etc/profile 配置
 
-1. 去 33.15 机器上执行启动 server 的脚本。
+3. 去 33.15 机器上执行启动 server 的脚本。
 
 ```shell
 sh start_server_33_15.sh
 ```
 
-1. 其他 server 依次执行重启。
+4. 其他 server 依次执行重启。
 
 #### 检查
 
@@ -1338,7 +1340,9 @@ public class MultiGetFunction implements Function {
 }
 ```
 
-**2. deploy 到服务器** 我们写好后打成 jar 包上传到服务器，gfsh 执行 deploy 命令：
+#### 2. deploy 到服务器
+
+我们写好后打成 jar 包上传到服务器，gfsh 执行 deploy 命令：
 
 ```shell
 deploy --jar=/tmp/upload_dir/ddh/geode-study.jar
@@ -1350,7 +1354,10 @@ server_33_23 | geode-study.jar | /opt/geode_work/server_33_23/geode-study.v5.jar
 server_33_29 | geode-study.jar | /opt/geode_work/server_33_29/geode-study.v5.jar
 ```
 
-我们在做 deploy 的时候，Geode 会自动将实现了 function 接口的类型进行函数注册。**3. 执行函数** 方式一：
+#### 3. 执行函数
+
+我们在做 deploy 的时候，Geode 会自动将实现了 function 接口的类型进行函数注册。
+方式一：
 
 ```shell
 Cluster-254 gfsh>execute function --id=func-a --region=test99 --filter=KEY_4,KEY_7
@@ -1398,7 +1405,8 @@ http://192.168.33.15:7070/pulse
 
 在 locator 变为 leader 之后会自动启用 pulse，用户名密码为 admin/admin。
 
-pulse 中可以在不同维护查看数据。**1. 总览** 内存，成员数，服务数，region 数量，集群读写等等。
+pulse 中可以在不同维护查看数据。
+**1. 总览** 内存，成员数，服务数，region 数量，集群读写等等。
 
 ![图解](../assets/铁总在用的高性能分布式缓存计算框架 Geode-13.png)
 
@@ -1406,7 +1414,7 @@ pulse 中可以在不同维护查看数据。**1. 总览** 内存，成员数，
 
 ![图解](../assets/铁总在用的高性能分布式缓存计算框架 Geode-14.png)
 
-### 3. region 维度
+**3. region 维度**
 
 region 维度主要对 region 进行描述：
 
@@ -1553,7 +1561,9 @@ list is: [[ent(27134):60330/45855, ent(27130):60333/36743]]
 
 > [https://gitee.com/gavinage/geode_study](https://gitee.com/gavinage/geode_study)
 
-#### Geode 扩展功能 **memCache 适配器**
+#### Geode 扩展功能
+
+**memCache 适配器**
 
 ```shell
 gfsh>start server

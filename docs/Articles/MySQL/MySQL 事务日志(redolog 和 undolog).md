@@ -361,7 +361,9 @@ undo log 有两个作用：提供回滚和多个行版本控制(MVCC)。
 
 undo log 和 redo log 记录物理日志不一样，它是逻辑日志。**可以认为当 delete 一条记录时，undo log 中会记录一条对应的 insert 记录，反之亦然，当 update 一条记录时，它记录一条对应相反的 update 记录。** 当执行 rollback 时，就可以从 undo log 中的逻辑记录读取到相应的内容并进行回滚。有时候应用到行版本控制的时候，也是通过 undo log 来实现的：当读取的某一行被其他事务锁定时，它可以从 undo log 中分析出该行记录以前的数据是什么，从而提供该行版本信息，让用户实现非锁定一致性读取。**undo log** 是采用段(segment) **的方式来记录的，每个 undo** 操作在记录的时候占用一个 undo log segment **。**
 
-## 另外，**undo log** 也会产生 redo log **，因为 undo log** 也要实现持久性保护。**2.2 undo log 的存储方式
+另外，**undo log** 也会产生 redo log **，因为 undo log** 也要实现持久性保护。
+
+## 2.2 undo log 的存储方式
 
 innodb 存储引擎对 undo 的管理采用段的方式。**rollback segment** 称为回滚段，每个回滚段中有 1024 **个 undo log segment**。**
 

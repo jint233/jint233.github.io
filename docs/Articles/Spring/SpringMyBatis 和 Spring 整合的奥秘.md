@@ -314,7 +314,8 @@ public class Main {
 
 运行结果：
 
-```getObject
+```text
+getObject
 Teacher{name='琦玉老师'}
 ```
 
