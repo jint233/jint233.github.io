@@ -11,7 +11,7 @@
 
 本文对以上内容都做了非常详细的说明。希望对各位初学、深入 MySQL 复制有所帮助。
 
-mysql replication 官方手册：[https://dev.mysql.com/doc/refman/5.7/en/replication.html。](https://dev.mysql.com/doc/refman/5.7/en/replication.html%E3%80%82)
+MySQL Replication 官方手册：[MySQL 5.7 Reference Manual](https://dev.mysql.com/doc/refman/5.7/en/replication.html)
 
 ## 1. 复制的基本概念和原理
 
@@ -136,14 +136,21 @@ mysql 支持一主一从和一主多从。但是每个 slave 必须只能是一�
 
 1. **配置 master 和 slave 的配置文件。**
 
-```shell
-[mysqld]          # master
+master 配置：
+
+```ini
+[mysqld]
 datadir=data
 socket=datamysql.sock
 log-bin=master-bin
 sync-binlog=1
 server-id=100
-[mysqld]       # slave
+```
+
+slave 配置：
+
+```ini
+[mysqld]
 datadir=data
 socket=datamysql.sock
 relay-log=slave-bin
@@ -233,7 +240,7 @@ CALL proc_num2 (1000000) ;
 
 所谓数值辅助表是只有一列的表，且这个字段的值全是数值，从 1 开始增长。例如上面的是从 1 到 100W 的数值辅助表。
 
-```sql
+```text
 mysql> select * from backuptest.num_isam limit 10;
 +----+
 | n  |
@@ -283,16 +290,16 @@ mysql> show master status;   # 为了排版，简化了输出结果
 2. 如果要复制的是某个或某几个库，直接拷贝相关目录即可。但注意，这种冷备份的方式只适合 MyISAM 表和开启了`innodb_file_per_table=ON`的 InnoDB 表。如果没有开启该变量，innodb 表使用公共表空间，无法直接冷备份。
 3. 如果要冷备份 innodb 表，最安全的方法是先关闭 master 上的 mysql，而不是通过表锁。 所以，**如果没有涉及到 innodb 表，那么在锁表之后，可以直接冷拷贝。最后释放锁。**
 
-```shell
-   mysql> flush tables with read lock;
-   mysql> show master status;   # 为了排版，简化了输出结果
-   +-------------------+----------+--------------+--------+--------+
-   | File              | Position | Binlog_Do_DB | ...... | ...... |
-   +-------------------+----------+--------------+--------+--------+
-   | master-bin.000001 |      623 |              |        |        |
-   +-------------------+----------+--------------+--------+--------+
-   shell> rsync -avz data 192.168.100.150:
-   mysql> unlock tables;
+```text
+mysql> flush tables with read lock;
+mysql> show master status;   # 为了排版，简化了输出结果
++-------------------+----------+--------------+--------+--------+
+| File              | Position | Binlog_Do_DB | ...... | ...... |
++-------------------+----------+--------------+--------+--------+
+| master-bin.000001 |      623 |              |        |        |
++-------------------+----------+--------------+--------+--------+
+shell> rsync -avz data 192.168.100.150:
+mysql> unlock tables;
 ```
 
 此处实验，假设要备份的是整个实例，因为 **涉及到了 innodb 表，所以建议关闭 MySQL**。因为是冷备份，所以 slave 上也应该关闭 MySQL。
@@ -440,7 +447,7 @@ shell> mysql -uroot -p -e 'select * from backuptest.num_isam limit 10;'
 
 连接 master 时，需要使用`change master to`提供连接到 master 的连接选项，包括 user、port、password、binlog、position 等。
 
-```shell
+```sql
 mysql> change master to 
         master_host='192.168.100.20',
         master_port=3306,
@@ -452,7 +459,7 @@ mysql> change master to
 
 完整的`change master to`语法如下：
 
-```shell
+```sql
 CHANGE MASTER TO option [, option] ...
 option:
   | MASTER_HOST = 'host_name'
@@ -477,7 +484,7 @@ option:
 
 然后，启动 IO 线程和 SQL 线程。可以一次性启动两个，也可以分开启动。
 
-```shell
+```sql
 # 一次性启动、关闭
 start slave;
 stop slave;
@@ -500,7 +507,7 @@ master.info 文件记录的是 **IO 线程相关的信息**，也就是连接 ma
 
 以下是 master.info 的内容，每一行的意义见[官方手册](https://dev.mysql.com/doc/refman/5.7/en/slave-logs-status.html)
 
-```shell
+```text
 [root@xuexi ~]# cat datamaster.info 
 25                        # 本文件的行数
 master-bin.000002         # IO线程正从哪个master binlog读取日志
@@ -522,7 +529,7 @@ P@ssword1!                # master_password
 
 relay-log.info 文件中记录的是 **SQL 线程相关的信息**。以下是 relay-log.info 文件的内容，每一行的意义见[官方手册](https://dev.mysql.com/doc/refman/5.7/en/slave-logs-status.html)
 
-```shell
+```text
 [root@xuexi ~]# cat datarelay-log.info 
 7                   # 本文件的行数
 .slave-bin.000001  # 当前SQL线程正在读取的relay-log文件
@@ -538,8 +545,8 @@ master-bin.000002   # SQL线程最近执行的操作对应的是哪个master bin
 
 在 slave 上执行`show slave status`可以查看 slave 的状态信息。信息非常多，每个字段的详细意义可参见[官方手册](https://dev.mysql.com/doc/refman/5.7/en/show-slave-status.html)
 
-```shell
-mysql> show slave statusG
+```text
+mysql> show slave status\G
 *************************** 1. row ***************************
                Slave_IO_State:        # slave上IO线程的状态，来源于show processlist
                   Master_Host: 192.168.100.20
@@ -606,7 +613,7 @@ Master_SSL_Verify_Server_Cert: No
 
 再次回到上面`show slave status`的信息。除了那些描述 IO 线程、SQL 线程状态的行，还有几个 log_file 和 pos 相关的行，如下所列。
 
-```shell
+```text
       Master_Log_File: master-bin.000002
   Read_Master_Log_Pos: 154
        Relay_Log_File: slave-bin.000001
@@ -636,7 +643,7 @@ Relay_Master_Log_File: master-bin.000002
 
 首先查看启动 io thread 和 sql thread 后的状态。使用`show processlist`查看即可。
 
-```shell
+```text
 mysql> start slave;
 mysql> show processlist;   # slave上的信息，为了排版，简化了输出
 +----+-------------+---------+--------------------------------------------------------+
@@ -656,17 +663,14 @@ mysql> show processlist;   # slave上的信息，为了排版，简化了输出
 
 再看看此时 master 上的信息。
 
-```shell
+```text
 mysql> show processlist;        # master上的信息，为了排版，经过了修改
-+----+------+-----------------------+-------------+--------------------------------------+
-| Id | User | Host                  | Command     | State                                |
-+----+------+-----------------------+-------------+--------------------------------------+
-| 4  | root | localhost             | Query       | starting                             |
-|----| ---- | --------------------- | ----------- | ------------------------------------ |
-| 16 | repl | 192.168.100.150:39556 | Binlog Dump | Master has sent all binlog to slave; |
-|    |      |                       |             | waiting for more updates             |
-+----+------+-----------------------+-------------+--------------------------------------+
 ```
+
+| Id | User | Host                  | Command     | State                                                               |
+| ---: | --- | --- | --- | --- |
+| 4 | root | localhost | Query | starting |
+| 16 | repl | 192.168.100.150:39556 | Binlog Dump | Master has sent all binlog to slave; waiting for more updates |
 
 master 上有一个`Id=16`的 binlog dump 线程，该线程的用户是 repl。它的状态指示"已经将所有的 binlog 发送给 slave 了"。
 
@@ -674,14 +678,14 @@ master 上有一个`Id=16`的 binlog dump 线程，该线程的用户是 repl。
 
 仍然使用前面插入数值辅助表的存储过程，这次分别向两张表中插入一亿条数据(尽管去抽烟、喝茶，够等几分钟的。如果机器性能不好，请大幅减少插入的行数)。
 
-```shell
+```sql
 call proc_num1(100000000);
 call proc_num2(100000000);
 ```
 
 然后去 slave 上查看信息，如下。因为太长，已经裁剪了一部分没什么用的行。
 
-```shell
+```text
 mysql> show slave status\G
 mysql: [Warning] Using a password on the command line interface can be insecure.
 *************************** 1. row ***************************
@@ -899,7 +903,7 @@ mysql> show slave status\G
 
 默认情况下，slave 会复制 master 上所有库。可以指定以下变量显式指定要复制的库、表和要忽略的库、表，也可以将其写入配置文件。
 
-```shell
+```text
 Replicate_Do_DB: 要复制的数据库
         Replicate_Ignore_DB: 不复制的数据库
          Replicate_Do_Table: 要复制的表
@@ -928,7 +932,7 @@ Replicate_Wild_Ignore_Table: 通配符方式指定不复制的表
 
 如果想查看 master 有几个 slave 的信息，可以使用`show slave hosts`。以下为某个 master 上的结果：
 
-```shell
+```text
 mysql> show slave hosts; 
 +-----------+------+------+-----------+--------------------------------------+
 | Server_id | Host | Port | Master_id | Slave_UUID                           |
@@ -944,14 +948,14 @@ mysql> show slave hosts;
 
 例如，在 slave2 上修改其配置文件，添加 report-host 项后重启 MySQL 服务。
 
-```shell
+```ini
 [mysqld]
 report_host=192.168.100.19
 ```
 
 在 slave1(前文的实验环境，slave1 是 slave2 的 master)上查看，host 已经显示为新配置的项。
 
-```shell
+```text
 mysql> show slave hosts;
 +-----------+----------------+------+-----------+--------------------------------------+
 | Server_id | Host           | Port | Master_id | Slave_UUID                           |
@@ -963,7 +967,9 @@ mysql> show slave hosts;
 
 ## 6.4 多线程复制
 
-在老版本中，只有一个 SQL 线程读取 relay log 并重放。重放的速度肯定比 IO 线程写 relay log 的速度慢非常多，导致 SQL 线程非常繁忙，且 **实现到从库上延迟较大**。**没错，多线程复制可以解决主从延迟问题，且使用得当的话效果非常的好(关于主从复制延迟，是生产环境下最常见的问题之一，且没有很好的办法来避免。后文稍微介绍了一点方法)**。
+在老版本中，只有一个 SQL 线程读取 relay log 并重放。重放速度比 IO 线程写 relay log 慢时，会导致 SQL 线程非常繁忙，从而造成从库延迟较大。
+
+**多线程复制可以缓解主从延迟，使用得当时效果明显。** 主从复制延迟是生产环境中的常见问题之一，目前没有很好的通用解决办法，后文会简单介绍一些方法。
 
 在 MySQL 5.6 中引入了多线程复制(multi-thread slave，简称 MTS)，这个 **多线程指的是多个 SQL 线程，IO 线程还是只有一个**。当 IO 线程将 master binlog 写入 relay log 中后，一个称为"多线程协调器(multithreaded slave coordinator)"会对多个 SQL 线程进行调度，让它们按照一定的规则去执行 relay log 中的事件。
 
@@ -971,7 +977,7 @@ mysql> show slave hosts;
 
 通过全局变量`slave-parallel-workers`控制 SQL 线程个数，设置为非 0 正整数 N，表示多加 N 个 SQL 线程，加上原有的共 N+1 个 SQL 线程。默认为 0，表示不加任何 SQL 线程，即关闭多线程功能。
 
-```shell
+```text
 mysql> show variables like "%parallel%";
 +------------------------+-------+
 | Variable_name          | Value |
@@ -988,10 +994,10 @@ mysql> show variables like "%parallel%";
 
 设置`slave_parallel_workers=2`。
 
-```shell
+```text
 mysql> set @@global.slave_parallel_workers=2;
 mysql> stop slave sql_thread;
-msyql> start slave sql_thread;
+mysql> start slave sql_thread;
 mysql> show full processlist;
 ```
 
@@ -1021,7 +1027,7 @@ mysql> show full processlist;
 
 当事务 B 准备先于事务 A 提交的时候，它将一直等待。此时 slave 的状态将显示：
 
-```shell
+```text
 1 Waiting for preceding transaction to commit   # MySQL 5.7.8之后显示该状态
 2 Waiting for its turn to commit       # MySQL 5.7.8之前显示该状态
 ```
@@ -1033,11 +1039,17 @@ mysql> show full processlist;
 ```shell
 shell> mysqladmin -uroot -p shutdown
 shell> cat /etc/my.cnf
+```
+
+```ini
 log_bin=slave-bin
 log-slave-updates
 slave_parallel_workers=1
 slave_parallel_type=LOGICAL_CLOCK
-shell>service mysqld start
+```
+
+```shell
+shell> service mysqld start
 ```
 
 **2.如何处理已经存在的 gap。**
@@ -1055,7 +1067,7 @@ shell>service mysqld start
 
 多线程的带来的问题不止 gaps 一种，所以没有深入了解多线程的情况下，千万不能在生产环境中启用它。如果想将多线程切换回单线程，可以执行如下操作：
 
-```shell
+```sql
 START SLAVE UNTIL SQL_AFTER_MTS_GAPS;
 SET @@GLOBAL.slave_parallel_workers = 0;
 START SLAVE SQL_THREAD;
@@ -1109,7 +1121,7 @@ START SLAVE SQL_THREAD;
 
 例如：屏蔽创建 repl 用户的语句。
 
-```shell
+```sql
 mysql> set sql_log_bin=0;
 mysql> create user repl@'%' identified by 'P@ssword1!';
 mysql> grant replication slave on *.* to repl@'%';

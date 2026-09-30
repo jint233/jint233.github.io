@@ -39,17 +39,24 @@ gtid 在 master 和 slave 上是一直 **持久化保存** (即使删除了日�
 
    注意，主从复制的情况下，sync-binlog 基本上都会设置为 1，这表示在每次提交事务时将缓存中的 binlog 刷盘。所以，在事务提交前，gtid 以及事务相关操作的信息都在缓存中，提交后它们才写入到 binlog file 中，然后才会被 dump 线程 dump 出去。
 
-   换句话说，**只有提交了的事务，gtid 和对应的事务操作才会记录到 binlog 文件中。记录的格式是先记录 gtid，紧跟着再记录事务相关的操作。** 2.  当 binlog 传送到 relay log 中后，slave 上的 SQL 线程首先读取该 gtid，并设置变量 _gtid_next_ 的值为该 gtid，表示下一个要操作的事务是该 gtid。 _gtid_next_ **是基于会话的，不同会话的 gtid_next 不同。** 3.  随后 slave 检测该 gtid 在自己的 binlog 中是否存在。如果存在，则放弃此 gtid 事务；如果不存在，则将此 gtid 写入到 **自己的 binlog 中**，然后立刻执行该事务，并在自己的 binlog 中记录该事务相关的操作。
+   换句话说，**只有提交了的事务，gtid 和对应的事务操作才会记录到 binlog 文件中。记录的格式是先记录 gtid，紧跟着再记录事务相关的操作。**
+
+2. 当 binlog 传送到 relay log 中后，slave 上的 SQL 线程首先读取该 gtid，并设置变量 _gtid_next_ 的值为该 gtid，表示下一个要操作的事务是该 gtid。 _gtid_next_ **是基于会话的，不同会话的 gtid_next 不同。**
+
+3. 随后 slave 检测该 gtid 在自己的 binlog 中是否存在。如果存在，则放弃此 gtid 事务；如果不存在，则将此 gtid 写入到 **自己的 binlog 中**，然后立刻执行该事务，并在自己的 binlog 中记录该事务相关的操作。
 
    注意，**slave 上 replay 的时候，gtid 不是提交后才写到自己的 binlog file 的，而是判断 gtid 不存在后立即写入 binlog file。** 通过这种在执行事务前先检查并写 gtid 到 binlog 的机制，不仅可以保证当前会话在此之前没有执行过该事务，还能保证没有其他会话读取了该 gtid 却没有提交。因为如果其他会话读取了该 gtid 会立即写入到 binlog(不管是否已经开始执行事务)，所以当前会话总能读取到 binlog 中的该 gtid，于是当前会话就会放弃该事务。总之，一个 gtid 事务是决不允许多次执行、多个会话并行执行的。
 
-2. slave 在重放 relay log 中的事务时，不会自己生成 gtid，所以所有的 slave(无论是何种方式的一主一从或一主多从复制架构)通过重放 relay log 中事务获取的 gtid 都来源于 master，并永久保存在 slave 上。
+4. slave 在重放 relay log 中的事务时，不会自己生成 gtid，所以所有的 slave(无论是何种方式的一主一从或一主多从复制架构)通过重放 relay log 中事务获取的 gtid 都来源于 master，并永久保存在 slave 上。
 
 ## 3. 基于 GTID 复制的好处
 
 从上面可以看出，gtid 复制的优点大致有：
 
-1. **保证同一个事务在某 slave 上绝对只执行一次，没有执行过的 gtid 事务总是会被执行。** 2. **不用像传统复制那样保证 binlog 的坐标准确，因为根本不需要 binlog 以及坐标。** 3. **故障转移到新的 master 的时候很方便，简化了很多任务。** 4. **很容易判断 master 和 slave 的数据是否一致。只要 master 上提交的事务在 slave 上也提交了，那么一定是一致的。**
+1. **保证同一个事务在某 slave 上绝对只执行一次，没有执行过的 gtid 事务总是会被执行。**
+2. **不用像传统复制那样保证 binlog 的坐标准确，因为根本不需要 binlog 以及坐标。**
+3. **故障转移到新的 master 的时候很方便，简化了很多任务。**
+4. **很容易判断 master 和 slave 的数据是否一致。只要 master 上提交的事务在 slave 上也提交了，那么一定是一致的。**
 
 当然，MySQL 提供了选项可以控制跳过某些 gtid 事务，防止 slave 第一次启动复制时执行 master 上的所有事务而导致耗时过久。
 
@@ -59,41 +66,16 @@ gtid 在 master 和 slave 上是一直 **持久化保存** (即使删除了日�
 
 环境：
 
-主机 IP
-
-OS 版本
-
-MySQL 版本
-
-角色(master/slave)
-
-数据状态
-
-192.168.100.21
-
-centos 7
-
-MySQL 5.7.22
-
-master_gtid
-
-全新实例
-
-192.168.100.22
-
-centos 7
-
-MySQL 5.7.22
-
-slave1_gtid
-
-全新实例
+| 主机 IP        | OS 版本 | MySQL 版本   | 角色(master/slave) | 数据状态 |
+|----------------|---------|--------------|--------------------|----------|
+| 192.168.100.21 | centos 7 | MySQL 5.7.22 | master_gtid        | 全新实例 |
+| 192.168.100.22 | centos 7 | MySQL 5.7.22 | slave1_gtid        | 全新实例 |
 
 因为是用作 master 和 slave 的 mysql 实例都是全新环境，所以这里简单配置一下即可。
 
 master 的配置文件：
 
-```plaintext
+```ini
 [mysqld]
 datadir=/data
 socket=/data/mysql.sock
@@ -111,7 +93,7 @@ gtid_mode=on                  # gtid复制需要加上的必须项
 
 slave 的配置文件：
 
-```plaintext
+```ini
 [mysqld]
 datadir=/data
 socket=/data/mysql.sock
@@ -183,7 +165,8 @@ call proc_num2(1000000);
 
 ```plaintext
 # slave上执行：
-mysql> show slave status\G ****  ****  ****  ****  ****  ****  ***1. row**  ****  ****  ****  ****  ****  **** *
+mysql> show slave status\G
+*************************** 1. row ***************************
                Slave_IO_State: Waiting for master to send event
                   Master_Host: 192.168.100.21
                   Master_User: repl
@@ -458,9 +441,9 @@ Auto_Position: 1
 
 ```sql
 [root@localhost ~]# mysqlbinlog /data/master-bin.000007
-/_!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=1_/;
-/_!50003 SET @@SESSION.COMPLETION_TYPE=0_/;
-DELIMITER /_!_/;
+/*!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=1*/;
+/*!50003 SET @@SESSION.COMPLETION_TYPE=0*/;
+DELIMITER /*!*/;
 # at 4
 # 180610  1:34:08 server id 100  end_log_pos 123 CRC32 0x4a6e9510        Start: binlog v 4, server v 5.7.22-log created 180610  1:34:08
 # Warning: this binlog is either in use or was not closed properly
@@ -468,40 +451,40 @@ BINLOG '
 kA8cWw9kAAAAdwAAAHsAAAABAAQANS43LjIyLWxvZwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAEzgNAAgAEgAEBAQEEgAAXwAEGggAAAAICAgCAAAACgoKKioAEjQA
 ARCVbko=
-'/_!_/;
+'/*!*/;
 # at 123
 # 180610  1:34:08 server id 100  end_log_pos 194 CRC32 0x0f6ba409        Previous-GTIDs
 # a659234f-6aea-11e8-a361-000c29ed4cf4:1-57         #### 注意行1
 # at 194
 # 180610  2:06:31 server id 100  end_log_pos 259 CRC32 0xfef9194e        GTID    last_committed=0        sequence_number=1       rbr_only=no  #### 注意行2
-SET @@SESSION.GTID_NEXT= 'a659234f-6aea-11e8-a361-000c29ed4cf4:58'/_!_/;   #### 注意行3
+SET @@SESSION.GTID_NEXT= 'a659234f-6aea-11e8-a361-000c29ed4cf4:58'/*!*/;   #### 注意行3
 # at 259
 # 180610  2:06:31 server id 100  end_log_pos 359 CRC32 0x5a561d94        Query   thread_id=2     exec_time=0     error_code=0
-use `backup`/_!_/;
-SET TIMESTAMP=1528567591/_!_/;
-SET @@session.pseudo_thread_id=2/_!_/;
-SET @@session.foreign_key_checks=1, @@session.sql_auto_is_null=0, @@session.unique_checks=1, @@session.autocommit=1/_!_/;
-SET @@session.sql_mode=1436549152/_!_/;
-SET @@session.auto_increment_increment=1, @@session.auto_increment_offset=1/_!_/;
-/_!\\C utf8 _//_!_/;
-SET @@session.character_set_client=33,@@session.collation_connection=33,@@session.collation_server=8/_!_/;
-SET @@session.lc_time_names=0/_!_/;
-SET @@session.collation_database=DEFAULT/_!_/;
+use `backup`/*!*/;
+SET TIMESTAMP=1528567591/*!*/;
+SET @@session.pseudo_thread_id=2/*!*/;
+SET @@session.foreign_key_checks=1, @@session.sql_auto_is_null=0, @@session.unique_checks=1, @@session.autocommit=1/*!*/;
+SET @@session.sql_mode=1436549152/*!*/;
+SET @@session.auto_increment_increment=1, @@session.auto_increment_offset=1/*!*/;
+/*!\\C utf8 *//*!*/;
+SET @@session.character_set_client=33,@@session.collation_connection=33,@@session.collation_server=8/*!*/;
+SET @@session.lc_time_names=0/*!*/;
+SET @@session.collation_database=DEFAULT/*!*/;
 create table t1(n int)
-/_!_/;
+/*!*/;
 # at 359
 # 180610  2:09:36 server id 100  end_log_pos 424 CRC32 0x82564e69        GTID    last_committed=1        sequence_number=2       rbr_only=no     #### 注意行4
-SET @@SESSION.GTID_NEXT= 'a659234f-6aea-11e8-a361-000c29ed4cf4:59'/_!_/;  #### 注意行5
+SET @@SESSION.GTID_NEXT= 'a659234f-6aea-11e8-a361-000c29ed4cf4:59'/*!*/;  #### 注意行5
 # at 424
 # 180610  2:09:36 server id 100  end_log_pos 524 CRC32 0xbc21683a        Query   thread_id=2     exec_time=0     error_code=0
-SET TIMESTAMP=1528567776/_!_/;
+SET TIMESTAMP=1528567776/*!*/;
 create table t2(n int)
-/_!_/;
-SET @@SESSION.GTID_NEXT= 'AUTOMATIC' /_added by mysqlbinlog _/ /_!_/;   #### 注意行6
+/*!*/;
+SET @@SESSION.GTID_NEXT= 'AUTOMATIC' /* added by mysqlbinlog */ /*!*/;   #### 注意行6
 DELIMITER ;
 # End of log file
-/_!50003 SET @@SESSION.COMPLETION_TYPE_/;
-/_!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=0_/;
+/*!50003 SET @@SESSION.COMPLETION_TYPE*/;
+/*!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=0*/;
 ```
 
 其中：

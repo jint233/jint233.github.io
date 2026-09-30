@@ -16,28 +16,41 @@
 
 ### 介绍
 
-Spring Cloud Eureka 是在 Netflix 的 Eureka 的基础上进行二次开发而诞，采用了 C-S 的设计架构，Spring Cloud Eureka 提供 Eureka Server 服务端与 Eureka Client 客户端 ，服务端即是 Eureka 服务注册中心，客户端完成微服务向 Eureka 服务的注册与发现。服务端和客户端均采用 Java 语言编写。
+Spring Cloud Eureka 是在 Netflix 的 Eureka 基础上进行二次开发的，采用 C-S 设计架构。Spring Cloud Eureka 提供 Eureka Server 服务端与 Eureka Client 客户端：服务端是 Eureka 服务注册中心，客户端完成微服务向 Eureka 服务的注册与发现。服务端和客户端均采用 Java 语言编写。
 
-网上很多人说 Eureka 闭源，其实没有，只是 Eurkea 2.x 分支不再维护，官方依然在积极地维护 Eureka 1.x，Spring Cloud 还是使用的 1.x 版本的 Eureka，所以不必过分担心，就算 Eureka 真的闭源了，Spring Cloud 还可以使用 ZooKeeper、Consul、Nacos 等等来实现服务治理。比如使用 ZooKeeper 替代 Eureka，也是改几行配置和换个 jar 的事情。
+网上很多人说 Eureka 闭源，其实没有，只是 Eureka 2.x 分支不再维护，官方依然在维护 Eureka 1.x，Spring Cloud 仍然使用 1.x 版本的 Eureka。就算 Eureka 真的闭源，Spring Cloud 还可以使用 ZooKeeper、Consul、Nacos 等组件实现服务治理。比如使用 ZooKeeper 替代 Eureka，只需修改几行配置并更换依赖。
 
-**Eureka Server 与 Eureka Client 的关系：**![服务注册中心 Eureka](../assets/服务注册与发现原理剖析（Eureka、Zookeeper、Nacos）-2.png)
+**Eureka Server 与 Eureka Client 的关系：**
+
+![服务注册中心 Eureka](../assets/服务注册与发现原理剖析（Eureka、Zookeeper、Nacos）-2.png)
 
 ### 服务端（Eureka Server）
 
-Eureka Server 其实就是服务注册中心，负责管理每个 Eureka Client 的服务信息（IP、端口等等）和状态。服务端主要提供以下功能。**提供服务注册** 提供一个统一存储服务的地方，即服务列表，Eureka Client 应用启动时把自己的服务都注册到这里。**提供注册表** 为 Eureka Client 提供服务列表，Eureka Client 首次获取服务列表后会缓存一份到自己的本地，定时更新本地缓存，下次调用时直接使用本地缓存的服务信息进行远程调用，可以提高效率。**服务剔除（Eviction）** 如果 Eureka Client 超过 90 秒（默认）不向 Eureka Sever 上报心跳，Eureka Server 会剔除该 Eureka Client 实例，但是前提是不满足自我保护机制才剔除，避免杀错好人。**自我保护机制** 如果出现网络不稳定的时候，Eureka Client 的都能正常提供服务，即使超过了 90 秒没有上报心跳，也不会马上剔除该 Eureka Client 实例，而是进入自我保护状态，不会做任何的删除服务操作，仍然可以提供注册服务，当网络稳定之时，则解除自我保护恢复正常。
+Eureka Server 是服务注册中心，负责管理每个 Eureka Client 的服务信息（IP、端口等）和状态。服务端主要提供以下功能：
+
+- **提供服务注册：** 提供统一的服务列表。Eureka Client 应用启动时，会将自己的服务注册到这里。
+- **提供注册表：** 为 Eureka Client 提供服务列表。客户端首次获取服务列表后会在本地缓存，并定时更新；下次调用时可直接使用缓存中的服务信息进行远程调用，提高效率。
+- **服务剔除（Eviction）：** 如果 Eureka Client 超过 90 秒（默认）不向 Eureka Server 上报心跳，Eureka Server 会剔除该实例；但只有在自我保护机制未触发时才会剔除，以避免误删。
+- **自我保护机制：** 如果网络不稳定，Eureka Client 仍可能正常提供服务。即使超过 90 秒没有上报心跳，Eureka Server 也不会立即剔除该实例，而是进入自我保护状态，暂停删除服务；网络恢复稳定后，再解除自我保护并恢复正常。
 
 ### 客户端（Eureka Client）
 
-Eureka Client 可以是服务提供者客户端角色，也可以是服务消费者客户端角色，客户端主要提供以下功能。**服务注册（Register）** 作为服务提供者角色，把自己的服务（IP、端口等等）注册到服务注册中心。**自动刷新缓存（GetRegisty）** 作为服务消费者角色，从服务注册中心获取服务列表，并缓存在本地供下次使用，每 30 秒刷新一次缓存。**服务续约（Renew）** Eureka Client 每 30 秒（默认可配置）向 Server 端上报心跳（http 请求）告诉自己很健康，如果 Server 端在 90 秒（默认可配置）内没有收到心跳，而且不是自我保护情况，则剔除之。**远程调用（Remote Call）** 作为服务消费者角色，从服务注册中心获取服务列表后，就可以根据服务相关信息进行远程调用了，如果存在多个服务提供者实例时，默认使用负载均衡 Ribbon 的轮询策略调用服务。**服务下线（Cancel）** 作为服务提供者角色，在应用关闭时会发请求到服务端，服务端接受请求并把该实例剔除。
+Eureka Client 可以作为服务提供者，也可以作为服务消费者，主要提供以下功能：
+
+- **服务注册（Register）：** 作为服务提供者，将自己的服务（IP、端口等）注册到服务注册中心。
+- **自动刷新缓存（GetRegistry）：** 作为服务消费者，从服务注册中心获取服务列表并缓存在本地，每 30 秒刷新一次。
+- **服务续约（Renew）：** Eureka Client 每 30 秒（默认，可配置）向 Server 端发送 HTTP 心跳，报告自身状态。如果 Server 端在 90 秒（默认，可配置）内没有收到心跳，且自我保护机制未触发，则会剔除该实例。
+- **远程调用（Remote Call）：** 作为服务消费者，根据服务列表中的信息发起远程调用。如果存在多个服务提供者实例，默认使用 Ribbon 的轮询策略调用服务。
+- **服务下线（Cancel）：** 作为服务提供者，在应用关闭时向服务端发送请求，由服务端接收请求并剔除该实例。
 
 ### 注册与发现的工作流程
 
 1. 假设 Eureka Server 已经启动，Eureka Client（服务提供者）启动时把服务注册到 Eureka Server；
-2. Eureka Client（服务提供者）每 30 秒（默认可配置）向 Eureka Sever 发 http 请求（即心跳），即服务续约；
-3. Eureka Server90 秒没有收到向 Eureka Client（服务提供者）的心跳请求，则统计 15 分钟内是否存在 85% 的 Eureka Client（服务提供者）没有发心跳，如果是则进行自我保护状态（比如网络不稳定），如果不是则剔除该 Eureka Client（服务提供者）实例；
+2. Eureka Client（服务提供者）每 30 秒（默认可配置）向 Eureka Server 发送 HTTP 请求（即心跳），即服务续约；
+3. 如果 Eureka Server 90 秒没有收到 Eureka Client（服务提供者）的心跳请求，就统计 15 分钟内是否有 85% 的 Eureka Client（服务提供者）没有发送心跳。如果是，则进入自我保护状态（例如网络不稳定）；如果不是，则剔除该 Eureka Client 实例；
 4. Eureka Client（服务消费者）定时调用 Eureka Server 接口获取服务列表更新本地缓存；
 5. Eureka Client（服务消费者）远程调用服务时，先从本地缓存找，如果找到则直接发起服务调用，如果没有则到 Eureka Server 获取服务列表缓存到本地后再发起服务调用；
-6. Eureka Client（服务提供者）应用关闭时会发 HTTP 请求到 Eureka Server，服务端接受请求后把该实例剔除。
+6. Eureka Client（服务提供者）应用关闭时会向 Eureka Server 发送 HTTP 请求，服务端接收请求后将该实例剔除。
 
 ### 集群
 
@@ -87,9 +100,8 @@ ZK 的文件结构类似于 Linux 系统的树状结构，注册服务时，即�
 
 ### 主要功能点
 
-**服务注册与发现** 类似 Eureka、ZooKeeper、Consul 等组件，既可以支持 HTTP、https 的服务注册和发现，也可以支持 RPC 的服务注册和发现，比如 Dubbo，也是出自于阿里，完全可以替代 Eureka、ZooKeeper、Consul。**动态配置服务**
-
-类似 Spring Cloud Config + Bus、Apollo 等组件。提供了后台管理界面来统一管理所有的服务和应用的配置，后台修改公共配置后不需重启应用程序即可生效。
+- **服务注册与发现：** 类似 Eureka、ZooKeeper、Consul 等组件，既支持 HTTP、HTTPS 服务的注册与发现，也支持 RPC 服务的注册与发现，例如 Dubbo。Nacos 也出自阿里，可用于替代 Eureka、ZooKeeper、Consul。
+- **动态配置服务：** 类似 Spring Cloud Config + Bus、Apollo 等组件。提供后台管理界面，统一管理服务和应用配置；修改公共配置后，无需重启应用程序即可生效。
 
 ### 注册与发现的工作流程
 

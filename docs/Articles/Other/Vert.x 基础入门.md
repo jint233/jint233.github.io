@@ -163,7 +163,7 @@ Verticle 分为三类：
 - 工作 Verticle ，在工作线程池运行。一个实例不会同时在多于一个线程上执行；
 - 多线程工作 Verticle ，在工作线程池运行，是高阶特性，一个实例不会同时在多于一个线程上执行，但是实例自身可以开启多个线程。
 
-Verticle 最大的特色就是它的线程隔离性。在启动的时候， Verticle 就被分配给了创建和 start 方法调用的 _Event Loop_ 了。当调用一个使用 core API 的 handler 的方法的时候， Vert.x 保证这些 handler 将在同一个 _Event Loop_ 上执行的。
+Verticle 最大的特色就是它的线程隔离性。在启动的时候， Verticle 就被分配给了创建和 start 方法调用的 _Event Loop_ 了。当调用一个使用 core API 的 handler 的方法的时候， Vert.x 保证这些 handler 将在同一个 _Event Loop_ 上执行的。
 
 也就是说在 Verticle 实例的代码保证是在同一个 _Event Loop_ 执行。
 
@@ -345,7 +345,7 @@ brew install vert.x
 
 编写一个 js 脚本 my-verticle.js 如下：
 
-```javaScript
+```javascript
 var server = vertx.createHttpServer();
 server.requestHandler(function (request) {
  request.response().end("Hello world");

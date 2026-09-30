@@ -1,4 +1,4 @@
-# MySQL 故障诊断：一个 ALTER TALBE 执行了很久，你慌不慌？
+# MySQL 故障诊断：一个 ALTER TABLE 执行了很久，你慌不慌？
 
 ## 先了解下 MySQL 数据字典
 
@@ -103,10 +103,10 @@ mysql> desc sbtest.sbtest1;
 
 数据量 500W：
 
-```sql
-mysql> select count(\*) from  sbtest.sbtest1;
+```text
+mysql> select count(*) from  sbtest.sbtest1;
 +----------+
-| count(\*) |
+| count(*)  |
 +----------+
 |  5000000 |
 +----------+
@@ -121,11 +121,9 @@ mysql> alter table sbtest.sbtest1 add d char(20);
 
 重头戏来了，查看一下进度：
 
-```sql
-mysql> select * from performance_schema.events_stages_current\\G;
-****  ****  ****  ****  ****  ****  ***1. row**  ****  ****  ****  ****  ****  **** *
-```
-
+```text
+mysql> select * from performance_schema.events_stages_current\G
+*************************** 1. row ***************************
 THREAD_ID: 28
       EVENT_ID: 14
   END_EVENT_ID: NULL
@@ -136,16 +134,12 @@ THREAD_ID: 28
     TIMER_WAIT: 93305928947000
 WORK_COMPLETED: 118256
 WORK_ESTIMATED: 302958
-
-```sql
 NESTING_EVENT_ID: 13
 NESTING_EVENT_TYPE: STATEMENT
 1 row in set (0.00 sec)
 ......
-mysql> select * from performance_schema.events_stages_current\\G;
-****  ****  ****  ****  ****  ****  ***1. row**  ****  ****  ****  ****  ****  **** *
-```
-
+mysql> select * from performance_schema.events_stages_current\G
+*************************** 1. row ***************************
 THREAD_ID: 28
       EVENT_ID: 14
   END_EVENT_ID: NULL
@@ -156,8 +150,6 @@ THREAD_ID: 28
     TIMER_WAIT: 184226682328000
 WORK_COMPLETED: 230688
 WORK_ESTIMATED: 302958
-
-```plaintext
 NESTING_EVENT_ID: 13
 NESTING_EVENT_TYPE: STATEMENT
 1 row in set (0.01 sec)

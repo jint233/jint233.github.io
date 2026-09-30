@@ -81,7 +81,11 @@ Buffer Pool 的内存初始化，主要是 Buffer Chunks 的内存初始化，bu
 
 分配完了内存，`buf_chunk_init` 函数中，把这片内存划分为两个部分，前一部分是数据页控制体 (buf_block_t)，在阿里云 RDS MySQL 5.6 release 版本中，每个 buf_block_t 是 424 字节，一共有 innodb_buffer_pool_size/UNIV_PAGE_SIZE 个。后一部分是真正的数据页，按照 UNIV_PAGE_SIZE 分隔。假设 page 大小为 16KB，则数据页控制体占的内存：数据页约等于 1:38.6，也就是说如果 innodb_buffer_pool_size 被配置为 40G，则需要额外的 1G 多空间来存数据页的控制体。
 
-划分完空间后，遍历数据页控制体，设置 buf_block_t::frame 指针，指向真正的数据页，然后把这些数据页加入到 Free List 中即可。初始化完 Buffer Chunks 的内存，还需要初始化 BUF_BLOCK_POOL_WATCH 类型的数据页控制块，page hash 的结构体，zip hash 的结构体 (所有被压缩页的伙伴系统分配走的数据页面会加入到这个哈希表中)。注意这些内存是额外分配的，不包含在 Buffer Chunks 中。 除了 `buf_pool_init` 外，建议读者参考一下 `but_pool_free` 这个内存释放函数，加深对 Buffer Pool 相关内存的理解。
+划分完空间后，遍历数据页控制体，设置 buf_block_t::frame 指针，指向真正的数据页，然后把这些数据页加入到 Free List 中即可。
+
+初始化完 Buffer Chunks 的内存，还需要初始化 BUF_BLOCK_POOL_WATCH 类型的数据页控制块，page hash 的结构体，zip hash 的结构体 (所有被压缩页的伙伴系统分配走的数据页面会加入到这个哈希表中)。注意这些内存是额外分配的，不包含在 Buffer Chunks 中。
+
+除了 `buf_pool_init` 外，建议读者参考一下 `but_pool_free` 这个内存释放函数，加深对 Buffer Pool 相关内存的理解。
 
 ## Buf_page_get 函数解析
 
@@ -97,7 +101,9 @@ Buffer Pool 的内存初始化，主要是 Buffer Chunks 的内存初始化，bu
 
 **BUF_GET_IF_IN_POOL_OR_WATCH:** 只在 Buffer Pool 中查找这个数据页，如果在则判断是否要把它加入到 young list 中以及判断是否需要进行线性预读。如果不在则设置 watch。加锁方式与 BUF_GET 类似。这个是要是给 purge 线程用。
 
-**BUF_GET_POSSIBLY_FREED:** 这个 mode 与 BUF_GET 类似，只是允许相应的数据页在函数执行过程中被释放，主要用在估算 Btree 两个 slot 之前的数据行数。 接下来，我们简要分析一下这个函数的主要逻辑。
+**BUF_GET_POSSIBLY_FREED:** 这个 mode 与 BUF_GET 类似，只是允许相应的数据页在函数执行过程中被释放，主要用在估算 Btree 两个 slot 之前的数据行数。
+
+接下来，我们简要分析一下这个函数的主要逻辑。
 
 - 首先通过 `buf_pool_get` 函数依据 space_id 和 page_no 查找指定的数据页在那个 Buffer Pool Instance 里面。算法很简单 `instance_no = (space_id << 20 + space_id + page_no>> 6) % instance_num`，也就是说先通过 space_id 和 page_no 算出一个 fold value 然后按照 instance 的个数取余数即可。这里有个小细节，page_no 的第六位被砍掉，这是为了保证一个 extent 的数据能被缓存到同一个 Buffer Pool Instance 中，便于后面的预读操作。
   

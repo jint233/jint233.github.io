@@ -10,7 +10,19 @@ java.lang.Object
 
 下面是对应方法的含义。
 
-**clone 方法** 保护方法，实现对象的浅复制，只有实现了 Cloneable 接口才可以调用该方法，否则抛出 CloneNotSupportedException 异常，深拷贝也需要实现 Cloneable，同时其成员变量为引用类型的也需要实现 Cloneable，然后重写 clone 方法。**finalize 方法** 该方法和垃圾收集器有关系，判断一个对象是否可以被回收的最后一步就是判断是否重写了此方法。**equals 方法** 该方法使用频率非常高。一般 equals 和 == 是不一样的，但是在 Object 中两者是一样的。子类一般都要重写这个方法。**hashCode 方法**
+**clone 方法**
+
+保护方法，实现对象的浅复制，只有实现了 Cloneable 接口才可以调用该方法，否则抛出 CloneNotSupportedException 异常，深拷贝也需要实现 Cloneable，同时其成员变量为引用类型的也需要实现 Cloneable，然后重写 clone 方法。
+
+**finalize 方法**
+
+该方法和垃圾收集器有关系，判断一个对象是否可以被回收的最后一步就是判断是否重写了此方法。
+
+**equals 方法**
+
+该方法使用频率非常高。一般 equals 和 == 是不一样的，但是在 Object 中两者是一样的。子类一般都要重写这个方法。
+
+**hashCode 方法**
 
 该方法用于哈希查找，重写了 equals 方法一般都要重写 hashCode 方法，这个方法在一些具有哈希功能的 Collection 中用到。
 
@@ -19,7 +31,9 @@ java.lang.Object
 - JDK 1.6、1.7 默认是返回随机数；
 - JDK 1.8 默认是通过和当前线程有关的一个随机数 + 三个确定值，运用 Marsaglia’s xorshift scheme 随机数算法得到的一个随机数。
 
-**wait 方法** 配合 synchronized 使用，wait 方法就是使当前线程等待该对象的锁，当前线程必须是该对象的拥有者，也就是具有该对象的锁。wait () 方法一直等待，直到获得锁或者被中断。wait (long timeout) 设定一个超时间隔，如果在规定时间内没有获得锁就返回。
+**wait 方法**
+
+配合 synchronized 使用，wait 方法就是使当前线程等待该对象的锁，当前线程必须是该对象的拥有者，也就是具有该对象的锁。wait () 方法一直等待，直到获得锁或者被中断。wait (long timeout) 设定一个超时间隔，如果在规定时间内没有获得锁就返回。
 
 调用该方法后当前线程进入睡眠状态，直到以下事件发生。
 
@@ -28,13 +42,29 @@ java.lang.Object
 3. 其他线程调用了 interrupt 中断该线程；
 4. 时间间隔到了。
 
-此时该线程就可以被调度了，如果是被中断的话就抛出一个 InterruptedException 异常。**notify 方法** 配合 synchronized 使用，该方法唤醒在该对象上 **等待队列** 中的某个线程（同步队列中的线程是给抢占 CPU 的线程，等待队列中的线程指的是等待唤醒的线程）。**notifyAll 方法** 配合 synchronized 使用，该方法唤醒在该对象上等待队列中的所有线程。**总结** 只要把上面几个方法熟悉就可以了，toString 和 getClass 方法可以不用去讨论它们。该题目考察的是对 Object 的熟悉程度，平时用的很多方法并没看其定义但是也在用，比如说：wait () 方法，equals () 方法等。
+此时该线程就可以被调度了，如果是被中断的话就抛出一个 InterruptedException 异常。
 
-```shell
+**notify 方法**
+
+配合 synchronized 使用，该方法唤醒在该对象上 **等待队列** 中的某个线程（同步队列中的线程是给抢占 CPU 的线程，等待队列中的线程指的是等待唤醒的线程）。
+
+**notifyAll 方法**
+
+配合 synchronized 使用，该方法唤醒在该对象上等待队列中的所有线程。
+
+**总结**
+
+只要把上面几个方法熟悉就可以了，toString 和 getClass 方法可以不用去讨论它们。该题目考察的是对 Object 的熟悉程度，平时用的很多方法并没看其定义但是也在用，比如说：wait () 方法，equals () 方法等。
+
+```text
 Class Object is the root of the class hierarchy.Every class has Object as a superclass. All objects, including arrays, implement the methods of this class.
 ```
 
-大致意思：Object 是所有类的根，是所有类的父类，所有对象包括数组都实现了 Object 的方法。**面试扩散** 上面提到了 wait、notify、notifyAll 方法，或许面试官会问你为什么 sleep 方法不属于 Object 的方法呢？因为提到 wait 等方法，所以最好把 synchronized 都说清楚，把线程状态也都说清楚，尝试让面试官跟着你的节奏走。
+大致意思：Object 是所有类的根，是所有类的父类，所有对象包括数组都实现了 Object 的方法。
+
+**面试扩散**
+
+上面提到了 wait、notify、notifyAll 方法，或许面试官会问你为什么 sleep 方法不属于 Object 的方法呢？因为提到 wait 等方法，所以最好把 synchronized 都说清楚，把线程状态也都说清楚，尝试让面试官跟着你的节奏走。
 
 ### 2. Java 创建对象有几种方式？
 
@@ -57,7 +87,11 @@ Class Object is the root of the class hierarchy.Every class has Object as a supe
 
 4. 使用反序列化创建对象，调用 ObjectInputStream 类的 readObject () 方法。
 
-我们反序列化一个对象，JVM 会给我们创建一个单独的对象。JVM 创建对象并不会调用任何构造函数。一个对象实现了 Serializable 接口，就可以把对象写入到文件中，并通过读取文件来创建对象。**总结** 创建对象的方式关键字：new、反射、clone 拷贝、反序列化。
+我们反序列化一个对象，JVM 会给我们创建一个单独的对象。JVM 创建对象并不会调用任何构造函数。一个对象实现了 Serializable 接口，就可以把对象写入到文件中，并通过读取文件来创建对象。
+
+**总结**
+
+创建对象的方式关键字：new、反射、clone 拷贝、反序列化。
 
 ### 3. 获取一个类对象的方式有哪些？
 
@@ -100,8 +134,12 @@ Class<?> clazz = Class.forName("com.tian.User");
 #### LinkedList
 
 - **优点** ：LinkedList 基于链表的数据结构，地址是任意的，所以在开辟内存空间的时候不需要等一个连续的地址。对于新增和删除操作，LinkedList 比较占优势。LinkedList 适用于要头尾操作或插入指定位置的场景。
-- **缺点** ：因为 LinkedList 要移动指针，所以查询操作性能比较低。**适用场景分析** - 当需要对数据进行对随机访问的时候，选用 ArrayList。
-  - 当需要对数据进行多次增加删除修改时，采用 LinkedList。
+- **缺点** ：因为 LinkedList 要移动指针，所以查询操作性能比较低。
+
+**适用场景分析**
+
+- 当需要对数据进行对随机访问的时候，选用 ArrayList。
+- 当需要对数据进行多次增加删除修改时，采用 LinkedList。
 
 如果容量固定，并且只会添加到尾部，不会引起扩容，优先采用 ArrayList。
 
@@ -343,7 +381,13 @@ public class MyTest {
 
 如果你在 Java 代码里创建一个线程，相应 JVM 虚拟机中就创建与之对应的程序计数器、Java 虚拟机栈、本地方法栈，同时方法区和堆是在虚拟机启动就已经有了。
 
-**程序计数器** 可以简单理解为：程序计数器是记录执行到你代码的的第几行了，每个线程各自对应自己的程序计数器。**Java 虚拟机栈** 虚拟机会为每个线程分配一个虚拟机栈，每个虚拟机栈中都有若干个栈帧，每个栈帧中存储了局部变量表、操作数栈、动态链接、返回地址等。一个栈帧就对应 Java 代码中的一个方法，当线程执行到一个方法时，就代表这个方法对应的栈帧已经进入虚拟机栈并且处于栈顶的位置，每一个 Java 方法从被调用到执行结束，就对应了一个栈帧从入栈到出栈的过程。一个线程的生命周期和与之对应的 Java 虚拟机栈的生命周期相同。
+**程序计数器**
+
+可以简单理解为：程序计数器是记录执行到你代码的的第几行了，每个线程各自对应自己的程序计数器。
+
+**Java 虚拟机栈**
+
+虚拟机会为每个线程分配一个虚拟机栈，每个虚拟机栈中都有若干个栈帧，每个栈帧中存储了局部变量表、操作数栈、动态链接、返回地址等。一个栈帧就对应 Java 代码中的一个方法，当线程执行到一个方法时，就代表这个方法对应的栈帧已经进入虚拟机栈并且处于栈顶的位置，每一个 Java 方法从被调用到执行结束，就对应了一个栈帧从入栈到出栈的过程。一个线程的生命周期和与之对应的 Java 虚拟机栈的生命周期相同。
 
 > 一个线程进来就创建虚拟机栈，该线程调用的方法就是栈帧，进入方法，栈帧就入栈（虚拟机栈），出方法就是出虚拟机栈。可以通过下面两张图进行理解：
 
@@ -351,7 +395,13 @@ public class MyTest {
 
 ![图解](../assets/面试最常被问的 Java 后端题-18.jpg)
 
-**本地方法栈** 和 Java 虚拟机栈类似，Java 虚拟机栈针对的是 Java 方法，而本地方法栈针对的 native 修饰的方法。**堆** JVM 几乎所有的对象的内存分配都在堆里。由于对象是有生命周期的，所以把堆又分成了新生代和老年代。
+**本地方法栈**
+
+和 Java 虚拟机栈类似，Java 虚拟机栈针对的是 Java 方法，而本地方法栈针对的 native 修饰的方法。
+
+**堆**
+
+JVM 几乎所有的对象的内存分配都在堆里。由于对象是有生命周期的，所以把堆又分成了新生代和老年代。
 
 新生代和老年代大小比例 = 1:2（默认）。新生代又分为 Eden、S0、S1 区域，Ede:S0:S1=8:1:1。
 
@@ -359,7 +409,9 @@ public class MyTest {
 
 ![图解](../assets/面试最常被问的 Java 后端题-19.jpg)
 
-**方法区** 先按照图中的关键字回答。但是方法区由于 JDK 版本有所变动。
+**方法区**
+
+先按照图中的关键字回答。但是方法区由于 JDK 版本有所变动。
 
 ![图解](../assets/面试最常被问的 Java 后端题-20.jpg)
 
@@ -489,12 +541,14 @@ G1=Garbage-First 收集器
 
 ![图解](../assets/面试最常被问的 Java 后端题-33.jpg)
 
-- **垃圾收集器整合** - G1 是新生代和老年代一起搞，不和别人合伙。
+- **垃圾收集器整合**
+  - G1 是新生代和老年代一起搞，不和别人合伙。
   - Serial：CMS 或者 Serial Old
   - ParNew：CMS 或者 Serial Old
   - Parallel Scavenge：Parallel Old 或者 Serial Old
   
-- **分代收集器对应** - 新生代收集器：Serial、ParNew、Parallel Scavenge
+- **分代收集器对应**
+  - 新生代收集器：Serial、ParNew、Parallel Scavenge
   - 老年代收集器：Serial Old、Parallel Old、CMS
   - 整堆收集器：G1
 
@@ -532,7 +586,9 @@ G1=Garbage-First 收集器
 - 第十层：serialize 层，数据序列化层。
   这是个很坑爹的面试题，但是很多面试官又喜欢问，你真的要背么？你能背那还是不错的，我建议不要背，你就想想 Dubbo 服务调用过程中应该会涉及到哪些技术，把这些技术串起来就 OK 了。
 
-**面试扩散** 如果让你设计一个 RPC 框架，你会怎么做？其实你就把上面这个工作原理中涉及的到技术点总结一下就行了。
+**面试扩散**
+
+如果让你设计一个 RPC 框架，你会怎么做？其实你就把上面这个工作原理中涉及的到技术点总结一下就行了。
 
 ### 3. Dubbo 支持哪些协议？
 
@@ -570,7 +626,29 @@ G1=Garbage-First 收集器
 
 ### 7. Dubbo 容错策略
 
-**failover cluster 模式** provider 宕机重试以后，请求会分到其他的 provider 上，默认两次，可以手动设置重试次数，建议把写操作重试次数设置成 0。**failback 模式** 失败自动恢复会在调用失败后，返回一个空结果给服务消费者。并通过定时任务对失败的调用进行重试，适合执行消息通知等操作。**failfast cluster 模式** 快速失败只会进行一次调用，失败后立即抛出异常。适用于幂等操作、写操作，类似于 failover cluster 模式中重试次数设置为 0 的情况。**failsafe cluster 模式** 失败安全是指，当调用过程中出现异常时，仅会打印异常，而不会抛出异常。适用于写入审计日志等操作。**forking cluster 模式** 并行调用多个服务器，只要一个成功即返回。通常用于实时性要求较高的读操作，但需要浪费更多服务资源。可通过 `forks="2"` 来设置最大并行数。**broadcacst cluster 模式** 广播调用所有提供者，逐个调用，任意一台报错则报错。通常用于通知所有提供者更新缓存或日志等本地资源信息。
+**failover cluster 模式**
+
+provider 宕机重试以后，请求会分到其他的 provider 上，默认两次，可以手动设置重试次数，建议把写操作重试次数设置成 0。
+
+**failback 模式**
+
+失败自动恢复会在调用失败后，返回一个空结果给服务消费者。并通过定时任务对失败的调用进行重试，适合执行消息通知等操作。
+
+**failfast cluster 模式**
+
+快速失败只会进行一次调用，失败后立即抛出异常。适用于幂等操作、写操作，类似于 failover cluster 模式中重试次数设置为 0 的情况。
+
+**failsafe cluster 模式**
+
+失败安全是指，当调用过程中出现异常时，仅会打印异常，而不会抛出异常。适用于写入审计日志等操作。
+
+**forking cluster 模式**
+
+并行调用多个服务器，只要一个成功即返回。通常用于实时性要求较高的读操作，但需要浪费更多服务资源。可通过 `forks="2"` 来设置最大并行数。
+
+**broadcast cluster 模式**
+
+广播调用所有提供者，逐个调用，任意一台报错则报错。通常用于通知所有提供者更新缓存或日志等本地资源信息。
 
 ### 8. Dubbo 动态代理策略有哪些？
 
@@ -579,7 +657,23 @@ G1=Garbage-First 收集器
 ### 9. 说说 Dubbo 与 Spring Cloud 的区别？
 
 这是很多面试官喜欢问的问题，本人认为其实他们没什么关联之处，但是硬是要问区别，那就说说吧。
-回答的时候主要围绕着四个关键点来说：通信方式、注册中心、监控、断路器，其余像 Spring 分布式配置、服务网关肯定得知道。**通信方式** Dubbo 使用的是 RPC 通信；Spring Cloud 使用的是 HTTP RestFul 方式。**注册中心** Dubbo 使用 ZooKeeper（官方推荐），还有 Redis、Multicast、Simple 注册中心，但不推荐。Spring Cloud 使用的是 Spring Cloud Netflix Eureka。**监控** Dubbo 使用的是 Dubbo-monitor；Spring Cloud 使用的是 Spring Boot admin。**断路器** Dubbo 在断路器这方面还不完善，Spring Cloud 使用的是 Spring Cloud Netflix Hystrix。分布式配置、网关服务、服务跟踪、消息总线、批量任务等。Dubbo 目前可以说还是空白，而 Spring Cloud 都有相应的组件来支撑。
+回答的时候主要围绕着四个关键点来说：通信方式、注册中心、监控、断路器，其余像 Spring 分布式配置、服务网关肯定得知道。
+
+**通信方式**
+
+Dubbo 使用的是 RPC 通信；Spring Cloud 使用的是 HTTP RestFul 方式。
+
+**注册中心**
+
+Dubbo 使用 ZooKeeper（官方推荐），还有 Redis、Multicast、Simple 注册中心，但不推荐。Spring Cloud 使用的是 Spring Cloud Netflix Eureka。
+
+**监控**
+
+Dubbo 使用的是 Dubbo-monitor；Spring Cloud 使用的是 Spring Boot admin。
+
+**断路器**
+
+Dubbo 在断路器这方面还不完善，Spring Cloud 使用的是 Spring Cloud Netflix Hystrix。分布式配置、网关服务、服务跟踪、消息总线、批量任务等。Dubbo 目前可以说还是空白，而 Spring Cloud 都有相应的组件来支撑。
 
 ### 10. 说说 TCP 与 UDP 的区别，以及各自的优缺点
 
@@ -603,7 +697,15 @@ G1=Garbage-First 收集器
 
 ### 13. 说一下 HTTP 的长连接与短连接的区别
 
-HTTP 协议的长连接和短连接，实质上是 TCP 协议的长连接和短连接。**短连接** 在 HTTP/1.0 中默认使用短链接，也就是说，浏览器和服务器每进行一次 HTTP 操作，就建立一次连接，但任务结束就中断连接。如果客户端访问的某个 HTML 或其他类型的 Web 资源，如 JavaScript 文件、图像文件、CSS 文件等。当浏览器每遇到这样一个 Web 资源，就会建立一个 HTTP 会话。**长连接** 从 HTTP/1.1 起，默认使用长连接，用以保持连接特性。在使用长连接的情况下，当一个网页打开完成后，客户端和服务器之间用于传输 HTTP 数据的 TCP 连接不会关闭。如果客户端再次访问这个服务器上的网页，会继续使用这一条已经建立的连接。Keep-Alive 不会永久保持连接，它有一个保持时间，可以在不同的服务器软件（如 Apache）中设定这个时间。
+HTTP 协议的长连接和短连接，实质上是 TCP 协议的长连接和短连接。
+
+**短连接**
+
+在 HTTP/1.0 中默认使用短链接，也就是说，浏览器和服务器每进行一次 HTTP 操作，就建立一次连接，但任务结束就中断连接。如果客户端访问的某个 HTML 或其他类型的 Web 资源，如 JavaScript 文件、图像文件、CSS 文件等。当浏览器每遇到这样一个 Web 资源，就会建立一个 HTTP 会话。
+
+**长连接**
+
+从 HTTP/1.1 起，默认使用长连接，用以保持连接特性。在使用长连接的情况下，当一个网页打开完成后，客户端和服务器之间用于传输 HTTP 数据的 TCP 连接不会关闭。如果客户端再次访问这个服务器上的网页，会继续使用这一条已经建立的连接。Keep-Alive 不会永久保持连接，它有一个保持时间，可以在不同的服务器软件（如 Apache）中设定这个时间。
 
 ## 四、MyBatis 篇
 
@@ -611,14 +713,20 @@ HTTP 协议的长连接和短连接，实质上是 TCP 协议的长连接和短�
 
 ![图解](../assets/面试最常被问的 Java 后端题-41.jpg)
 
-**一级缓存** 在应用运行过程中，我们有可能在一次数据库会话中，执行多次查询条件完全相同的 SQL，MyBatis 提供了一级缓存的方案优化这部分场景，如果是相同的 SQL 语句，会优先命中一级缓存，避免直接对数据库进行查询，提高性能。
+**一级缓存**
+
+在应用运行过程中，我们有可能在一次数据库会话中，执行多次查询条件完全相同的 SQL，MyBatis 提供了一级缓存的方案优化这部分场景，如果是相同的 SQL 语句，会优先命中一级缓存，避免直接对数据库进行查询，提高性能。
 每个 SqlSession 中持有了 Executor，每个 Executor 中有一个 LocalCache。当用户发起查询时，MyBatis 根据当前执行的语句生成 MappedStatement，在 Local Cache 进行查询，如果缓存命中的话，直接返回结果给用户，如果缓存没有命中的话，查询数据库，结果写入 Local Cache，最后返回结果给用户。具体实现类的类关系图如下图所示：
 
 ![图解](../assets/面试最常被问的 Java 后端题-42.jpg)
 
 1. MyBatis 一级缓存的生命周期和 SqlSession 一致。
 2. MyBatis 一级缓存内部设计简单，只是一个没有容量限定的 HashMap，在缓存的功能性上有所欠缺。
-3. MyBatis 的一级缓存最大范围是 SqlSession 内部，有多个 SqlSession 或者分布式的环境下，数据库写操作会引起脏数据，建议设定缓存级别为 Statement。**二级缓存** 在上文中提到的一级缓存中，其最大的共享范围就是一个 SqlSession 内部，如果多个 SqlSession 之间需要共享缓存，则需要使用到二级缓存。开启二级缓存后，会使用 CachingExecutor 装饰 Executor，进入一级缓存的查询流程前，先在 CachingExecutor 进行二级缓存的查询，具体的工作流程如下所示。
+3. MyBatis 的一级缓存最大范围是 SqlSession 内部，有多个 SqlSession 或者分布式的环境下，数据库写操作会引起脏数据，建议设定缓存级别为 Statement。
+
+**二级缓存**
+
+在上文中提到的一级缓存中，其最大的共享范围就是一个 SqlSession 内部，如果多个 SqlSession 之间需要共享缓存，则需要使用到二级缓存。开启二级缓存后，会使用 CachingExecutor 装饰 Executor，进入一级缓存的查询流程前，先在 CachingExecutor 进行二级缓存的查询，具体的工作流程如下所示。
 
 ![图解](../assets/面试最常被问的 Java 后端题-43.jpg)
 
@@ -684,11 +792,11 @@ HTTP 协议的长连接和短连接，实质上是 TCP 协议的长连接和短�
 4. 处理和显示结果。
 5. 释放资源。
 
-### 3. 说一下 MyBatis 中使用的 ## 和 $ 有什么区别
+### 3. 说一下 MyBatis 中使用的 `#{}` 和 `${}` 有什么区别
 
 动态 SQL 是 MyBatis 的主要特性之一，在 mapper 中定义的参数传到 xml 中之后，在查询之前 MyBatis 会对其进行动态解析。
-MyBatis 为我们提供了两种支持动态 SQL 的语法：`##{}` 以及 `${}`。
-`##{}` 是预编译处理，`${}` 是字符替换。在使用 ##{} 时，MyBatis 会将 SQL 中的 `##{}` 替换成 `?`，配合 PreparedStatement 的 set 方法赋值，这样可以有效的防止 SQL 注入，保证程序的运行安全。**建议能不要用就不要用，“常在河边走哪能不湿鞋”**。
+MyBatis 为我们提供了两种支持动态 SQL 的语法：`#{}` 以及 `${}`。
+`#{}` 是预编译处理，`${}` 是字符替换。在使用 `#{}` 时，MyBatis 会将 SQL 中的 `#{}` 替换成 `?`，配合 PreparedStatement 的 set 方法赋值，这样可以有效的防止 SQL 注入，保证程序的运行安全。**建议能不要用就不要用，“常在河边走哪能不湿鞋”**。
 
 ### 4. MyBatis 中比如 UserMapper.java 是接口，为什么没有实现类还能调用？
 
@@ -749,7 +857,11 @@ int (11) 中的 11，不影响字段存储的范围，只影响展示效果。
 
 ### 5. 为什么 SELECT COUNT (\*) FROM table 在 InnoDB 比 MyISAM 慢？
 
-对于 SELECT COUNT (\*) FROM table 语句，在没有 WHERE 条件的情况下，InnoDB 比 MyISAM 可能会慢很多，尤其在大表的情况下。因为，InnoDB 是去实时统计结果，会 **全表扫描** ；而 MyISAM 内部维持了一个计数器，预存了结果，所以直接返回即可。**面试扩散** 此题还有另外一种问法：`SELECT COUNT(*) FROM table` 在使用存储引擎 InnoDB 和 MyISAM，谁更快，为什么？
+对于 SELECT COUNT (\*) FROM table 语句，在没有 WHERE 条件的情况下，InnoDB 比 MyISAM 可能会慢很多，尤其在大表的情况下。因为，InnoDB 是去实时统计结果，会 **全表扫描** ；而 MyISAM 内部维持了一个计数器，预存了结果，所以直接返回即可。
+
+**面试扩散**
+
+此题还有另外一种问法：`SELECT COUNT(*) FROM table` 在使用存储引擎 InnoDB 和 MyISAM，谁更快，为什么？
 
 ### 6. 说说数据库的三范式和反模式
 
@@ -917,7 +1029,7 @@ MySQL 中有共享锁和排它锁，也就是读锁和写锁。
 ### 4. RabbitMQ 中什么是死信队列？
 
 DLX=Dead-Letter-Exchange。利用 DLX，当消息在一个队列中变成死信（dead message）之后，它能被重新 publish 到另一个 Exchange，这个 Exchange 就是 DLX。
-从字面上就看得出，死信就是无法被消费的消息。producer 将消息传给 broker 或者 queue 中，consumer 从 queue 取出消息进行消费。但是在某些特殊情况下会导致 queue 中部分消息无法被 consumer 消费，这样一直没有被消费的消息就变成了私信，既然有私信了，相应也有了死信队列。
+从字面上就看得出，死信就是无法被消费的消息。producer 将消息传给 broker 或者 queue 中，consumer 从 queue 取出消息进行消费。但是在某些特殊情况下会导致 queue 中部分消息无法被 consumer 消费，这样一直没有被消费的消息就变成了死信，既然有死信了，相应也有了死信队列。
 消息变成死信一般有以下几种情况：
 
 - 消息被拒绝（basic.reject/basic.nack）并且 requeue=false。
@@ -926,7 +1038,7 @@ DLX=Dead-Letter-Exchange。利用 DLX，当消息在一个队列中变成死信�
 
 ### 5. 如何处理死信队列？
 
-关于死信的出现既然不可避免，那么就需要从实际业务场景去考虑这个问题。对这些私信怎么处理，常见的处理办法有以下几种：
+关于死信的出现既然不可避免，那么就需要从实际业务场景去考虑这个问题。对这些死信怎么处理，常见的处理办法有以下几种：
 
 - 简单粗暴的丢弃，这是针对那些不是很重要的消息，可以有选择地丢弃；
 - 把死信记录在数据里，然后针对业务进行分析怎么处理这些死信；
@@ -940,9 +1052,23 @@ DLX=Dead-Letter-Exchange。利用 DLX，当消息在一个队列中变成死信�
 
 总结为：生产者搞丢数据、RabbitMQ 搞丢数据、消费者搞丢数据。
 
-**生产者搞丢数据**  **事务功能机制** 使用 RabbitMQ 的事务功能，就是生产者发送数据之前开启 RabbitMQ 事务 channel.txSelect，然后发送消息，如果消息没有成功被 RabbitMQ 接收到，那么生产者会收到异常报错，此时就可以回滚事务 channel.txRollback，然后重试发送消息；如果收到了消息，那么可以提交事务 channel.txCommit。但是这种方案是存在问题的，即 RabbitMQ 事务机制（同步）一搞，基本上 **吞吐量会下来**，因为 **太耗性能**。**confirm 机制** 在生产者那里设置开启 confirm 模式后，你每次写的消息都会分配一个唯一的 ID。如果写入 RabbitMQ 成功后会回传一个 ack 消息，告诉你这个消息已经到达 RabbitMQ 了；如果没收到你的消息或者失败了，则会回调你的一个 nack，告诉你这个消息 RabbitMQ 接受失败，然后你就可以继续重试发送，而且你可以结合这个机制在内存里维护一个 ID 的状态。如果超过一定时间没收到回调，那么就可以再次发送消息。所以一般在生产者这方避免数据丢失，都是使用 confirm 机制。**事务机制 PK confirm 模式** 事务机制是同步的，提交事务后会阻塞在那里等待。confirm 是异步的，发送这个消息后就可以发送下一个消息了。消息被 RabbitMQ 接收之后会异步回调一个通知，告知你这个消息已接收到了。
+**生产者搞丢数据**
 
-**RabbitMQ 搞丢数据** RabbitMQ 接收到消息，默认是放在内存里，如果系统挂了或者重启，那对应的消息就会丢失。所以选择开启持久化，把消息写入磁盘中，这样就算系统挂了或者重启都不会丢失消息。
+**事务功能机制**
+
+使用 RabbitMQ 的事务功能，就是生产者发送数据之前开启 RabbitMQ 事务 channel.txSelect，然后发送消息，如果消息没有成功被 RabbitMQ 接收到，那么生产者会收到异常报错，此时就可以回滚事务 channel.txRollback，然后重试发送消息；如果收到了消息，那么可以提交事务 channel.txCommit。但是这种方案是存在问题的，即 RabbitMQ 事务机制（同步）一搞，基本上 **吞吐量会下来**，因为 **太耗性能**。
+
+**confirm 机制**
+
+在生产者那里设置开启 confirm 模式后，你每次写的消息都会分配一个唯一的 ID。如果写入 RabbitMQ 成功后会回传一个 ack 消息，告诉你这个消息已经到达 RabbitMQ 了；如果没收到你的消息或者失败了，则会回调你的一个 nack，告诉你这个消息 RabbitMQ 接受失败，然后你就可以继续重试发送，而且你可以结合这个机制在内存里维护一个 ID 的状态。如果超过一定时间没收到回调，那么就可以再次发送消息。所以一般在生产者这方避免数据丢失，都是使用 confirm 机制。
+
+**事务机制 PK confirm 模式**
+
+事务机制是同步的，提交事务后会阻塞在那里等待。confirm 是异步的，发送这个消息后就可以发送下一个消息了。消息被 RabbitMQ 接收之后会异步回调一个通知，告知你这个消息已接收到了。
+
+**RabbitMQ 搞丢数据**
+
+RabbitMQ 接收到消息，默认是放在内存里，如果系统挂了或者重启，那对应的消息就会丢失。所以选择开启持久化，把消息写入磁盘中，这样就算系统挂了或者重启都不会丢失消息。
   持久化的两个步骤：
 
   1. 创建 queue 的时候将其设置为持久化，这样就可以保证 RabbitMQ 持久化 queue 的元数据，但是它不会持久化 queue 里的数据。
@@ -950,22 +1076,32 @@ DLX=Dead-Letter-Exchange。利用 DLX，当消息在一个队列中变成死信�
      上面两个持久化必须同时设置才行。这个 RabbitMQ 就算挂了，再次重启的时候也会从磁盘上重启恢复 queue 和 queue 里的数据。
      持久化和 confirm 模式一起使用，就算在消息持久化之前，RabbitMQ 挂了、数据丢了、生产者收不到 ack 的通知时，咱们也可以选择重新发送数据。
 
-**消费端搞丢消息数据** 消费端代码中可能有 bug，异常没有处理导致消费失败，或者系统重启、挂了等，那么 RabbitMQ 认为咱们已经消费了，所以对应消息数据就会丢失了。
+**消费端搞丢消息数据**
+
+消费端代码中可能有 bug，异常没有处理导致消费失败，或者系统重启、挂了等，那么 RabbitMQ 认为咱们已经消费了，所以对应消息数据就会丢失了。
    这时候我们就得使用 RabbitMQ 的 ack 机制。得把自动 ack 关闭，有个 api 直接调用，然后在自己代码里，确保消费者真的成功消费完成后，再进行一个手动 ack。
 
-**总结**![示意图](../assets/面试最常被问的 Java 后端题-61.jpg)
+**总结**
+
+![示意图](../assets/面试最常被问的 Java 后端题-61.jpg)
 
 ### 7. RabbitMQ 怎么高可用呢？
 
-**单机模式** 不属于高可用，单机模式就是启动单个 RabbitMQ 节点，一般用于本地开发或者测试环境。实际生产上，基本不会使用这种单节点模式。
+**单机模式**
 
-**普通集群模式** 不属于高可用，普通集群模式就是在多台机器上启动多个 RabbitMQ 实例，每个机器各自启动一个。你创建的 queue，只会放在一个 RabbitMQ 实例上，但是每个实例都是同步 queue 的元数据（元数据可以认为是 queue 的一些配置基本信息，通过元数据，可以找到 queue 所在的实例）。你消费的时候，如果连接到另外一个实例，那个实例就会从 queue 所在的实例上把数据拉取过来。
+不属于高可用，单机模式就是启动单个 RabbitMQ 节点，一般用于本地开发或者测试环境。实际生产上，基本不会使用这种单节点模式。
+
+**普通集群模式**
+
+不属于高可用，普通集群模式就是在多台机器上启动多个 RabbitMQ 实例，每个机器各自启动一个。你创建的 queue，只会放在一个 RabbitMQ 实例上，但是每个实例都是同步 queue 的元数据（元数据可以认为是 queue 的一些配置基本信息，通过元数据，可以找到 queue 所在的实例）。你消费的时候，如果连接到另外一个实例，那个实例就会从 queue 所在的实例上把数据拉取过来。
 
 ![图解](../assets/面试最常被问的 Java 后端题-62.jpg)
 
 上面这种普通集群方式确实很麻烦，给人的感觉不是很好，没有做到真正的分布式，就是一个普通的集群。因为这导致要么消费者每次都链接一个实例然后拉取消息数据，要么固定连接那个 queue 所在实例消费数据。前者有数据拉取的开销，后者导致实例性能瓶颈。如果消息放的 queue 挂了，会导致接下来其他实例无法从该实例上拉取消息数据。如果开启了消息持久化，让 RabbitMQ 本地持久化，消息不一定会丢。得等到这个实例重启恢复后，才可以继续从这个 queue 上拉取消息数据。所以上面这种模式，就没有所谓的高可用。这方案主要是提高吞吐量的，就是说让集群中多个节点来服务 queue 的读写操作。
 
-**镜像集群模式** 高可用模式，镜像集群模式才是所谓的 RabbitMQ 的高可用模式。跟普通集群模式不一样的是，**在镜像集群模式下，你所创建的 queue，无论元数据还是 queue 里的消息数据都会存在于多个实例上**。也就是说，每个 RabbitMQ 都有 queue 的一个完整镜像，包含 queue 的全部数据。每次写消息到 queue 的时候，都会自动把消息数据同步到多个实例的 queue 上。
+**镜像集群模式**
+
+高可用模式，镜像集群模式才是所谓的 RabbitMQ 的高可用模式。跟普通集群模式不一样的是，**在镜像集群模式下，你所创建的 queue，无论元数据还是 queue 里的消息数据都会存在于多个实例上**。也就是说，每个 RabbitMQ 都有 queue 的一个完整镜像，包含 queue 的全部数据。每次写消息到 queue 的时候，都会自动把消息数据同步到多个实例的 queue 上。
 
 ![图解](../assets/面试最常被问的 Java 后端题-63.jpg)
 
@@ -986,10 +1122,14 @@ DLX=Dead-Letter-Exchange。利用 DLX，当消息在一个队列中变成死信�
 
 应对上面的顺序消费问题有两种方案：
 
-**方案一** 拆分多个 queue，每个 queue 对应一个 consumer，就是多一些 queue 而已，确实也麻烦了些。
+**方案一**
+
+拆分多个 queue，每个 queue 对应一个 consumer，就是多一些 queue 而已，确实也麻烦了些。
 这种方式，有点类似于 Kafka 和 RocketMQ 中 Topic 的概念。比如说，原先一个 queue 叫 aaa，那么多个 queue，我们就可以搞成 aaa-01,aaa-02,aaa-03 等，相同前缀，不同后缀。
 
-**方法二** 就一个 queue，但对应一个 consumer，consumer 内部用内存做队列、做排队，然后分发给底层不同的 worker 来处理。这种方式就是将一个 queue 里的，相同 key 交给同一个 worker 来执行。因为 RabbitMQ 是可以单条消息来 ack，所以较为方便。
+**方法二**
+
+就一个 queue，但对应一个 consumer，consumer 内部用内存做队列、做排队，然后分发给底层不同的 worker 来处理。这种方式就是将一个 queue 里的，相同 key 交给同一个 worker 来执行。因为 RabbitMQ 是可以单条消息来 ack，所以较为方便。
 
 ![图解](../assets/面试最常被问的 Java 后端题-65.jpg)
 
@@ -1072,11 +1212,19 @@ Redis 内部使用 **文件事件处理器** file event handler，这个文件�
    3. 如果此时客户端准备好接收返回结果了，那么 Redis 中的 Socket01 会产生一个 AE_WRITABLE 事件，同样压入队列中。事件分派器找到相关联的命令回复处理器，由命令回复处理器对 Socket01 输入本次操作的一个结果（比如 ok）之后解除 Socket01 的 AE_WRITABLE 事件与命令回复处理器的关联。
    这样便完成了一次通信。不要怕这段文字，结合图看，一遍不行两遍，实在不行可以网上查点资料结合着看。一定要搞清楚，否则前面吹的牛逼就白费了。
 
-   4. 说一下 Redis 有什么优点和缺点 **优点** - 速度快：因为数据存在内存中，类似于 HashMap，HashMap 的优势就是查找和操作的时间复杂度都是 O (1)。
+   4. 说一下 Redis 有什么优点和缺点
+
+      **优点**
+
+      - 速度快：因为数据存在内存中，类似于 HashMap，HashMap 的优势就是查找和操作的时间复杂度都是 O (1)。
       - 支持丰富的数据结构：支持 String 、List、Set、Sorted Set、Hash 五种基础的数据结构。
       - 持久化存储：Redis 提供 RDB 和 AOF 两种数据的持久化存储方案，解决内存数据库最担心的 “万一 Redis 挂掉，数据会消失掉” 的问题。
       - 高可用：内置 Redis Sentinel，提供高可用方案，实现主从故障自动转移。内置 Redis Cluster，提供集群方案，实现基于槽的分片方案，从而支持更大的 Redis 规模。
-      - 丰富的特性：Key 过期、计数、分布式锁、消息队列等。**缺点** - 由于 Redis 是内存数据库，所以，单台机器存储的数据量，跟机器本身的内存大小有关。虽然 Redis 本身有 Key 过期策略，但还是需要提前预估和节约内存。如果内存增长过快，需要定期删除数据。
+      - 丰富的特性：Key 过期、计数、分布式锁、消息队列等。
+
+      **缺点**
+
+      - 由于 Redis 是内存数据库，所以，单台机器存储的数据量，跟机器本身的内存大小有关。虽然 Redis 本身有 Key 过期策略，但还是需要提前预估和节约内存。如果内存增长过快，需要定期删除数据。
       - 如果进行完整重同步，由于需要生成 RDB 文件，并进行传输。这会占用主机的 CPU，并会消耗现网的带宽。不过 Redis2.8 版本，已经有部分重同步的功能，但还是有可能有完整重同步的，比如：新上线的备机。
       - 修改配置文件，进行重启，将硬盘中的数据加载进内存，时间比较久。在这个过程中，Redis 不能提供服务。
 
@@ -1086,17 +1234,37 @@ Redis 内部使用 **文件事件处理器** file event handler，这个文件�
 
 ### 6. Redis 持久化方式有哪些？以及有什么区别？
 
-Redis 提供两种持久化机制 RDB 和 AOF 机制： **RDB 持久化方式** 指用数据集快照的方式半持久化模式记录 redis 数据库的所有键值对，在某个时间点将数据写入一个临时文件。持久化结束后，用这个临时文件替换上次持久化的文件，达到数据恢复。**优点：** - 只有一个文件 dump.rdb，方便持久化
-    - 容灾性好，一个文件可以保存到安全的磁盘
-    - 性能最大化，fork 子进程来完成写操作，让主进程继续处理命令，所以使 IO 最大化。使用单独子进程来进行持久化，主进程不会进行任何 IO 操作，保证了 Redis 的高性能
-    - 相对于数据集大时，比 AOF 的启动效率更 **缺点：** 数据安全性低。RDB 是间隔一段时间进行持久化，如果持久化期间 Redis 发生故障，会发生数据丢失。所以这种方式更适合数据要求不严谨的时候。
+Redis 提供两种持久化机制：RDB 和 AOF。
 
-**AOF=Append-only file 持久化方式** 是指所有的命令行记录，以 Redis 命令请求协议的格式完全持久化存储，保存为 AOF 文件。
+**RDB 持久化方式**
 
-**优点：** - 1. 数据安全。AOF 持久化可以配置 appendfsync 属性，有 always，每进行一次命令操作就记录到 AOF 文件中一次。
-    - 2. 通过 append 模式写文件。即使中途服务器宕机，也可以通过 redis-check-aof 工具解决数据一致性问题。
-    - 3. AOF 机制的 rewrite 模式。AOF 文件没被 rewrite 之前（文件过大时会对命令进行合并重写），可以删除其中的某些命令（比如误操作的 flushall）。**缺点：** 1. AOF 文件比 RDB 文件大，且恢复速度慢。
-    2. 数据集大的时候，比 RDB 启动效率低。
+指用数据集快照的方式半持久化模式记录 redis 数据库的所有键值对，在某个时间点将数据写入一个临时文件。持久化结束后，用这个临时文件替换上次持久化的文件，达到数据恢复。
+
+**优点**
+
+- 只有一个文件 dump.rdb，方便持久化。
+- 容灾性好，一个文件可以保存到安全的磁盘。
+- 性能最大化，fork 子进程来完成写操作，让主进程继续处理命令，所以使 IO 最大化。使用单独子进程来进行持久化，主进程不会进行任何 IO 操作，保证了 Redis 的高性能。
+- 数据集较大时，RDB 的启动效率比 AOF 更高。
+
+**缺点**
+
+数据安全性低。RDB 是间隔一段时间进行持久化，如果持久化期间 Redis 发生故障，会发生数据丢失。所以这种方式更适合数据要求不严谨的时候。
+
+**AOF=Append-only file 持久化方式**
+
+是指所有的命令行记录，以 Redis 命令请求协议的格式完全持久化存储，保存为 AOF 文件。
+
+**优点**
+
+1. 数据安全。AOF 持久化可以配置 appendfsync 属性，有 always，每进行一次命令操作就记录到 AOF 文件中一次。
+2. 通过 append 模式写文件。即使中途服务器宕机，也可以通过 redis-check-aof 工具解决数据一致性问题。
+3. AOF 机制的 rewrite 模式。AOF 文件没被 rewrite 之前（文件过大时会对命令进行合并重写），可以删除其中的某些命令（比如误操作的 flushall）。
+
+**缺点**
+
+1. AOF 文件比 RDB 文件大，且恢复速度慢。
+2. 数据集大的时候，比 RDB 启动效率低。
 
 ### 7. 持久化有两种，那应该怎么选择呢？
 
@@ -1151,7 +1319,12 @@ Codis 是一个代理中间件，当客户端向 Codis 发送指令时，Codis �
 
 ### 1.Spring Boot 提供了哪些核心功能？
 
-**独立运行 Spring 项目** Spring Boot 可以以 jar 包形式独立运行，运行一个 Spring Boot 项目只需要通过 java -jar xx.jar 来运行。**内嵌 Servlet 容器** Spring Boot 可以选择内嵌 Tomcat、Jetty 或者 Undertow，这样我们无须以 war 包形式部署项目。**提供 Starter 简化 Maven 配置** Spring 提供了一系列的 starter pom 来简化 Maven 的依赖加载，比如：spring-boot-starter-web。**自动配置 Spring Bean** Spring Boot 检测到特定类的存在，就会针对这个应用做一定的配置，进行自动配置 Bean，这样会极大地减少我们要使用的配置。当然，Spring Boot 只考虑大多数的开发场景，并不是所有的场景，若在实际开发中我们需要配置 Bean，而 Spring Boot 没有提供支持，则可以自定义自动配置进行解决。**准生产的应用监控** Spring Boot 提供基于 HTTP、JMX、SSH 对运行时的项目进行监控。**无代码生成和 XML 配置** Spring Boot 没有引入任何形式的代码生成，它使用的是 Spring 4.0 的条件 @Condition 注解以实现根据条件进行配置。同时使用了 Maven /Gradle 的依赖传递解析机制来实现 Spring 应用里面的自动配置。
+- **独立运行 Spring 项目**：Spring Boot 可以以 jar 包形式独立运行，运行一个 Spring Boot 项目只需要通过 java -jar xx.jar 来运行。
+- **内嵌 Servlet 容器**：Spring Boot 可以选择内嵌 Tomcat、Jetty 或者 Undertow，这样我们无须以 war 包形式部署项目。
+- **提供 Starter 简化 Maven 配置**：Spring 提供了一系列的 starter pom 来简化 Maven 的依赖加载，比如：spring-boot-starter-web。
+- **自动配置 Spring Bean**：Spring Boot 检测到特定类的存在，就会针对这个应用做一定的配置，进行自动配置 Bean，这样会极大地减少我们要使用的配置。当然，Spring Boot 只考虑大多数的开发场景，并不是所有的场景，若在实际开发中我们需要配置 Bean，而 Spring Boot 没有提供支持，则可以自定义自动配置进行解决。
+- **准生产的应用监控**：Spring Boot 提供基于 HTTP、JMX、SSH 对运行时的项目进行监控。
+- **无代码生成和 XML 配置**：Spring Boot 没有引入任何形式的代码生成，它使用的是 Spring 4.0 的条件 @Condition 注解以实现根据条件进行配置。同时使用了 Maven /Gradle 的依赖传递解析机制来实现 Spring 应用里面的自动配置。
 
 ### 2. Spring Boot 核心注解是什么？
 
@@ -1333,7 +1506,16 @@ Bean 的声明周期为 bean 的创建、应用、销毁。
 
 ### 8. Spring 中用到了哪些设计模式？
 
-**简单工厂模式** ：Spring 中的 BeanFactory 就是简单工厂模式的体现。根据传入一个唯一的标识来获得 Bean 对象，但是在传入参数后创建还是传入参数前创建，要根据具体情况来定。**工厂模式** ：Spring 中的 FactoryBean 就是典型的工厂方法模式，实现了 FactoryBean 接口的 bean 是一类叫做 factory 的 bean。其特点是，spring 在使用 getBean () 调用获得该 bean 时，会自动调用该 bean 的 getObject () 方法，所以返回的不是 factory 这个 bean，而是这个 bean.getOjbect () 方法的返回值。**单例模式** ：在 spring 中用到的单例模式有：`scope="singleton"`，注册式单例模式，bean 存放于 Map 中。bean name 当做 key，bean 当做 value。**原型模式** ：在 spring 中用到的原型模式有：`scope="prototype"`，每次获取的是通过克隆生成的新实例，对其进行修改时对原有实例对象不造成任何影响。**迭代器模式** ：在 Spring 中有个 CompositeIterator 实现了 Iterator，Iterable 接口和 Iterator 接口，这两个都是迭代相关的接口。可以这么认为，实现了 Iterable 接口，则表示某个对象是可被迭代的。Iterator 接口相当于是一个迭代器，实现了 Iterator 接口，等于具体定义了这个可被迭代的对象时如何进行迭代的。**代理模式** ：Spring 中经典的 AOP，就是使用动态代理实现的，分 JDK 和 CGlib 动态代理。**适配器模式** ：Spring 中的 AOP 中 AdvisorAdapter 类，它有三个实现：MethodBeforAdviceAdapter、AfterReturnningAdviceAdapter、ThrowsAdviceAdapter。Spring 会根据不同的 AOP 配置来使用对应的 Advice，与策略模式不同的是，一个方法可以同时拥有多个 Advice。Spring 存在很多以 Adapter 结尾的，大多数都是适配器模式。**观察者模式** ：Spring 中的 Event 和 Listener。spring 事件：ApplicationEvent，该抽象类继承了 EventObject 类，JDK 建议所有的事件都应该继承自 EventObject。spring 事件监听器：ApplicationListener，该接口继承了 EventListener 接口，JDK 建议所有的事件监听器都应该继承 EventListener。**模板模式** ：Spring 中的 org.springframework.jdbc.core.JdbcTemplate 就是非常经典的模板模式的应用，里面的 execute 方法，把整个算法步骤都定义好了。**责任链模式** ：DispatcherServlet 中的 doDispatch () 方法中获取与请求匹配的处理器 HandlerExecutionChain，this.getHandler () 方法的处理使用到了责任链模式。
+- **简单工厂模式**：Spring 中的 BeanFactory 就是简单工厂模式的体现。根据传入一个唯一的标识来获得 Bean 对象，但是在传入参数后创建还是传入参数前创建，要根据具体情况来定。
+- **工厂模式**：Spring 中的 FactoryBean 就是典型的工厂方法模式，实现了 FactoryBean 接口的 bean 是一类叫做 factory 的 bean。其特点是，spring 在使用 getBean () 调用获得该 bean 时，会自动调用该 bean 的 getObject () 方法，所以返回的不是 factory 这个 bean，而是这个 bean.getOjbect () 方法的返回值。
+- **单例模式**：在 spring 中用到的单例模式有：`scope="singleton"`，注册式单例模式，bean 存放于 Map 中。bean name 当做 key，bean 当做 value。
+- **原型模式**：在 spring 中用到的原型模式有：`scope="prototype"`，每次获取的是通过克隆生成的新实例，对其进行修改时对原有实例对象不造成任何影响。
+- **迭代器模式**：在 Spring 中有个 CompositeIterator 实现了 Iterator，Iterable 接口和 Iterator 接口，这两个都是迭代相关的接口。可以这么认为，实现了 Iterable 接口，则表示某个对象是可被迭代的。Iterator 接口相当于是一个迭代器，实现了 Iterator 接口，等于具体定义了这个可被迭代的对象时如何进行迭代的。
+- **代理模式**：Spring 中经典的 AOP，就是使用动态代理实现的，分 JDK 和 CGlib 动态代理。
+- **适配器模式**：Spring 中的 AOP 中 AdvisorAdapter 类，它有三个实现：MethodBeforAdviceAdapter、AfterReturnningAdviceAdapter、ThrowsAdviceAdapter。Spring 会根据不同的 AOP 配置来使用对应的 Advice，与策略模式不同的是，一个方法可以同时拥有多个 Advice。Spring 存在很多以 Adapter 结尾的，大多数都是适配器模式。
+- **观察者模式**：Spring 中的 Event 和 Listener。spring 事件：ApplicationEvent，该抽象类继承了 EventObject 类，JDK 建议所有的事件都应该继承自 EventObject。spring 事件监听器：ApplicationListener，该接口继承了 EventListener 接口，JDK 建议所有的事件监听器都应该继承 EventListener。
+- **模板模式**：Spring 中的 org.springframework.jdbc.core.JdbcTemplate 就是非常经典的模板模式的应用，里面的 execute 方法，把整个算法步骤都定义好了。
+- **责任链模式**：DispatcherServlet 中的 doDispatch () 方法中获取与请求匹配的处理器 HandlerExecutionChain，this.getHandler () 方法的处理使用到了责任链模式。
 
 ### 9. Spring 框架中的单例 Bean 是线程安全的么？
 
@@ -1351,7 +1533,7 @@ Spring 框架并没有对单例 Bean 进行任何多线程的封装处理。
 
 1. 首先 A 完成初始化第一步并将自己 **提前曝光** 出来（通过 ObjectFactory 将自己提前曝光），在初始化的时候，发现自己依赖对象 B，此时就会去尝试 get (B)，这个时候发现 B 还没有被创建出来；
 2. 然后 B 就走创建流程，在 B 初始化的时候，同样发现自己依赖 C，C 也没有被创建出来；
-3. 这个时候 C 又开始初始化进程，但是在初始化的过程中发现自己依赖 A，于是尝试 get (A)。这个时候由于 A 已经添加至缓存中（一般都是添加至三级缓存 singletonFactories），通过 ObjectFactory 提前曝光，所以可以通过 ObjectFactory##getObject () 方法来拿到 A 对象。C 拿到 A 对象后顺利完成初始化，然后将自己添加到一级缓存中；
+3. 这个时候 C 又开始初始化进程，但是在初始化的过程中发现自己依赖 A，于是尝试 get (A)。这个时候由于 A 已经添加至缓存中（一般都是添加至三级缓存 singletonFactories），通过 ObjectFactory 提前曝光，所以可以通过 `ObjectFactory#getObject()` 方法来拿到 A 对象。C 拿到 A 对象后顺利完成初始化，然后将自己添加到一级缓存中；
 4. 回到 B，B 也可以拿到 C 对象，完成初始化，A 可以顺利拿到 B 完成初始化。到这里整个链路就已经完成了初始化过程了。
 
 ## 十、ZooKeeper 篇
@@ -1363,8 +1545,37 @@ ZooKeeper 是一个开放源码的分布式协调服务，它是集群的管理�
 
 ### 2. ZooKeeper 有哪些应用场景？
 
-**统一命名服务** 命名服务是指通过指定的名字来获取资源或服务的地址，利用 ZooKeeper 创建一个全局的路径，即时唯一的路径。这个路径就可以作为一个名字，指向集群中机器或者提供服务的地址，又或者一个远程的对象等。**分布式服务** 相对来说，这个功能使用还是比较广泛的。ZooKeeper 实现的分布式锁的可靠性比 Redis 实现的高，当然相对性能来说，ZooKeeper 性能稍弱，但其实已经很牛了。**配置管理** Spring Cloud Config ZooKeeper 就是基于 ZooKeeper 来实现的，提供配置中心的服务。**注册与发现** 是否有新的机器加入或者是有机器退出（挂了）。所有机器约定在父目录下创建临时节点，然后监听父节点下的子节点变化。一旦有机器挂机，该机器与 ZooKeeper 的链接断开，其所创建的临时目录节点也被删除，所有其他机器都收到对应的通知：某个结点被删除了。Dubbo 就是典型应用案例。**Master 选举** 基于 ZooKeeper 实现分布式协调，从而实现主从的选举。比如：Kafka、Elastic-job 等中间件都有使用到。**队列管理** ZooKeeper 有两种类型的队列：
-  同步队列：当一个队列的成员都聚齐时，这个队列才可用，否则一直等待。在约定的目录下创建临时目录节点，再监听节点数目是否是我们要求的数据。队列按照先进先出 FIFO 方式进行入队和出队操作。和分布式锁服务中心的控制时序的场景基本原理相同，入列和出列都有编号。创建 PERSISTENT_SEQUENTIAL 节点，创建成功时 Watcher 通知等待的队列，队列删除序列号最小的节点以消费。此场景下，znode 用于消息存储，znode 存储的数据就是消息队列中的消息内容，SEQUENTIAL 序列号就是消息的编号，按序取出即可。由于创建的节点是持久化的，所以不必担心队列消息丢失的问题。**分布式锁** 有了 ZooKeeper 的一致性文件系统，锁的问题就变得简单多了。锁服务可以分为保持独占和控制时序。
+**统一命名服务**
+
+命名服务是指通过指定的名字来获取资源或服务的地址，利用 ZooKeeper 创建一个全局的路径，即是唯一的路径。这个路径就可以作为一个名字，指向集群中机器或者提供服务的地址，又或者一个远程的对象等。
+
+**分布式服务**
+
+相对来说，这个功能使用还是比较广泛的。ZooKeeper 实现的分布式锁的可靠性比 Redis 实现的高，当然相对性能来说，ZooKeeper 性能稍弱，但其实已经很牛了。
+
+**配置管理**
+
+Spring Cloud Config ZooKeeper 就是基于 ZooKeeper 来实现的，提供配置中心的服务。
+
+**注册与发现**
+
+是否有新的机器加入或者是有机器退出（挂了）。所有机器约定在父目录下创建临时节点，然后监听父节点下的子节点变化。一旦有机器挂机，该机器与 ZooKeeper 的链接断开，其所创建的临时目录节点也被删除，所有其他机器都收到对应的通知：某个结点被删除了。Dubbo 就是典型应用案例。
+
+**Master 选举**
+
+基于 ZooKeeper 实现分布式协调，从而实现主从的选举。比如：Kafka、Elastic-job 等中间件都有使用到。
+
+**队列管理**
+
+ZooKeeper 可以通过顺序节点实现队列管理，下面介绍同步队列：
+
+**同步队列**
+
+当一个队列的成员都聚齐时，这个队列才可用，否则一直等待。在约定的目录下创建临时目录节点，再监听节点数目是否是我们要求的数据。队列按照先进先出 FIFO 方式进行入队和出队操作。和分布式锁服务中心的控制时序的场景基本原理相同，入列和出列都有编号。创建 PERSISTENT_SEQUENTIAL 节点，创建成功时 Watcher 通知等待的队列，队列删除序列号最小的节点以消费。此场景下，znode 用于消息存储，znode 存储的数据就是消息队列中的消息内容，SEQUENTIAL 序列号就是消息的编号，按序取出即可。由于创建的节点是持久化的，所以不必担心队列消息丢失的问题。
+
+**分布式锁**
+
+有了 ZooKeeper 的一致性文件系统，锁的问题就变得简单多了。锁服务可以分为保持独占和控制时序。
 
 - 保持独占。我们把 znode 看作是一把锁，通过 createZnode 的方式来实现。所有客户端都去创建 /distribute_lock 节点，最终成功创建的那个客户端也即拥有了这把锁，用完删除掉自己创建的 /distribute_lock 节点就释放出锁。
 - 控制时序。/distribute_lock 已经预先存在，所有客户端在它下面创建临时顺序编号目录节点，和 Master 一样，编号最小的获得锁，用完删除，依次方便。
@@ -1388,7 +1599,7 @@ ZooKeeper 允许客户端向服务端的某个 znode 注册一个 Watcher 监听
 
 服务端处理 Watcher
 
-1. 务端接收 Watcher 并存储；
+1. 服务端接收 Watcher 并存储；
 2. Watcher 触发；
 3. 调用 process 方法来触发 Watcher。
 
@@ -1409,7 +1620,21 @@ ZooKeeper 允许客户端向服务端的某个 znode 注册一个 Watcher 监听
 
 ### 7. ZooKeeper 集群中 Server 有哪些工作状态？
 
-**LOOKING** 寻找 Leader 状态。当服务器处于该状态时，它会认为当前集群中没有 Leader，因此需要进入 Leader 选举状态。**FOLLOWING** 跟随者状态。表明当前服务器角色是 Follower。**LEADING** 领导者状态。表明当前服务器角色是 Leader。**OBSERVING** 观察者状态。表明当前服务器角色是 Observer。
+**LOOKING**
+
+寻找 Leader 状态。当服务器处于该状态时，它会认为当前集群中没有 Leader，因此需要进入 Leader 选举状态。
+
+**FOLLOWING**
+
+跟随者状态。表明当前服务器角色是 Follower。
+
+**LEADING**
+
+领导者状态。表明当前服务器角色是 Leader。
+
+**OBSERVING**
+
+观察者状态。表明当前服务器角色是 Observer。
 
 ### 8. ZooKeeper 集群中是怎样选举 leader 的？
 

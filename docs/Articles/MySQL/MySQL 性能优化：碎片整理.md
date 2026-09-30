@@ -2,17 +2,20 @@
 
 ## MySQL 碎片是什么
 
-MySQL 碎片就是 MySQL 数据文件中一些不连续的空白空间，这些空间无法再被全部利用，久而久之越来多，越来越零碎，从而造成物理存储和逻辑存储的位置顺序不一致，这就是碎片。
+MySQL 碎片是数据文件中不连续的空白空间。这些空间无法被充分利用，久而久之会越来越多、越来越零碎，造成物理存储和逻辑存储的位置顺序不一致。
 
 ### 碎片是如何产生的
 
-**delete 操作** 在 MySQL 中删除数据，在存储中就会产生空白的空间，当有新数据插入时，MySQL 会试着在这些空白空间中保存新数据，但是呢总是用不满这些空白空间。所以日积月累，亦或是一下有大量的 delete 操作，一下就会有大量的空白空间，慢慢的会大到比表的数据使用的空间还大。**update 操作** 在 MySQL 中更新数据，在可变长度的字段（比如 varchar）中更新数据，innodb 表存储数据的单位是页，update 操作会造成页分裂，分裂以后存储变的不连续，不规则，从而产生碎片。比如说原始字段长度 varchar(100)，我们大量的更新数据长度位为 50，这样的话，有 50 的空间被空白了，新入库的数据不能完全利用剩余的 50，这就会产生碎片。
+**delete 操作：** 删除数据后，存储中会产生空白空间。插入新数据时，MySQL 会尝试复用这些空间，但未必能全部填满。长期积累或大量删除后，空白空间可能变得很多，甚至超过表中数据占用的空间。
+
+**update 操作：** 更新可变长度字段（例如 `VARCHAR`）时，InnoDB 可能会发生页分裂，使数据存储变得不连续、不规则，从而产生碎片。例如，原字段长度为 `VARCHAR(100)`，更新后数据长度为 50，剩余空间可能无法被新数据充分利用。
 
 ### 碎片到底产生了什么影响
 
-MySQL 既然产生了碎片，你可能比较豪横说磁盘空间够大，浪费空间也没事，但是这些碎片也会产生性能问题，碎片会有什么影响呢？**空间浪费** 空间浪费不用多说，碎片占用了大量可用空间。**读写性能下降**
+碎片会带来以下影响：
 
-由于存在大量碎片，数据从连续规则的存储方式变为随机分散的存储方式，磁盘 IO 会变的繁忙，数据库读写性能就会下降。
+- **空间浪费：** 碎片占用了可用空间。
+- **读写性能下降：** 数据从连续、规则的存储方式变为随机分散的存储方式后，磁盘 I/O 会更加繁忙，数据库读写性能也会下降。
 
 ### 找一找有哪些碎片
 
@@ -81,9 +84,11 @@ mysql> select count(*) from titles;
 
 #### 1. 通过表状态信息查看
 
-```plaintext
+```text
 show table status like '%table_name%';
-mysql> show table status like 'salaries'\\G; ****  ****  ****  ****  ****  ****  ***1. row**  ****  ****  ****  ****  ****  **** *Name: salaries
+mysql> show table status like 'salaries'\G
+*************************** 1. row ***************************
+Name: salaries
 Engine: InnoDB
 Version: 10
 Row_format: Dynamic
@@ -104,10 +109,13 @@ Comment:
 1 row in set (0.00 sec)
 ```
 
-data_length 表数据大小 index_length 表索引大小 data_free 碎片大小
-根据返回信息，我们知道碎片大小为 4194304（单位 B） **2. 通过数据库视图信息查看** 查询 information_schema.tables 的 data_free 列的值：
+返回信息中的 `Data_length` 表示数据大小，`Index_length` 表示索引大小，`Data_free` 表示碎片大小。这里的碎片大小为 4194304 B。
 
-```python
+#### 2. 通过数据库视图信息查看
+
+查询 `information_schema.tables` 中的 `data_free` 列：
+
+```text
 mysql> select
 t.table_schema,
 t.table_name,
@@ -136,21 +144,29 @@ where t.table_schema = 'employees';
 
 ### 如何清理碎片
 
-找到表碎片了，我们如何清理呢？有两种方法。**1. 分析表** 命令：
+找到表碎片后，可以通过以下两种方法清理。
 
-```plaintext
+#### 1. 分析表
+
+执行命令：
+
+```sql
 optimize table table_name;
 ```
 
 这个方法主要针对 MyISAM 引擎表使用，因为 MyISAM 表的数据和索引是分离的，optimize 表可以整理数据文件，重新排列索引。
-注意：optimize 会锁表，时间长短依据表数据量的大小。**2. 重建表引擎** 命令：
+注意：`OPTIMIZE TABLE` 会锁表，耗时取决于表的数据量。
+
+#### 2. 重建表引擎
+
+执行命令：
 
 ```sql
 alter table table_name engine = innodb;
 ```
 
 这个方法主要针对 InnoDB 引擎表使用，该操作会重建表的存储引擎，重组数据和索引的存储。
-刚才我们查到表 salaries 有 4M 的碎片，我们清理一下 salaries 表碎片：
+刚才查询到 `salaries` 表有 4 MB 碎片，下面清理该表：
 
 ```sql
 mysql> alter table salaries engine = innodb;
@@ -158,7 +174,7 @@ mysql> alter table salaries engine = innodb;
 
 查询一下该表的碎片是否被清理：
 
-```python
+```text
 mysql> select
 t.table_schema,
 t.table_name,
@@ -177,7 +193,7 @@ where t.table_schema = 'employees' and table_name='salaries';
 ```
 
 碎片从原来的 4M 清理到现在的 2M。
-我们看看查询表是否提高了速度：
+再查询一次，比较查询速度：
 
 ```sql
 mysql> select count(*) from salaries;
@@ -189,4 +205,6 @@ mysql> select count(*) from salaries;
 1 row in set (0.16 sec)
 ```
 
-速度还是提高了不少，清理碎片后提高了查询速度。**总结一下** ：清理表的碎片可以提高 MySQL 性能，在日常工作中我们可以定期执行表碎片整理，从而提高 MySQL 性能。
+清理碎片后，查询速度有所提高。
+
+**总结：** 定期整理表碎片可以改善 MySQL 的存储空间利用率和查询性能。

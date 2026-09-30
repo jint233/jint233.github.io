@@ -4,7 +4,7 @@
 
 ### UUID
 
-[uuid](https://en.wikipedia.org/wiki/Universally_unique_identifier) universally unique identifier (UUID,are for practical purposes unique.))
+[UUID（Universally Unique Identifier，通用唯一标识符）](https://en.wikipedia.org/wiki/Universally_unique_identifier) 在实际应用中可视为唯一标识。
 
 1 个 UUID 是 1 个 16 字节（128 位）的数字； 为了方便阅读，通常将 UUID 表示成如下的方式：
 
@@ -165,7 +165,7 @@ CREATE TABLE IF NOT EXISTS `worker_node_tab`
 
 1. sequence += 1
 2. 如果 sequence 还没超过 MAX_SEQUENCE(2^12)，则跳到(3)直接生成 Id；如果 sequence 大于等于 MAX_SEQUENCE，则设置 timestamp += 1, sequence = 0，然后跳到(3)生成 Id（timestamp 在本地自增，因此不用担心时间回拨的问题）
-3. 生成 Id：Id = timestamp \<\< (10 + 12) | workerId \<\< 12 | sequence
+3. 生成 ID：`ID = timestamp << (10 + 12) | workerId << 12 | sequence`
 
 duration_step 可以设置为两天（或更长），每隔一天异步到 DB 申请一个时间号段（即设置 DB last_timestamp += duration_step）；可以做到弱依赖 DB
 

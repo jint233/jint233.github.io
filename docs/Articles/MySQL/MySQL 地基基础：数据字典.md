@@ -5,7 +5,7 @@
 MySQL 数据字典的发展史：
 
 - MySQL 4 提供了 information_schema 数据字典，可以简单的使用 SQL 来检索系统元数据。
-- MySQL 5.5 提供了 performa nce_schema 性能引擎，可以查看 MySQL 性能问题，但是这个有一定难度。
+- MySQL 5.5 提供了 performance_schema 性能引擎，可以查看 MySQL 性能问题，但是这个有一定难度。
 - MySQL 5.7 提供了 sys 系统数据库，其包含的表、视图、函数、存储过程、触发器可以帮我们快速了解数据库的情况。
 
 ### 数据字典的作用
@@ -707,8 +707,7 @@ mysql> update sys_config set value = 'OFF' where variable = 'debug';
 
 在 MySQL 5.7 开始提供了一个新的用户 mysql.sys，这个用户可避免修改或删除 root 用户时发生的问题，但是该用户被锁定是无法连接客户端的。
 
-接下来说的两个触发器，在定义时使用了 `DEFINER = 'mysql.sys'@'localhost'`，就是说只能用 mysql.sys 调用触发器，从而对表
-sys_config 的内容做修改，如果 mysql.sys 用户不存在会报错
+接下来介绍的两个触发器，在定义时使用了 `DEFINER = 'mysql.sys'@'localhost'`，表示只能由 mysql.sys 用户调用触发器，从而修改 `sys_config` 表的内容。如果 mysql.sys 用户不存在，就会报错。
 
 ```shell
 ERROR 1449 (HY000): The user specified as a definer ('mysql.sys'@'localhost') does not exist
@@ -730,12 +729,15 @@ Query OK, 1 row affected (0.02 sec)
 Rows matched: 1  Changed: 1  Warnings: 0
 ```
 
-**sysconfiginsertsetuser** 当对 sys.sys_config 表做 insert 操作时，该触发器会将 sys_config 表的 set_by 列设置为当前用户名。
+**sysconfiginsertsetuser**
+
+当对 sys.sys_config 表做 update 操作时，该触发器会将 sys_config 表的 set_by 列设置为当前用户名。
+
 **sysconfigupdatesetuser**
 
 当对 sys.sys_config 表做 insert 操作时，该触发器会将 sys_config 表的 set_by 列设置为当前用户名。
 
-这两个触发器可以更新 set_by 字段都有一个前提条件：
+这两个触发器都会设置 `set_by` 字段，前提是以下变量的值为 0：
 
 ```shell
 mysql> set @sys.ignore_sys_config_triggers=0;

@@ -161,16 +161,11 @@ mysql>  SELECT @@tx_isolation;
 |--------------------------------------------------------------------------------|--------|
 | begin;                                                                         | begin; |
 | update t_account set balance=balance+100 where name='A'; #给用户 A 增加 100 元 |        |
-
-select balance from t_account where name='A'; #转账前查询用户 A 余额为 200 元
-
-rollback; #决定不给用户 A 增加 100 元了，事务回滚|
-
-update t_account set balance=balance-200 where name='A'; #用户 A 继续给用户 B 转账，用户 A 减 200 元
-
-update t_account set balance=balance+200 where name='B'; #用户 A 继续给用户 B 转账，用户 B 加 200 元
-
-commit; #提交事务|
+|                                                                                | select balance from t_account where name='A'; #转账前查询用户 A 余额为 200 元 |
+| rollback; #决定不给用户 A 增加 100 元了，事务回滚 |                               |
+|                                                                                | update t_account set balance=balance-200 where name='A'; #用户 A 继续给用户 B 转账，用户 A 减 200 元 |
+|                                                                                | update t_account set balance=balance+200 where name='B'; #用户 A 继续给用户 B 转账，用户 B 加 200 元 |
+|                                                                                | commit; #提交事务 |
 
 现在我们查询一下用户 A 和用户 B 的余额：
 
@@ -211,21 +206,13 @@ mysql>  SELECT @@tx_isolation;
 
 环境：用户 A 有 100 元钱，给用户 A 增加 100 元。
 
-事务 1
-
-事务 2
-
-begin;
-
-begin;
-
-update t_account set balance=balance+100 where name='A'; #给用 A 增加 100 元
-
-select \* from t_account where name='A'; #事务 2 查用户的余额，因事务 1 未提交，仍为 100 元
-
-commit;
-
-select \* from t_account where name='A'; #事务 2 查用户的余额，事务 1 已提交，变为 200 元
+| 事务 1 | 事务 2 |
+|--------|--------|
+| begin; | begin; |
+| update t_account set balance=balance+100 where name='A'; #给用 A 增加 100 元 | |
+| | select \* from t_account where name='A'; #事务 2 查用户的余额，因事务 1 未提交，仍为 100 元 |
+| commit; | |
+| | select \* from t_account where name='A'; #事务 2 查用户的余额，事务 1 已提交，变为 200 元 |
 
 一个事务重新读取前面读取过的数据时，发现该数据已经被修改了，其实已被另一个已提交的事务操作了。
 
@@ -255,33 +242,21 @@ mysql>  SELECT @@tx_isolation;
 
 环境：用户 A 有 100 元钱，给用户 A 增加 100 元。
 
-事务 1
-
-事务 2
-
-begin;
-
-begin;
-
-select \* from t_account where name='A'; #事务 2 查用户的余额，为 100 元
-
-update t_account set balance=balance+100 where name='A'; #给用 A 增加 100 元
-
-select \* from t_account where name='A'; #事务 2 查用户的余额，因事务 1 未提交，仍为 100 元
-
-commit;
-
-select \* from t_account where name='A'; #事务 2 查用户的余额，事务 1 已提交，仍为 100 元
+| 事务 1 | 事务 2 |
+|--------|--------|
+| begin; | begin; |
+| | select \* from t_account where name='A'; #事务 2 查用户的余额，为 100 元 |
+| update t_account set balance=balance+100 where name='A'; #给用 A 增加 100 元 | |
+| | select \* from t_account where name='A'; #事务 2 查用户的余额，因事务 1 未提交，仍为 100 元 |
+| commit; | |
+| | select \* from t_account where name='A'; #事务 2 查用户的余额，事务 1 已提交，仍为 100 元 |
 
 这就能看出来，事务 2 开启后读取了用户 A 的余额，即使事务 1 修改了数据，不管提交与否，事务 2 读取的数据一直是之前第一次读取的数据。继续操作。
 
-事务 1
-
-事务 2
-
-commit;
-
-select \* from t_account where name='A'; ##事务 2 查用户的余额，为 200 元
+| 事务 1 | 事务 2 |
+|--------|--------|
+| commit; | |
+| | select \* from t_account where name='A'; ##事务 2 查用户的余额，为 200 元 |
 
 为什么现在变成了 200 元了，因为事务 2 已经 commit，再次 select 是一个新的事务，读取数据当然又变为第一次获取数据（此时的数据是最新的数据）。
 
@@ -293,59 +268,33 @@ select \* from t_account where name='A'; ##事务 2 查用户的余额，为 200
 
 update 操作：
 
-事务 1
-
-事务 2
-
-begin;
-
-begin;
-
-select \* from t_account; #有一行数据，用户 A，余额 100 元
-
-insert into t_account values('B',100); #增加用户 B，余额 100 元
-
-commit;
-
-select \* from t_account where name='B'; #无返回行，查询不到用户 B
-
-update t_account set balance=balance+100 where name='B'; #神奇，更新成功了
-
-select \* from t_account; #用户 A 余额 100，用户 B 余额 200
-
-select \* from t_account; #用户 A 余额 100，用户 B 余额 100
-
-commit;
-
-select \* from t_account; #用户 A 余额 100，用户 B 余额 200
+| 事务 1 | 事务 2 |
+|--------|--------|
+| begin; | begin; |
+| | select \* from t_account; #有一行数据，用户 A，余额 100 元 |
+| insert into t_account values('B',100); #增加用户 B，余额 100 元 | |
+| commit; | |
+| | select \* from t_account where name='B'; #无返回行，查询不到用户 B |
+| | update t_account set balance=balance+100 where name='B'; #神奇，更新成功了 |
+| | select \* from t_account; #用户 A 余额 100，用户 B 余额 200 |
+| | select \* from t_account; #用户 A 余额 100，用户 B 余额 100 |
+| | commit; |
+| | select \* from t_account; #用户 A 余额 100，用户 B 余额 200 |
 
 delete 操作：
 
-事务 1
-
-事务 2
-
-begin;
-
-begin;
-
-select \* from t_account; #有 2 行数据，用户 A 余额 100 元，用户 B 余额 200
-
-insert into t_account values('C',100); #增加用户 C，余额 100 元
-
-commit;
-
-select \* from t_account where name='C'; #无返回行，查询不到用户 C
-
-delete from t_account where name='C'; #神奇，删除成功了
-
-select \* from t_account; #用户 A 余额 100，用户 B 余额 200
-
-select \* from t_account; #用户 A 余额 100，用户 B 余额 200，用户 C 余额 100
-
-commit;
-
-select \* from t_account; #户 A 余额 100，用户 B 余额 200
+| 事务 1 | 事务 2 |
+|--------|--------|
+| begin; | begin; |
+| | select \* from t_account; #有 2 行数据，用户 A 余额 100 元，用户 B 余额 200 |
+| insert into t_account values('C',100); #增加用户 C，余额 100 元 | |
+| commit; | |
+| | select \* from t_account where name='C'; #无返回行，查询不到用户 C |
+| | delete from t_account where name='C'; #神奇，删除成功了 |
+| | select \* from t_account; #用户 A 余额 100，用户 B 余额 200 |
+| | select \* from t_account; #用户 A 余额 100，用户 B 余额 200，用户 C 余额 100 |
+| | commit; |
+| | select \* from t_account; #户 A 余额 100，用户 B 余额 200 |
 
 通过这两个例子你是不是了解了一个事务的 update 和 delete 操作了另外一个事务提交的数据，会使得这些数据在当前事务变得可见。就像幻影一下出现了！
 
@@ -373,31 +322,18 @@ mysql>  SELECT @@tx_isolation;
 
 环境：用户 A 有 100 元钱，给用户 A 增加 100 元。
 
-事务 1
-
-事务 2
-
-begin;
-
-begin;
-
-select \* from t_account where name='A'; #查询用户余额
-
-update t_account set balance=balance+100 where name='A'; #给用户 A 增加 100 元，执行一直处于等待
-
-commit;
-
-update 成功返回
-
-select \* from t_account where name='A'; #用户 A 余额为 100，因为事务 2 还未提交，获取的是 undo 中的历史版本数据
-
-begin;
-
-select \* from t_account where name='A'; #新开一个事务，由于事务 2 还未提交，此查询锁等
-
-commit;
-
-select \* from t_account where name='A'; #用户 A 余额 200
+| 事务 1 | 事务 2 |
+|--------|--------|
+| begin; | begin; |
+| select \* from t_account where name='A'; #查询用户余额 | |
+| | update t_account set balance=balance+100 where name='A'; #给用户 A 增加 100 元，执行一直处于等待 |
+| commit; | |
+| | update 成功返回 |
+| select \* from t_account where name='A'; #用户 A 余额为 100，因为事务 2 还未提交，获取的是 undo 中的历史版本数据 | |
+| begin; | |
+| | select \* from t_account where name='A'; #新开一个事务，由于事务 2 还未提交，此查询锁等 |
+| commit; | |
+| | select \* from t_account where name='A'; #用户 A 余额 200 |
 
 好了，实例讲解到此结束，是否已经帮你理解了 MySQL 事务隔离级别。
 
@@ -432,11 +368,19 @@ MySQL 在数据库内部自动管理，协调并发连接的资源争用。内�
 - 行锁：会话事务将访问的行数据加锁
 - 表锁：会话事务将访问的表整体加锁
 
-**外部锁** 会话层使用特殊的手段显示获取锁，阻塞其他会话对数据的操作。我们通过外部操作命令实现外部锁，比如使用 lock table 和 unlock tables。
+### 外部锁
+
+会话层使用特殊的手段显示获取锁，阻塞其他会话对数据的操作。我们通过外部操作命令实现外部锁，比如使用 lock table 和 unlock tables。
 
 我们举个例子来描述一下这个过程吧，比如有事务 1 和事务 2，事务 1 锁定了一行数据，加了一个 S 锁；事务 2 想要对整个表加锁，需要判断这个表是否被加了表锁，表中的每一行是否有行锁。仔细想想这个过程是很快呢？还是非常的慢？如果表很小无所谓了，如果表是海量级数据，那糟了，事务 2 势必耗费很多资源。
 
-如何解决事务 2 这种检索资源消耗的问题呢？事务意向锁帮你先获取意向，先一步问问情况，然后再获取我们想要的 S 和 X 锁，具体分为： **意向共享锁（IS）** 事务 1 说：我要加一个行锁，我有这个意向，你们其他人有没有意见，如果没有我就先拿这个 IS 锁了。**意向排它锁（IX）**
+如何解决事务 2 这种检索资源消耗的问题呢？事务意向锁帮你先获取意向，先一步问问情况，然后再获取我们想要的 S 和 X 锁，具体分为：
+
+**意向共享锁（IS）**
+
+事务 1 说：我要加一个行锁，我有这个意向，你们其他人有没有意见，如果没有我就先拿这个 IS 锁了。
+
+**意向排它锁（IX）**
 
 事务 2 说：我要加一个表锁，这个可是排他锁，我拿了你们就等我用完再说吧，我有这个意向，你们其他人有没有意见，如果没有我就先拿这个 IX 锁了。
 
@@ -447,53 +391,12 @@ MySQL 在数据库内部自动管理，协调并发连接的资源争用。内�
 
 那么这四个锁之间兼容性如何呢？
 
-X
-
-S
-
-IX
-
-IS
-
-X
-
-冲突
-
-冲突
-
-冲突
-
-冲突
-
-S
-
-冲突
-
-兼容
-
-冲突
-
-兼容
-
-IX
-
-冲突
-
-冲突
-
-兼容
-
-兼容
-
-IS
-
-冲突
-
-兼容
-
-兼容
-
-兼容
+| 锁类型 | X | S | IX | IS |
+|--------|---|---|----|----|
+| X      | 冲突 | 冲突 | 冲突 | 冲突 |
+| S      | 冲突 | 兼容 | 冲突 | 兼容 |
+| IX     | 冲突 | 冲突 | 兼容 | 兼容 |
+| IS     | 冲突 | 兼容 | 兼容 | 兼容 |
 
 ## 聊几个经典死锁案例
 

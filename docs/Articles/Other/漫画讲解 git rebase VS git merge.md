@@ -69,25 +69,44 @@ git push origin master
 于是他将食物清单改为香蕉后再次提交。
 
 ```shell
-sed -i 's/apple/banana/g' -i today-food-menu.txt
+sed -i 's/apple/banana/g' today-food-menu.txt
 git add .
 git commit -m 'update apple to banana'
 git push origin master
 ```
 
-但是这次可没有这么顺利就修改成功了，Git 报错信息
+但是这次没有顺利推送成功，Git 报错信息：
 
-> To <https://gitee.com/chandler2code/git-conflict-demo.git> ! [rejected] master -> master (fetch first) error: failed to push some refs to '<https://gitee.com/chandler2code/git-conflict-demo.git>' hint: Updates were rejected because the remote contains work that you do hint: not have locally. This is usually caused by another repository pushing hint: to the same ref. You may want to first integrate the remote changes hint: (e.g., 'git pull …') before pushing again. hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+```text
+To <https://gitee.com/chandler2code/git-conflict-demo.git>
+ ! [rejected] master -> master (fetch first)
+error: failed to push some refs to '<https://gitee.com/chandler2code/git-conflict-demo.git>'
+hint: Updates were rejected because the remote contains work that you do
+hint: not have locally. This is usually caused by another repository pushing
+hint: to the same ref. You may want to first integrate the remote changes
+hint: (e.g., 'git pull …') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+```
 
 意思就是当前分支与远端的分支相比，远端已经发生了修改，如果要继续操作，则要先执行命令`git pull`合并远端的代码。
 
-下面来执行一下`git pull`，此时冲突就产生了，报错信息：
+下面执行 `git pull`，此时冲突就产生了，报错信息：
 
-> remote: Enumerating objects: 5, done. remote: Counting objects: 100% (5/5), done. remote: Total 3 (delta 0), reused 0 (delta 0), pack-reused 0 Unpacking objects: 100% (3/3), done. From <https://gitee.com/chandler2code/git-conflict-demo> 5026b5e..484cb3d master -> origin/master Auto-merging today-food-menu.txt CONFLICT (content): Merge conflict in today-food-menu.txt Automatic merge failed; fix conflicts and then commit the result.
+```text
+remote: Enumerating objects: 5, done.
+remote: Counting objects: 100% (5/5), done.
+remote: Total 3 (delta 0), reused 0 (delta 0), pack-reused 0
+Unpacking objects: 100% (3/3), done.
+From <https://gitee.com/chandler2code/git-conflict-demo>
+   5026b5e..484cb3d  master -> origin/master
+Auto-merging today-food-menu.txt
+CONFLICT (content): Merge conflict in today-food-menu.txt
+Automatic merge failed; fix conflicts and then commit the result.
+```
 
 提示`today-food-menu.txt`产生了冲突，我们打开查看文件内容：
 
-```shell
+```text
 <<<<<<< HEAD
 banana
 =======
@@ -116,10 +135,10 @@ git push origin master
 于是第二天在修改食物清单时，他选择自己先在本地创建分支，然后在自己的分支上修改，这样就可以时不时的切换到 master 分支拉取最新的代码。
 
 ```shell
-#创建并切换到本地food分支
+# 创建并切换到本地 food 分支
 git checkout -b food
 #今天他想吃苹果了
-sed -i 's/banana/apple/g' -i today-food-menu.txt
+sed -i 's/banana/apple/g' today-food-menu.txt
 git add .
 #更改提交到本地
 git commit -m 'update today-food-menu.txt: eat apple'
@@ -131,7 +150,7 @@ git commit -m 'update today-food-menu.txt: eat apple'
 
 ```shell
 git pull
-sed -i 's/banana/honey/g' -i today-food-menu.txt
+sed -i 's/banana/honey/g' today-food-menu.txt
 git add .
 git commit -m 'update today-food-menu.txt'
 git push origin master
@@ -150,19 +169,23 @@ git pull
 
 ![图解](../assets/漫画讲解 git rebase VS git merge-12.png)
 
-熊大考虑到仓库的蜂蜜快坏了，所以他这下坚持要吃苹果，于是他将自己的 food 分支的更改合并到 master 分支。有两种方式可以做到，分别是`git merge`和`git rabase`，后面都会详细的做讲解。我这里先用`git merge`解决冲突。
+熊大考虑到仓库的蜂蜜快坏了，所以他这下坚持要吃苹果，于是他将自己的 food 分支的更改合并到 master 分支。有两种方式可以做到，分别是 `git merge` 和 `git rebase`，后面都会详细讲解。我这里先用 `git merge` 解决冲突。
 
 ```shell
 git merge food
 ```
 
-合并分支时冲突产生，错误信息：
+合并分支时产生了冲突，错误信息：
 
-> Auto-merging today-food-menu.txt CONFLICT (content): Merge conflict in today-food-menu.txt Automatic merge failed; fix conflicts and then commit the result.
+```text
+Auto-merging today-food-menu.txt
+CONFLICT (content): Merge conflict in today-food-menu.txt
+Automatic merge failed; fix conflicts and then commit the result.
+```
 
 再查看冲突的内容：
 
-```shell
+```text
 <<<<<<< HEAD
 honey
 =======
@@ -180,9 +203,11 @@ git push origin master
 
 ![示意图](../assets/漫画讲解 git rebase VS git merge-13.png)
 
-**总结：在前面我们看到，如果 master 分支上开发。由于 master 分支时刻保持最新的发行代码，所以变动频繁，因此拉取 master 分支非常容易造成冲突。因此这里是将更改在本地分支上进行，在需要合并时，切换到 master 分支拉取最新代码后，根据拉取的内容，再去合并分支。同时这种方式也是更受大家推崇的。** 分析 git merge 合并分支代码的特点
+**总结：在前面我们看到，如果 master 分支上开发。由于 master 分支时刻保持最新的发行代码，所以变动频繁，因此拉取 master 分支非常容易造成冲突。因此这里是将更改在本地分支上进行，在需要合并时，切换到 master 分支拉取最新代码后，根据拉取的内容，再去合并分支。同时这种方式也是更受大家推崇的。**
 
-上一节演示了冲突是如何产生的，并演示了通过`git merge`方式合并分支冲突。这一章节我们来分析一下`get merge`合并分支代码冲突的特点。
+## 分析 git merge 合并分支代码的特点
+
+上一节演示了冲突是如何产生的，并演示了通过 `git merge` 方式合并分支冲突。这一章节我们来分析一下 `git merge` 合并分支代码冲突的特点。
 
 云端仓库查看 commit 记录
 
@@ -206,7 +231,7 @@ git push origin master
 
 ```shell
 git checkout -b food2
-sed -i 's/apple/honey/g' -i today-food-menu.txt
+sed -i 's/apple/honey/g' today-food-menu.txt
 git add .
 git commit -m 'update today-food-menu.txt:honey'
 ```
@@ -216,7 +241,7 @@ git commit -m 'update today-food-menu.txt:honey'
 ![图解](../assets/漫画讲解 git rebase VS git merge-17.png)
 
 ```shell
-sed -i 's/honey/coffee/g' -i today-food-menu.txt
+sed -i 's/honey/coffee/g' today-food-menu.txt
 git add .
 git commit -m 'update today-food-menu.txt:coffee'
 ```
@@ -227,7 +252,7 @@ git commit -m 'update today-food-menu.txt:coffee'
 
 ```shell
 git pull
-sed -i 's/apple/banana/g' -i today-food-menu.txt 
+sed -i 's/apple/banana/g' today-food-menu.txt
 git add .
 git commit -m 'update today-food-menu.txt:banana'
 git push origin master
@@ -249,15 +274,27 @@ git checkout food2
 git rebase master
 ```
 
-输出信息
+输出信息：
 
-> First, rewinding head to replay your work on top of it… Applying: update today-food-menu.txt:honey Using index info to reconstruct a base tree… M today-food-menu.txt Falling back to patching base and 3-way merge… Auto-merging today-food-menu.txt CONFLICT (content): Merge conflict in today-food-menu.txt error: Failed to merge in the changes. Patch failed at 0001 update today-food-menu.txt:honey Use 'git am --show-current-patch' to see the failed patch
->
-> Resolve all conflicts manually, mark them as resolved with "git add/rm \<conflicted_files>", then run "git rebase --continue". You can instead skip this commit: run "git rebase --skip". To abort and get back to the state before "git rebase", run "git rebase --abort".
+```text
+First, rewinding head to replay your work on top of it…
+Applying: update today-food-menu.txt:honey
+Using index info to reconstruct a base tree…
+M       today-food-menu.txt
+Falling back to patching base and 3-way merge…
+Auto-merging today-food-menu.txt
+CONFLICT (content): Merge conflict in today-food-menu.txt
+error: Failed to merge in the changes. Patch failed at 0001 update today-food-menu.txt:honey
+Use 'git am --show-current-patch' to see the failed patch
+
+Resolve all conflicts manually, mark them as resolved with "git add/rm <conflicted_files>", then run "git rebase --continue".
+You can instead skip this commit: run "git rebase --skip".
+To abort and get back to the state before "git rebase", run "git rebase --abort".
+```
 
 又回到了我们熟悉的合并冲突，查看`today-food-menu.txt`内容：
 
-```shell
+```text
 <<<<<<< HEAD
 banana
 =======
@@ -276,7 +313,11 @@ git rebase --continue
 
 输出信息：
 
-> No changes - did you forget to use 'git add'? If there is nothing left to stage, chances are that something else already introduced the same changes; you might want to skip this patch.
+```text
+No changes - did you forget to use 'git add'? If there is nothing left to stage,
+chances are that something else already introduced the same changes; you might
+want to skip this patch.
+```
 
 意思这次 rebase 合并冲突后和远端的内容一致，可以选择跳过这次 rebase。
 
@@ -286,13 +327,24 @@ git rebase --skip
 
 跳过这次 commit 之后，来到下一次，输出信息：
 
-> Applying: update today-food-menu.txt:coffee Using index info to reconstruct a base tree… M today-food-menu.txt Falling back to patching base and 3-way merge… Auto-merging today-food-menu.txt CONFLICT (content): Merge conflict in today-food-menu.txt error: Failed to merge in the changes. Patch failed at 0002 update today-food-menu.txt:coffee Use 'git am --show-current-patch' to see the failed patch
->
-> Resolve all conflicts manually, mark them as resolved with "git add/rm \<conflicted_files>", then run "git rebase --continue". You can instead skip this commit: run "git rebase --skip". To abort and get back to the state before "git rebase", run "git rebase --abort".
+```text
+Applying: update today-food-menu.txt:coffee
+Using index info to reconstruct a base tree…
+M       today-food-menu.txt
+Falling back to patching base and 3-way merge…
+Auto-merging today-food-menu.txt
+CONFLICT (content): Merge conflict in today-food-menu.txt
+error: Failed to merge in the changes. Patch failed at 0002 update today-food-menu.txt:coffee
+Use 'git am --show-current-patch' to see the failed patch
+
+Resolve all conflicts manually, mark them as resolved with "git add/rm <conflicted_files>", then run "git rebase --continue".
+You can instead skip this commit: run "git rebase --skip".
+To abort and get back to the state before "git rebase", run "git rebase --abort".
+```
 
 还记得吗，熊大还提交过一次将蜂蜜改为咖啡，我们来看一下冲突的内容：
 
-```shell
+```text
 <<<<<<< HEAD
 banana
 =======
@@ -311,7 +363,9 @@ git rebase --continue
 
 输出内容：
 
-> Applying: update today-food-menu.txt:coffee
+```text
+Applying: update today-food-menu.txt:coffee
+```
 
 此时没有提示任何的信息，所以 rebase 结束。其实版本高一点的 Git（2.22 及以上），是有 rebase 进度条展示的，可以看到 rebase 的进度，如图所示：
 
@@ -339,13 +393,15 @@ git push origin master
 
 ## git merge 对比 git rebase 该如何选择？
 
-`git merge`
+### `git merge`
 
 操作合并分支会让两个分支的每一次提交都按照提交时间（并不是 push 时间）排序，并且会将两个分支的最新一次 commit 点进行合并成一个新的 commit，最终的分支树呈现非整条线性直线的形式。
 
-`git rebase`
+### `git rebase`
 
-操作实际上是将当前执行 rebase 分支的所有基于原分支提交点之后的 commit 打散成一个一个的 patch，并重新生成一个新的 commit hash 值，再次基于原分支目前最新的 commit 点上进行提交，并不根据两个分支上实际的每次提交的时间点排序，rebase 完成后，切到基分支进行合并另一个分支时也不会生成一个新的 commit 点，可以保持整个分支树的完美线性。**从效果出发，如果代码版本迭代快，项目大，参与人多，建议最好用 rebase 方式合并。反之则直接用 merge 即可。** 加餐学习：git stash 解决线上代码冲突
+操作实际上是将当前执行 rebase 分支的所有基于原分支提交点之后的 commit 打散成一个一个的 patch，并重新生成一个新的 commit hash 值，再次基于原分支目前最新的 commit 点上进行提交，并不根据两个分支上实际的每次提交的时间点排序，rebase 完成后，切到基分支进行合并另一个分支时也不会生成一个新的 commit 点，可以保持整个分支树的完美线性。**从效果出发，如果代码版本迭代快，项目大，参与人多，建议最好用 rebase 方式合并。反之则直接用 merge 即可。**
+
+## 加餐学习：git stash 解决线上代码冲突
 
 以上的演示合并冲突，是为了让我们的 commit 历史记录更加的便于审查。接下来我要说的`git stash`则是应急所需，平时工作中都是迫不得已的时候采用的，学会了以备不时之需。
 
@@ -360,7 +416,7 @@ git push origin master
 - `git stash list`：查看当前 stash 的列表，因为有些时候会存多个暂存区
 - `git stash pop`：将当前 stash 中的内容弹出，并应用到当前工作目录上。
 - `git stash apply`：将堆栈中的内容应用到当前目录，不同于`git stash pop`，该命令不会将内容从堆栈中删除，也就说该命令能够将堆栈的内容多次应用到工作目录中，适应于多个分支的情况。
-- `git stash clear`：除堆栈中的所有内容
+- `git stash clear`：清除堆栈中的所有内容。
 
 ## 总结
 

@@ -75,7 +75,8 @@ Version: '5.6.35'  socket: '/mydata/data/mysql.sock'  port: 3306  MySQL Communit
 和查询日志有关的变量有：
 
 ```shell
-`long_query_time = 10 ``# 指定慢查询超时时长，超出此时长的属于慢查询，会记录到慢查询日志中``log_output={TABLE|FILE|NONE}  ``# 定义一般查询日志和慢查询日志的输出格式，不指定时默认为file`
+long_query_time = 10 # 指定慢查询超时时长，超出此时长的属于慢查询，会记录到慢查询日志中
+log_output={TABLE|FILE|NONE} # 定义一般查询日志和慢查询日志的输出格式，不指定时默认为file
 ```
 
 TABLE 表示记录日志到表中，FILE 表示记录日志到文件中，NONE 表示不记录日志。只要这里指定为 NONE，即使开启了一般查询日志和慢查询日志，也都不会有任何记录。
@@ -83,7 +84,9 @@ TABLE 表示记录日志到表中，FILE 表示记录日志到文件中，NONE �
 和一般查询日志相关的变量有：
 
 ```shell
-`general_log=off ``# 是否启用一般查询日志，为全局变量，必须在global上修改。``sql_log_off=off ``# 在session级别控制是否启用一般查询日志，默认为off，即启用``general_log_file=``/mydata/data/hostname``.log  ``# 默认是库文件路径下主机名加上.log`
+general_log=off # 是否启用一般查询日志，为全局变量，必须在global上修改。
+sql_log_off=off # 在session级别控制是否启用一般查询日志，默认为off，即启用
+general_log_file=/mydata/data/hostname.log # 默认是库文件路径下主机名加上.log
 ```
 
 在 MySQL 5.6 以前的版本还有一个"log"变量也是决定是否开启一般查询日志的。在 5.6 版本开始已经废弃了该选项。
@@ -138,7 +141,12 @@ mysql 记录慢查询日志是在查询执行完毕且已经完全释放锁之�
 和慢查询有关的变量：
 
 ```shell
-`long_query_time=10 ``# 指定慢查询超时时长(默认10秒)，超出此时长的属于慢查询``log_output={TABLE|FILE|NONE} ``# 定义一般查询日志和慢查询日志的输出格式，默认为file``log_slow_queries={``yes``|no}    ``# 是否启用慢查询日志，默认不启用``slow_query_log={1|ON|0|OFF}  ``# 也是是否启用慢查询日志，此变量和log_slow_queries修改一个另一个同时变化``slow_query_log_file=``/mydata/data/hostname-slow``.log  ``#默认路径为库文件目录下主机名加上-slow.log``log_queries_not_using_indexes=OFF ``# 查询没有使用索引的时候是否也记入慢查询日志`
+long_query_time=10 # 指定慢查询超时时长(默认10秒)，超出此时长的属于慢查询
+log_output={TABLE|FILE|NONE} # 定义一般查询日志和慢查询日志的输出格式，默认为file
+log_slow_queries={yes|no} # 是否启用慢查询日志，默认不启用
+slow_query_log={1|ON|0|OFF} # 也是是否启用慢查询日志，此变量和log_slow_queries修改一个另一个同时变化
+slow_query_log_file=/mydata/data/hostname-slow.log # 默认路径为库文件目录下主机名加上-slow.log
+log_queries_not_using_indexes=OFF # 查询没有使用索引的时候是否也记入慢查询日志
 ```
 
 现在启用慢查询日志。
@@ -251,7 +259,9 @@ MariaDB/MySQL 默认没有启动二进制日志，要启用二进制日志使用
 或者在配置文件中的[mysqld]部分设置 log-bin 也可以。注意：对于 mysql 5.7，直接启动 binlog 可能会导致 mysql 服务启动失败，这时需要在配置文件中的 mysqld 为 mysql 实例分配 server_id。
 
 ```shell
-[mysqld]# server_id=1234``log-bin=[on|filename]`
+[mysqld]
+# server_id=1234
+log-bin=[on|filename]
 ```
 
 mysqld 还 **创建一个二进制日志索引文件**，当二进制日志文件滚动的时候会向该文件中写入对应的信息。所以该文件包含所有使用的二进制日志文件的文件名。默认情况下该文件与二进制日志文件的文件名相同，扩展名为'.index'。要指定该文件的文件名使用 --log-bin-index[=file_name] 选项。当 mysqld 在运行时不应手动编辑该文件，免得 mysqld 变得混乱。
@@ -271,7 +281,9 @@ MySQL 中查看二进制日志的方法主要有几种。
 2.使用 show 显示对应的信息。
 
 ```plaintext
-`SHOW {BINARY | MASTER} LOGS      ``# 查看使用了哪些日志文件``SHOW BINLOG EVENTS [IN ``'log_name'``] [FROM pos]   ``# 查看日志中进行了哪些操作``SHOW MASTER STATUS         ``# 显式主服务器中的二进制日志信息`
+SHOW {BINARY | MASTER} LOGS      # 查看使用了哪些日志文件
+SHOW BINLOG EVENTS [IN 'log_name'] [FROM pos]   # 查看日志中进行了哪些操作
+SHOW MASTER STATUS         # 显式主服务器中的二进制日志信息
 ```
 
 ### 5.2.1 mysqlbinlog
@@ -285,7 +297,14 @@ MySQL 中查看二进制日志的方法主要有几种。
 以下是常用的几个选项：
 
 ```plaintext
-`-d,--database=name：只查看指定数据库的日志操作``-o,--offset=``#：忽略掉日志中的前n个操作命令``-r,--result-``file``=name：将输出的日志信息输出到指定的文件中，使用重定向也一样可以。``-s,--short-form：显示简单格式的日志，只记录一些普通的语句，会省略掉一些额外的信息如位置信息和时间信息以及基于行的日志。可以用来调试，生产环境千万不可使用``--``set``-charset=char_name：在输出日志信息到文件中时，在文件第一行加上``set` `names char_name``--start-datetime,--stop-datetime：指定输出开始时间和结束时间内的所有日志信息``--start-position=``#,--stop-position=#：指定输出开始位置和结束位置内的所有日志信息``-``v``,-vv：显示更详细信息，基于row的日志默认不会显示出来，此时使用-``v``或-vv可以查看`
+-d,--database=name：只查看指定数据库的日志操作
+-o,--offset=#：忽略掉日志中的前n个操作命令
+-r,--result-file=name：将输出的日志信息输出到指定的文件中，使用重定向也一样可以。
+-s,--short-form：显示简单格式的日志，只记录一些普通的语句，会省略掉一些额外的信息如位置信息和时间信息以及基于行的日志。可以用来调试，生产环境千万不可使用
+--set-charset=char_name：在输出日志信息到文件中时，在文件第一行加上 set names char_name
+--start-datetime,--stop-datetime：指定输出开始时间和结束时间内的所有日志信息
+--start-position=#,--stop-position=#：指定输出开始位置和结束位置内的所有日志信息
+-v,-vv：显示更详细信息，基于row的日志默认不会显示出来，此时使用-v或-vv可以查看
 ```
 
 在进行测试之前，先对日志进行一次刷新，以方便解释二进制日志的信息。

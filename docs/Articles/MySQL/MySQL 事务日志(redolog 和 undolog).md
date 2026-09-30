@@ -2,7 +2,10 @@
 
 innodb 事务日志包括 redo log 和 undo log。redo log 是重做日志，提供前滚操作，undo log 是回滚日志，提供回滚操作。
 
-undo log 不是 redo log 的逆向过程，其实它们都算是用来恢复的日志： **1.redo log 通常是物理日志，记录的是数据页的物理修改，而不是某一行或某几行修改成怎样怎样，它用来恢复提交后的物理数据页(恢复数据页，且只能恢复到最后一次提交的位置)。**  **2.undo 用来回滚行记录到某个版本。undo log 一般是逻辑日志，根据每行记录进行记录。**
+undo log 不是 redo log 的逆向过程，其实它们都算是用来恢复的日志：
+
+1. **redo log 通常是物理日志，记录的是数据页的物理修改，而不是某一行或某几行修改成怎样怎样，它用来恢复提交后的物理数据页(恢复数据页，且只能恢复到最后一次提交的位置)。**
+2. **undo 用来回滚行记录到某个版本。undo log 一般是逻辑日志，根据每行记录进行记录。**
 
 ## 1. redo log
 
@@ -46,7 +49,10 @@ MySQL 支持用户自定义在 commit 时如何将 log buffer 中的日志刷 lo
 
 在主从复制结构中，要保证事务的持久性和一致性，需要对日志相关变量设置为如下：
 
-- **如果启用了二进制日志，则设置 sync_binlog=1，即每提交一次事务同步写到磁盘中。** - **总是设置 innodb_flush_log_at_trx_commit=1，即每提交一次事务都写到磁盘中。** 上述两项变量的设置保证了：每次提交事务都写入二进制日志和事务日志，并在提交时将它们刷新到磁盘中。
+- **如果启用了二进制日志，则设置 sync_binlog=1，即每提交一次事务同步写到磁盘中。**
+- **总是设置 innodb_flush_log_at_trx_commit=1，即每提交一次事务都写到磁盘中。**
+
+上述两项变量的设置保证了：每次提交事务都写入二进制日志和事务日志，并在提交时将它们刷新到磁盘中。
 
 选择刷日志的时间会严重影响数据修改时的性能，特别是刷到磁盘的过程。下例就测试了 innodb_flush_log_at_trx_commit 分别为 0、1、2 时的差距。
 
@@ -201,7 +207,7 @@ redo log file 的大小对 innodb 的性能影响非常大，设置的太大，�
 - redo_log_type：占用 1 个字节，表示 redo log 的日志类型。
 - space：表示表空间的 ID，采用压缩的方式后，占用的空间可能小于 4 字节。
 - page_no：表示页的偏移量，同样是压缩过的。
-- redo_log_body 表示每个重做日志的数据部分，恢复时会调用相应的函数进行解析。例如 insert 语句和 delete 语句写入 redo log 的内容是不一样的。
+- redo_log_body 表示每个重做日志的数据部分，恢复时会调用相应的函数进行解析。例如 insert 语句和 delete 语句写入 redo log 的内容是不一样的。
 
 如下图，分别是 insert 和 delete 大致的记录方式。
 
@@ -215,7 +221,10 @@ log buffer 中未刷到磁盘的日志称为脏日志(dirty log)。
 
 刷日志到磁盘有以下几种规则：
 
-**1.发出 commit 动作时。已经说明过，commit 发出后是否刷日志由变量 innodb_flush_log_at_trx_commit 控制。**  **2.每秒刷一次。这个刷日志的频率由变量 innodb_flush_log_at_timeout 值决定，默认是 1 秒。要注意，这个刷日志频率和 commit 动作无关。**  **3.当 log buffer 中已经使用的内存超过一半时。**  **4.当有 checkpoint 时，checkpoint 在一定程度上代表了刷到磁盘时日志所处的 LSN 位置。**
+1. **发出 commit 动作时。** 已经说明过，commit 发出后是否刷日志由变量 innodb_flush_log_at_trx_commit 控制。
+2. **每秒刷一次。** 这个刷日志的频率由变量 innodb_flush_log_at_timeout 值决定，默认是 1 秒。要注意，这个刷日志频率和 commit 动作无关。
+3. 当 log buffer 中已经使用的内存超过一半时。
+4. 当有 checkpoint 时，checkpoint 在一定程度上代表了刷到磁盘时日志所处的 LSN 位置。
 
 ## 1.7 数据页刷盘的规则及 checkpoint
 
@@ -244,11 +253,9 @@ LSN 称为日志的逻辑序列号(log sequence number)，在 innodb 存储引�
 
 根据 LSN，可以获取到几个有用的信息：
 
-1.数据页的版本信息。
-
-2.写入的日志总量，通过 LSN 开始号码和结束号码可以计算出写入的日志量。
-
-3.可知道检查点的位置。
+1. 数据页的版本信息。
+2. 写入的日志总量，通过 LSN 开始号码和结束号码可以计算出写入的日志量。
+3. 可知道检查点的位置。
 
 实际上还可以获得很多隐式的信息。
 
@@ -269,7 +276,12 @@ Last checkpoint at  2225502463
 3201299 log i/o's done, 0.00 log i/o's/second
 ```
 
-其中： **log sequence number 就是当前的 redo log(in buffer)中的 lsn；** -  **log flushed up to 是刷到 redo log file on disk 中的 lsn；** -  **pages flushed up to 是已经刷到磁盘数据页上的 LSN；** - **last checkpoint at 是上一次检查点所在位置的 LSN。**
+其中：
+
+- **log sequence number** 就是当前的 redo log(in buffer)中的 lsn；
+- **log flushed up to** 是刷到 redo log file on disk 中的 lsn；
+- **pages flushed up to** 是已经刷到磁盘数据页上的 LSN；
+- **last checkpoint at** 是上一次检查点所在位置的 LSN。
 
 innodb 从执行修改语句开始：
 

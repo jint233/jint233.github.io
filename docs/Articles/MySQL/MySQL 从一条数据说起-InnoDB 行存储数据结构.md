@@ -180,7 +180,7 @@ ERROR 1118 (42000): Row size too large. The maximum row size for the used table 
 
 字段允许为 `NULL` 时需要占用 1 字节记录 NULL 值列表，真实数据长度需要 2 字节保存，因此 `VARCHAR` 最大实际能声明的字符长度为：
 
-$$65535 - 2 - 1 = 65532 \\text{ 字节}$$
+$$65535 - 2 - 1 = 65532 \text{ 字节}$$
 
 测试创建 `VARCHAR(65532)`：
 
@@ -199,7 +199,7 @@ CREATE TABLE test_max (
 
 如果包含多个列，所有列的实际数据大小 + 变长字段列表 + NULL 值列表的总和必须满足：
 
-$$\\text{总字节数} \le 65535$$
+$$\text{总字节数} \le 65535$$
 
 ## 行溢出
 

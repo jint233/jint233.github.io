@@ -8,7 +8,7 @@
 
 ## Docker 镜像是什么
 
-这里，我们以一个 Debian 系统的镜像为例。通过 `docker run --it debian` 可以启动一个 `debian` 的容器，终端会有如下输出：
+这里，我们以一个 Debian 系统的镜像为例。通过 `docker run -it debian` 可以启动一个 `debian` 的容器，终端会有如下输出：
 
 ```shell
 / # docker run -it debian
@@ -87,7 +87,7 @@ debian-image/
 
 **注意：在实际存储时，是不包含空格的，这里为了便于展示所以使用了 jq 工具进行格式化。**
 
-`manifest.json` 包含了镜像的顶层配置，它是一系列配置按顺序组织而成的；以现在我们的 `debian` 镜像为例，它至包含了一组配置，这组配置中包含了 3 个主要的信息，我们由简到繁进行说明。
+`manifest.json` 包含了镜像的顶层配置，它是一系列配置按顺序组织而成的；以现在我们的 `debian` 镜像为例，它只包含了一组配置，这组配置中包含了 3 个主要的信息，我们由简到繁进行说明。
 
 ## RepoTags
 
@@ -273,7 +273,7 @@ IMAGE               CREATED             CREATED BY                              
 
 从 Docker Hub 上我们也可以找到[此镜像的 `Dockerfile` 文件](https://github.com/debuerreotype/docker-debian-artifacts/blob/fd138cb56a6a6a4fd9cb30c2acce9e8d9cccd28a/stretch/Dockerfile)，看下具体内容：
 
-```shell
+```dockerfile
 FROM scratch
 ADD rootfs.tar.xz /
 CMD ["bash"]
@@ -324,7 +324,7 @@ Run 'docker image COMMAND --help' for more information on a command.
 
 对于我们开始时对镜像进行分析的操作，我们可以直接通过 `docker inspect debian` 直接拿到它的配置信息。
 
-`pull`, `push`, `tag` 这三个子命令与和镜像仓库的交互比较相关，可以结合前面 `RepoTags` 理解。
+`pull`, `push`, `tag` 这三个子命令与镜像仓库的交互比较相关，可以结合前面 `RepoTags` 理解。
 
 `save` 和 `load` 是将镜像保存到文件系统上及从文件系统中导入 Docker 中。
 
@@ -524,7 +524,7 @@ drwxrwxr-x. 9 tao tao 4096 5月  15 06:52 target
 
 ### 利用缓存
 
-```shell
+```dockerfile
 FROM debian
 COPY . /app
 RUN apt update
@@ -542,7 +542,7 @@ CMD [ "java", "-jar", "/app/target/gs-spring-boot-0.1.0.jar" ]
 
 对此 `Dockerfile` 进行改进：
 
-```shell
+```dockerfile
 FROM debian
 RUN apt update
 RUN apt install -y openjdk-8-jdk
@@ -558,7 +558,7 @@ CMD [ "java", "-jar", "/app/target/gs-spring-boot-0.1.0.jar" ]
 
 而对于我们要构建的镜像而言，那些文件是不必要的，所以我们可以将 `Dockerfile` 改成这样：
 
-```shell
+```dockerfile
 FROM debian
 RUN apt update
 RUN apt install -y openjdk-8-jdk
@@ -566,7 +566,7 @@ COPY target/gs-spring-boot-0.1.0.jar /app/
 CMD [ "java", "-jar", "/app/gs-spring-boot-0.1.0.jar" ]
 ```
 
-第二个实践指南： **避免将全部内容拷贝至镜像中, 至保留需要的内容即可**。当然除去修改 `Dockerfile` 文件外，也可以通过修改 `.dockerignore` 文件来完成类似的事情。
+第二个实践指南：**避免将全部内容拷贝至镜像中，只保留需要的内容即可**。当然除去修改 `Dockerfile` 文件外，也可以通过修改 `.dockerignore` 文件来完成类似的事情。
 
 `docker build` 的过程是先加载 `.dockerignore` 文件，然后才按照 `Dockerfile` 进行构建，`.dockerignore` 的用法与 `.gitignore` 类似，排除掉你不想要的文件即可。
 
@@ -576,7 +576,7 @@ CMD [ "java", "-jar", "/app/gs-spring-boot-0.1.0.jar" ]
 
 比如说，我想安装一个最新版的 `vim` 在镜像中，可以简单的修改第三行为 `RUN apt install -y openjdk-8-jdk vim` ，但由于 `RUN apt update` 是被缓存的，所以我无法安装到最新版本的 `vim` 。
 
-```shell
+```dockerfile
 FROM debian
 RUN apt update && apt install -y openjdk-8-jdk
 COPY target/gs-spring-boot-0.1.0.jar /app/
@@ -606,7 +606,7 @@ After this operation, 548 MB of additional disk space will be used.
 
 所以 `Dockerfile` 可以修改为：
 
-```shell
+```dockerfile
 FROM debian
 RUN apt update && apt install -y --no-install-recommends openjdk-8-jdk
 COPY target/gs-spring-boot-0.1.0.jar /app/
@@ -639,7 +639,7 @@ root@container:/#
 
 可以看到有 16M 左右的大小，我们修改 `Dockerfile` 增加删除操作：
 
-```shell
+```dockerfile
 FROM debian
 RUN apt update && apt install -y --no-install-recommends openjdk-8-jdk \
         && rm -rf /var/lib/apt/lists/*  
@@ -669,7 +669,7 @@ Docker Hub 上提供了很多 [官方镜像](https://hub.docker.com/search/?q=&t
 
 我们选择 Docker 官方 `openjdk` 镜像来作为基础镜像，`Dockerfile` 可以改写为：
 
-```shell
+```dockerfile
 FROM openjdk:8-jdk-stretch
 COPY target/gs-spring-boot-0.1.0.jar /app/
 CMD [ "java", "-jar", "/app/gs-spring-boot-0.1.0.jar" ]
@@ -679,7 +679,7 @@ CMD [ "java", "-jar", "/app/gs-spring-boot-0.1.0.jar" ]
 
 我们其实只想要一个 Java 的运行环境，所以选择一个基于 [Alpine Linux](https://alpinelinux.org/) 的超小的镜像 `openjdk:8-jre-alpine` 这样 `Dockerfile` 可以改写为:
 
-```shell
+```dockerfile
 FROM openjdk:8-jre-alpine
 COPY target/gs-spring-boot-0.1.0.jar /app/
 CMD [ "java", "-jar", "/app/gs-spring-boot-0.1.0.jar" ]
@@ -705,7 +705,7 @@ local/spring-boot   2                   178dacdaf015        14 hours ago        
 
 在前面的实践中，我们都是先本地构建好之后，才 `COPY` 进去的，这容易导致不同用户构建出的镜像可能不同。所以我们将构建过程写入到 `Dockerfile`:
 
-```shell
+```dockerfile
 FROM maven:3.6.1-jdk-8-alpine
 WORKDIR /app
 COPY pom.xml /app/
@@ -718,7 +718,7 @@ CMD [ "java", "-jar", "/app/target/gs-spring-boot-0.1.0.jar" ]
 
 但我们也会发现一个问题，在 `mvn -e -B package` 这一步耗费的时间特别长，因为它需要先拉取依赖才能进行构建。而对于项目开发而言，代码变更比依赖变更更加频繁，为了能加快构建速度，有效的利用缓存，我们将解决依赖与构建分成两步。
 
-```shell
+```dockerfile
 FROM maven:3.6.1-jdk-8-alpine
 WORKDIR /app
 COPY pom.xml /app/
@@ -732,7 +732,7 @@ CMD [ "java", "-jar", "/app/target/gs-spring-boot-0.1.0.jar" ]
 
 当然，现在我们构建的镜像中，还是包含着项目的源代码，这其实并非我们所需要的。那么我们可以使用 **多阶段构建** 来解决这个问题。`Dockerfile` 可以修改为：
 
-```shell
+```dockerfile
 FROM maven:3.6.1-jdk-8-alpine AS builder
 WORKDIR /app
 COPY pom.xml /app/
@@ -748,7 +748,7 @@ CMD [ "java", "-jar", "/gs-spring-boot-0.1.0.jar" ]
 
 `Dockerfile` 可以修改为：
 
-```shell
+```dockerfile
 FROM maven:3.6.1-jdk-8-alpine AS builder
 WORKDIR /app
 COPY pom.xml /app/
@@ -791,7 +791,7 @@ local/spring-boot   6                   f96bea38825f        2 hours ago         
 
 通过添加环境变量 `DOCKER_BUILDKIT=1` 或者在 Docker 的配置文件 `/etc/docker/daemon.json` 中添加如下配置：
 
-```shell
+```json
 "features": {
     "buildkit": true
 }

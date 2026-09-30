@@ -566,7 +566,7 @@ curl -X PUT "localhost:9200/my_index/_mapping/my_type?pretty" -H 'Content-Type: 
 
 添加依赖：
 
-```shell
+```xml
   <!-- TransportClient 依赖包-->
         <dependency>
             <groupId>org.elasticsearch.client</groupId>

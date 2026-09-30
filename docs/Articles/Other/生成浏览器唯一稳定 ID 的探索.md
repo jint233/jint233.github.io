@@ -8,7 +8,7 @@
 
 这里说的浏览器 ID 在业界早有研究，被称为 **浏览器指纹**（Browser Fingerprinting）。浏览器指纹是 EFF（电子前哨基金会）提出的一项追踪技术，通过浏览器对网站可见的公开配置来匿名识别浏览器。在 50 万份不同浏览器数据分析中，某些场景下 94% 的浏览器具有唯一的指纹。当时，EFF 通过提取浏览器的 8 个特征值：
 
-$$\{ \\text{user agent}, \\text{plugins}, \\text{fonts}, \\text{video}, \\text{supercookies}, \\text{http accept}, \\text{timezone}, \\text{cookie enabled} \}$$
+$$\{ \text{user agent}, \text{plugins}, \text{fonts}, \text{video}, \text{supercookies}, \text{http accept}, \text{timezone}, \text{cookie enabled} \}$$
 
 综合起来哈希生成一个指纹值。每项浏览器特征都包含不同 Bit 的信息熵，提取的八项特征共包含 18.1 Bits 的信息，这意味着在 286,777 个指纹中才会出现一个重复的浏览器指纹。
 
@@ -76,7 +76,7 @@ FingerprintJS（简称 FPJS）是一个高度精密的浏览器指纹库，提�
 
 ![图解](../assets/生成浏览器唯一稳定 ID 的探索-6.jpg)
 
-#### 2.3 分析与实验发现
+### 2.3 分析与实验发现
 
 ![示意图](../assets/生成浏览器唯一稳定 ID 的探索-7.jpg)
 

@@ -385,9 +385,8 @@ Non-Default Attributes Shared By Hosting Members
 | Region | size | 1     |
 ```
 
-| data-policy        | PERSISTENT_PARTITION
-
 ```shell
+| data-policy        | PERSISTENT_PARTITION
 Eviction  | eviction-action    | overflow-to-disk
 | eviction-algorithm | lru-heap-percentage
 Partition | redundant-copies   | 1
@@ -1255,7 +1254,7 @@ sh start_server_33_15.sh
 
 - 检查 locator 和 server => list member
 - 检查 region ==> list region
-- 检查 `<http://${主locator的IP}:7070/pulse/`
+- 检查 `http://${主locator的IP}:7070/pulse/`
 
 #### 升级客户端
 
@@ -1406,11 +1405,16 @@ http://192.168.33.15:7070/pulse
 在 locator 变为 leader 之后会自动启用 pulse，用户名密码为 admin/admin。
 
 pulse 中可以在不同维护查看数据。
-**1. 总览** 内存，成员数，服务数，region 数量，集群读写等等。
+
+**1. 总览**
+
+内存，成员数，服务数，region 数量，集群读写等等。
 
 ![图解](../assets/铁总在用的高性能分布式缓存计算框架 Geode-13.png)
 
-**2. ip 维度** 这里多了一个机器的链接详情：
+**2. ip 维度**
+
+这里多了一个机器的链接详情：
 
 ![图解](../assets/铁总在用的高性能分布式缓存计算框架 Geode-14.png)
 

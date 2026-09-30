@@ -69,11 +69,11 @@ BuildKit 的产生主要是由于 v1 版本的 builder 的性能，存储管理�
 
 这些功能我们暂且略过，先回到我们的主线上来。
 
-BuildKit 在 Docker v18.06 版本之后可通过 `export DOCKER_BUILDKIT=1` 环境变量来设置是否启用。对于 Docker v18.06 需要将 dockerd 也以实现性模式运行。即，修改 /etc/docker/daemon.json 文件，增加 `"experimental": true` 配置，然后使用 `systemctl restart docker` 重启 dockerd 。
+BuildKit 在 Docker v18.06 版本之后可通过 `export DOCKER_BUILDKIT=1` 环境变量来设置是否启用。对于 Docker v18.06 需要将 dockerd 也以实验性模式运行。即，修改 /etc/docker/daemon.json 文件，增加 `"experimental": true` 配置，然后使用 `systemctl restart docker` 重启 dockerd 。
 
 如果将 /etc/docker/daemon.json 文件中添加以下配置：
 
-```shell
+```json
 {
   "experimental": true,
   "features": {
@@ -144,7 +144,7 @@ drwxrwxr-x. 9 tao tao 4096 5月  15 06:52 target
 
 我们来看下该项目的 Dockerfile 的内容：
 
-```shell
+```dockerfile
 FROM maven:3.6.1-jdk-8-alpine AS builder
 WORKDIR /app
 COPY pom.xml /app/
@@ -220,7 +220,9 @@ IMAGE               CREATED             CREATED BY                              
 
 由此，得出了我们的第一个结论，**Docker 镜像的构建历史是不安全的，通过 ENV 设置的信息可在 history 中看到**。
 
-这也引出了我们的第一个问题： **Docker 镜像的构建记录是可查看的，如何管理构建过程中需要的密码/密钥等敏感信息？** ### 高阶特性：密码管理
+这也引出了我们的第一个问题：**Docker 镜像的构建记录是可查看的，如何管理构建过程中需要的密码/密钥等敏感信息？**
+
+### 高阶特性：密码管理
 
 为了应对类似前面这样的问题，当开启 BuildKit 时，我们可以使用高阶用法，即：Dockerfile 的实验特性。
 
@@ -228,7 +230,7 @@ Dockerfile 的实验特性，通过给它的顶部添加 `# syntax = docker/dock
 
 具体用法如下：
 
-```shell
+```dockerfile
 # syntax = docker/dockerfile:experimental
 COPY fetch_remote_data.sh .
 RUN --mount=type=secret,id=moelove,target=/cache_builder,required ./fetch_remote_data.sh
@@ -260,7 +262,7 @@ b5fcff644568        292 years ago       CMD ["java" "-jar" "/gs-spring-boot-0.1.
 
 对于这种情况，我们也可以使用高阶特性, （这里就不在上面例子的基础上来写了，写了一个新的 Dockerfile）。
 
-```shell
+```dockerfile
 # syntax = docker/dockerfile:experimental
 FROM alpine
 # 安装必要的包
@@ -369,7 +371,7 @@ Docker 19.03 在（2019/05/30 发布了 beta5 版本）正式版也将在不久�
 
 具体配置方式是（Docker 19.03 中）在 /etc/docker/daemon.json 中写入以下内容：
 
-```shell
+```json
 {
 "experimental": true,
 "features": {
@@ -537,7 +539,7 @@ buildx 是 Docker 的一个 CLI 插件，默认安装完 19.03 后将会同时�
 
 我们对前面所举例中的 Spring Boot 项目的 Dockerfile 做点小改动：
 
-```shell
+```dockerfile
 FROM maven:3.6.1-jdk-8-alpine AS builder
 WORKDIR /app
 COPY pom.xml /app/

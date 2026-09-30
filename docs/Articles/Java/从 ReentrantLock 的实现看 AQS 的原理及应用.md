@@ -19,7 +19,8 @@ ReentrantLock 意思为可重入锁，指的是一个线程能够对一个临界
 下面通过伪代码，进行更加直观的比较：
 
 ```java
-// ****  ****  ****  ****  ****  ****  **Synchronized 的使用方式**  ****  ****  ****  ****  ****  **** // 1. 用于代码块
+// Synchronized 的使用方式
+// 1. 用于代码块
 synchronized (this) {}
 // 2. 用于对象
 synchronized (object) {}
@@ -29,22 +30,28 @@ public synchronized void test () {}
 for (int i = 0; i < 100; i++) {
  synchronized (this) {}
 }
-// ****  ****  ****  ****  ****  ****  **ReentrantLock 的使用方式**  ****  ****  ****  ****  ****  **** public void test () throw Exception {
- // 1. 初始化选择公平锁、非公平锁
- ReentrantLock lock = new ReentrantLock(true);
- // 2. 可用于代码块
- lock.lock();
- try {
-  try {
-   // 3. 支持多种加锁方式，比较灵活；具有可重入特性
-   if(lock.tryLock(100, TimeUnit.MILLISECONDS)){ }
-  } finally {
-   // 4. 手动释放锁
-   lock.unlock()
-  }
- } finally {
-  lock.unlock();
- }
+// ReentrantLock 的使用方式
+public void test() throws InterruptedException {
+    // 1. 初始化时选择公平锁或非公平锁
+    ReentrantLock lock = new ReentrantLock(true);
+
+    // 2. 可以用代码块管理加锁和解锁
+    lock.lock();
+    try {
+        // 3. 支持多种加锁方式，并具有可重入特性
+        if (lock.tryLock(100, TimeUnit.MILLISECONDS)) {
+            try {
+                // tryLock 成功后，持有计数加一
+            } finally {
+                // 4. 手动释放 tryLock 获取的锁
+                lock.unlock();
+            }
+        }
+    } finally {
+        // 释放 lock.lock() 获取的锁
+        lock.unlock();
+    }
+}
 ```
 
 ### 1.2 ReentrantLock 与 AQS 的关联

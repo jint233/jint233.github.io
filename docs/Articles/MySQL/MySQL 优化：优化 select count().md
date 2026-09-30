@@ -10,8 +10,9 @@
 
 首先我们造一个 500W 数据量的表，别结构如下：
 
-```sql
-mysql> show create table sbtest1\G; ****  ****  ****  ****  ****  ****  ***1. row**  ****  ****  ****  ****  ****  **** *
+```text
+mysql> show create table sbtest1\G
+*************************** 1. row ***************************
        Table: sbtest1
 Create Table: CREATE TABLE `sbtest1` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

@@ -442,7 +442,9 @@ default model : Model[success=null, failure=false]
 
 后来，作者单独和《阿里巴巴 Java 开发手册》、《码出高效》的作者 —— 孤尽 单独 1V1 (qing) Battle (jiao) 了一下。
 
-最终达成共识，还是 **尽量使用包装类型**。**但是，作者还是想强调一个我的观点，尽量避免在你的代码中出现不确定的 null 值。**  **null 何罪之有？**
+最终达成共识，还是 **尽量使用包装类型**。**但是，作者还是想强调一个我的观点，尽量避免在你的代码中出现不确定的 null 值。**
+
+**null 何罪之有？**
 
 关于 null 值的使用，我在 [使用 Optional 避免 NullPointerException](https://www.hollischuang.com/archives/883)、[9 Things about Null in Java](https://www.hollischuang.com/archives/74) 等文中就介绍过。
 

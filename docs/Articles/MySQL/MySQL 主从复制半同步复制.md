@@ -118,8 +118,9 @@ mysql> show plugins;
 
 或者查看`information_schema.plugins`表获取更详细的信息。
 
-```sql
-mysql> select * from information_schema.plugins where plugin_name like "%semi%"\G ****  ****  ****  ****  ****  ****  ***1. row**  ****  ****  ****  ****  ****  **** *
+```text
+mysql> select * from information_schema.plugins where plugin_name like "%semi%"\G
+*************************** 1. row ***************************
            PLUGIN_NAME: rpl_semi_sync_master
         PLUGIN_VERSION: 1.0
          PLUGIN_STATUS: ACTIVE
@@ -442,9 +443,11 @@ mysql> show status like "%semi%";
 
 可以看到在这一小段时间内，slave1 还是半同步复制。此时用`show slave status`查看 slave1。
 
-```python
+```text
 # slave1上执行
-mysql> show slave status \G ****  ****  ****  ****  ****  ****  ***1. row**  ****  ****  ****  ****  ****  **** *Slave_IO_State: Waiting for master to send event
+mysql> show slave status \G
+*************************** 1. row ***************************
+           Slave_IO_State: Waiting for master to send event
                   Master_Host: 192.168.100.21
                   Master_User: repl
                   Master_Port: 3306
